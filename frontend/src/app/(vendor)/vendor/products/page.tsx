@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Pencil, Trash2, Image as ImageIcon,
-  X, Loader2, AlertTriangle, Package,
+  X, Loader2, AlertTriangle, Package, ExternalLink,
 } from 'lucide-react';
 import { vendorApi } from '@/lib/vendorApi';
 
@@ -108,6 +108,13 @@ export default function VendorProductsPage() {
     return image.startsWith('http') || image.startsWith('blob') ? image : `${imageBase}${image}`;
   };
 
+  const getProductWebsiteUrl = (product: any) => {
+    const publicId = product?.slug || product?._id;
+    if (!publicId) return '';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    return `${origin}/product/${publicId}`;
+  };
+
   const openEdit = (p: any) => {
     setEditingProduct(p);
     setForm({
@@ -178,6 +185,7 @@ export default function VendorProductsPage() {
   };
 
   const lowStockCount = products?.filter((p: any) => p.totalQuantity <= 5).length || 0;
+  const editingProductUrl = editingProduct ? getProductWebsiteUrl(editingProduct) : '';
 
   return (
     <div className="space-y-5">
@@ -305,6 +313,33 @@ export default function VendorProductsPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              {editingProductUrl && (
+                <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Live product page</p>
+                      <a
+                        href={editingProductUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 block truncate text-sm font-medium text-gray-900 hover:underline"
+                      >
+                        {editingProductUrl}
+                      </a>
+                    </div>
+                    <a
+                      href={editingProductUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                    >
+                      <ExternalLink size={15} />
+                      Open
+                    </a>
+                  </div>
+                </div>
+              )}
+
               {/* Image upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
