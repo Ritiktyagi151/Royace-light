@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, Image as ImageIcon, X, Loader2, Search, GripVertical, Star, ExternalLink } from 'lucide-react';
+import { Plus, Pencil, Trash2, Image as ImageIcon, X, Loader2, Search, GripVertical, Star, ExternalLink, Crop } from 'lucide-react';
 import { adminApi } from '@/lib/adminApi';
 import Pagination from '@/components/Pagination';
 
@@ -30,6 +30,13 @@ const LIGHTING_SPEC_FIELDS = [
   { key: 'ipRate', label: 'IP Rate', placeholder: 'IP65', type: 'text' },
 ];
 
+const CROP_ASPECTS = [
+  { label: 'Square', value: 1 },
+  { label: '4:3', value: 4 / 3 },
+  { label: '3:4', value: 3 / 4 },
+  { label: '16:9', value: 16 / 9 },
+];
+
 type ImageItem = {
   id: string;
   src: string;
@@ -37,9 +44,25 @@ type ImageItem = {
   existing: boolean;
 };
 
+type CropState = {
+  item?: ImageItem;
+  file?: File;
+  fileName: string;
+  src: string;
+  revokeSrc: boolean;
+  naturalWidth: number;
+  naturalHeight: number;
+  aspect: number;
+  zoom: number;
+  offsetX: number;
+  offsetY: number;
+  isSaving: boolean;
+};
+
 export default function AdminProductsPage() {
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
+  const cropDragRef = useRef<{ startX: number; startY: number; offsetX: number; offsetY: number } | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
@@ -53,6 +76,8 @@ export default function AdminProductsPage() {
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
+  const [cropState, setCropState] = useState<CropState | null>(null);
+  const [pendingCropFiles, setPendingCropFiles] = useState<File[]>([]);
 
   useEffect(() => {
     setPage(1);
@@ -146,6 +171,210 @@ export default function AdminProductsPage() {
     return `${origin}/product/${publicId}`;
   };
 
+  const loadImage = (src: string) =>
+    new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+
+  const openNextPendingCrop = (files: File[]) => {
+    const [nextFile, ...rest] = files;
+    setPendingCropFiles(rest);
+    if (nextFile) {
+      openCrop({ file: nextFile });
+    }
+  };
+
+  const openCrop = async ({ item, file }: { item?: ImageItem; file?: File }) => {
+    setFormError('');
+    try {
+      let cropSrc = '';
+      let revokeSrc = false;
+      let fileName = 'product-image';
+
+      if (file) {
+        cropSrc = URL.createObjectURL(file);
+        revokeSrc = true;
+        fileName = file.name;
+      } else if (item) {
+        const displaySrc = getImageSrc(item.src);
+        const isBlob = displaySrc.startsWith('blob:');
+        cropSrc = displaySrc;
+        fileName = item.file?.name || item.src.split('/').pop() || 'product-image';
+
+        if (!isBlob) {
+          const response = await fetch(displaySrc);
+          if (!response.ok) throw new Error('Unable to load image');
+          cropSrc = URL.createObjectURL(await response.blob());
+          revokeSrc = true;
+        }
+      }
+
+      const image = await loadImage(cropSrc);
+      setCropState({
+        item,
+        file,
+        fileName,
+        src: cropSrc,
+        revokeSrc,
+        naturalWidth: image.naturalWidth,
+        naturalHeight: image.naturalHeight,
+        aspect: 1,
+        zoom: 1,
+        offsetX: 0,
+        offsetY: 0,
+        isSaving: false,
+      });
+    } catch {
+      setFormError('Unable to open this image for cropping. Try uploading it again.');
+    }
+  };
+
+  const closeCrop = (discardPending = false) => {
+    if (discardPending) setPendingCropFiles([]);
+    cropDragRef.current = null;
+    setCropState((current) => {
+      if (current?.revokeSrc) URL.revokeObjectURL(current.src);
+      return null;
+    });
+  };
+
+  const getCropBox = (state: CropState) => {
+    const imageAspect = state.naturalWidth / state.naturalHeight;
+    let cropWidth = state.naturalWidth;
+    let cropHeight = state.naturalHeight;
+
+    if (imageAspect > state.aspect) {
+      cropHeight = state.naturalHeight;
+      cropWidth = cropHeight * state.aspect;
+    } else {
+      cropWidth = state.naturalWidth;
+      cropHeight = cropWidth / state.aspect;
+    }
+
+    cropWidth /= state.zoom;
+    cropHeight /= state.zoom;
+
+    const maxX = Math.max(0, (state.naturalWidth - cropWidth) / 2);
+    const maxY = Math.max(0, (state.naturalHeight - cropHeight) / 2);
+    const x = (state.naturalWidth - cropWidth) / 2 - (state.offsetX / 100) * maxX;
+    const y = (state.naturalHeight - cropHeight) / 2 - (state.offsetY / 100) * maxY;
+
+    return { x, y, width: cropWidth, height: cropHeight };
+  };
+
+  const clampCropOffset = (value: number) => Math.max(-100, Math.min(100, value));
+
+  const startCropDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!cropState) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    cropDragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      offsetX: cropState.offsetX,
+      offsetY: cropState.offsetY,
+    };
+  };
+
+  const moveCropDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    const drag = cropDragRef.current;
+    if (!drag) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const nextOffsetX = drag.offsetX - ((e.clientX - drag.startX) / rect.width) * 200;
+    const nextOffsetY = drag.offsetY - ((e.clientY - drag.startY) / rect.height) * 200;
+    setCropState((current) => current ? {
+      ...current,
+      offsetX: clampCropOffset(nextOffsetX),
+      offsetY: clampCropOffset(nextOffsetY),
+    } : current);
+  };
+
+  const endCropDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    cropDragRef.current = null;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  };
+
+  const getCropOverlayStyle = (state: CropState) => {
+    const cropBox = getCropBox(state);
+    return {
+      left: `${(cropBox.x / state.naturalWidth) * 100}%`,
+      top: `${(cropBox.y / state.naturalHeight) * 100}%`,
+      width: `${(cropBox.width / state.naturalWidth) * 100}%`,
+      height: `${(cropBox.height / state.naturalHeight) * 100}%`,
+    };
+  };
+
+  const applyCrop = async () => {
+    if (!cropState) return;
+    setCropState({ ...cropState, isSaving: true });
+
+    try {
+      const image = await loadImage(cropState.src);
+      const cropBox = getCropBox(cropState);
+      const maxOutputSize = 1600;
+      const outputWidth = cropState.aspect >= 1
+        ? Math.min(maxOutputSize, Math.round(cropBox.width))
+        : Math.min(maxOutputSize, Math.round(cropBox.height * cropState.aspect));
+      const outputHeight = Math.round(outputWidth / cropState.aspect);
+      const canvas = document.createElement('canvas');
+      canvas.width = outputWidth;
+      canvas.height = outputHeight;
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Unable to crop image');
+
+      context.drawImage(
+        image,
+        cropBox.x,
+        cropBox.y,
+        cropBox.width,
+        cropBox.height,
+        0,
+        0,
+        outputWidth,
+        outputHeight,
+      );
+
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((nextBlob) => {
+          if (nextBlob) resolve(nextBlob);
+          else reject(new Error('Unable to create cropped image'));
+        }, 'image/webp', 0.92);
+      });
+
+      const fileName = cropState.fileName.replace(/\.[^.]+$/, '') + '-cropped.webp';
+      const file = new File([blob], fileName, { type: 'image/webp' });
+      const nextSrc = URL.createObjectURL(blob);
+      const targetId = cropState.item?.id;
+
+      if (targetId) {
+        setImageItems((items) => items.map((item) => {
+          if (item.id !== targetId) return item;
+          if (!item.existing && item.src.startsWith('blob:')) URL.revokeObjectURL(item.src);
+          return { ...item, src: nextSrc, file, existing: false };
+        }));
+      } else {
+        const nextItem = {
+          id: `cropped:${Date.now()}:${fileName}`,
+          src: nextSrc,
+          file,
+          existing: false,
+        };
+        setImageItems((items) => [...items, nextItem].slice(0, 8));
+        if (!primaryImageId) setPrimaryImageId(nextItem.id);
+      }
+      closeCrop();
+      openNextPendingCrop(pendingCropFiles);
+    } catch {
+      setCropState((current) => current ? { ...current, isSaving: false } : current);
+      setFormError('Unable to apply the crop. Please try a different image.');
+    }
+  };
+
   const openEdit = (product: any) => {
     setEditingProduct(product);
     setForm({
@@ -201,6 +430,7 @@ export default function AdminProductsPage() {
     imageItems.forEach((item) => {
       if (!item.existing && item.src.startsWith('blob:')) URL.revokeObjectURL(item.src);
     });
+    closeCrop(true);
     setModalOpen(false);
     setEditingProduct(null);
     setFormError('');
@@ -209,16 +439,7 @@ export default function AdminProductsPage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
-    const nextItems = files.map((file, index) => ({
-      id: `new:${Date.now()}:${index}:${file.name}`,
-      src: URL.createObjectURL(file),
-      file,
-      existing: false,
-    }));
-    setImageItems((current) => {
-      const merged = [...current, ...nextItems].slice(0, 8);
-      return merged;
-    });
+    openNextPendingCrop(files.slice(0, Math.max(0, 8 - imageItems.length)));
     e.target.value = '';
   };
 
@@ -498,6 +719,14 @@ export default function AdminProductsPage() {
                           <img src={getImageSrc(item.src)} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
                           <button
                             type="button"
+                            onClick={() => openCrop({ item })}
+                            className="absolute inset-0 m-auto flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-gray-700 opacity-0 shadow-sm transition-opacity hover:text-gray-900 group-hover:opacity-100"
+                            title="Crop image"
+                          >
+                            <Crop size={15} />
+                          </button>
+                          <button
+                            type="button"
                             className="absolute left-1 top-1 rounded-md bg-white/90 p-1 text-gray-500 shadow-sm cursor-grab"
                             title="Drag to reorder"
                           >
@@ -728,6 +957,99 @@ export default function AdminProductsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {cropState && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => closeCrop(true)} />
+          <div className="relative w-full max-w-2xl rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+              <h3 className="font-semibold text-gray-900">Crop Product Image</h3>
+              <button
+                type="button"
+                onClick={() => closeCrop(true)}
+                className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-5 p-6">
+              <div
+                className="relative mx-auto w-full max-w-lg touch-none select-none overflow-hidden rounded-xl bg-gray-100"
+                style={{ aspectRatio: cropState.naturalWidth / cropState.naturalHeight }}
+                onPointerDown={startCropDrag}
+                onPointerMove={moveCropDrag}
+                onPointerUp={endCropDrag}
+                onPointerCancel={endCropDrag}
+              >
+                <img
+                  src={cropState.src}
+                  alt="Crop preview"
+                  draggable={false}
+                  className="h-full w-full object-contain"
+                />
+                <div className="absolute inset-0 bg-black/35" />
+                <div
+                  className="absolute cursor-grab border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.35)] active:cursor-grabbing"
+                  style={getCropOverlayStyle(cropState)}
+                >
+                  <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
+                    {Array.from({ length: 9 }).map((_, index) => (
+                      <span key={index} className="border border-white/30" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Aspect Ratio</label>
+                  <select
+                    value={cropState.aspect}
+                    onChange={(e) => setCropState({ ...cropState, aspect: Number(e.target.value), offsetX: 0, offsetY: 0 })}
+                    className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  >
+                    {CROP_ASPECTS.map((aspect) => (
+                      <option key={aspect.label} value={aspect.value}>{aspect.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Zoom</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="3"
+                    step="0.05"
+                    value={cropState.zoom}
+                    onChange={(e) => setCropState({ ...cropState, zoom: Number(e.target.value) })}
+                    className="w-full accent-gray-900"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => closeCrop(true)}
+                  className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={applyCrop}
+                  disabled={cropState.isSaving}
+                  className="btn-admin flex flex-1 items-center justify-center gap-2"
+                >
+                  {cropState.isSaving && <Loader2 size={15} className="animate-spin" />}
+                  Apply Crop
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
