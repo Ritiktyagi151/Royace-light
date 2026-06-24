@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShoppingBag, Search, User, Menu, X, ChevronDown } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { openAuthModal } from '../../store/slices/uiSlice';
@@ -60,27 +61,42 @@ export function Navbar() {
     : 'transparent';
 
   return (
-    <>
+    <div className="fixed left-0 right-0 top-0 z-50">
       {/* Announcement bar */}
       <div
         style={{
           background: 'linear-gradient(90deg, var(--forest), var(--rolex-green), var(--forest))',
-          color: 'var(--ivory)',
           borderBottom: '1px solid rgba(228,199,124,0.24)',
           fontSize: '0.58rem',
           fontWeight: 500,
           letterSpacing: '0.3em',
           textTransform: 'uppercase',
-          textAlign: 'center',
-          padding: '0.5rem 1rem',
+          lineHeight: 0,
+          color: 'transparent',
+          overflow: 'hidden',
+          padding: '0.5rem 0',
           fontFamily: "'DM Sans', sans-serif",
         }}
       >
-        Complimentary White-Glove Installation · Orders Above ₹1,50,000
+        <div
+          className="animate-marquee flex w-max items-center gap-10 whitespace-nowrap"
+          style={{ color: 'var(--ivory)', lineHeight: 1.4 }}
+        >
+          {Array.from({ length: 2 }).map((_, groupIndex) => (
+            <div key={groupIndex} className="flex items-center gap-10 px-5">
+              <span>Complimentary White-Glove Installation</span>
+              <span aria-hidden="true" style={{ color: 'var(--gold-light)' }}>·</span>
+              <span>Orders Above ₹1,50,000</span>
+              <span aria-hidden="true" style={{ color: 'var(--gold-light)' }}>·</span>
+              <span>Luxury Chandeliers And Bespoke Lighting</span>
+              <span aria-hidden="true" style={{ color: 'var(--gold-light)' }}>·</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <header
-        className="sticky top-0 z-50 transition-all duration-500"
+        className="transition-all duration-500"
         style={{
           background: navBg,
           borderBottom: `1px solid ${navBorder}`,
@@ -90,28 +106,28 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center justify-between h-[68px]">
 
-            {/* Logo */}
             <Link
               href="/"
               className="brand-logo"
               style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: '1.2rem',
-                fontWeight: 400,
-                letterSpacing: '0.18em',
-                color: 'var(--ivory)',
-                textTransform: 'uppercase',
                 textDecoration: 'none',
                 lineHeight: 1,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem',
               }}
             >
-              <span style={{ color: 'var(--gold-light)', fontSize: '0.7rem' }}>✦</span>
-              Royace
-              <span style={{ color: 'rgba(250,247,240,0.3)', fontWeight: 300 }}>·</span>
-              Lighting
+              <Image
+                src="/images/royace-logo.png"
+                alt="Royace Lighting"
+                width={156}
+                height={48}
+                priority
+                style={{
+                  width: 'clamp(118px, 12vw, 156px)',
+                  height: 'auto',
+                  display: 'block',
+                }}
+              />
             </Link>
 
             {/* Desktop nav */}
@@ -514,6 +530,6 @@ export function Navbar() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

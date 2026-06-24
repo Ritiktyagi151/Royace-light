@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { BrandStory } from '@/components/home/BrandStory';
+import { BannerVideoSection } from '@/components/home/BannerVideoSection';
 import { CollectionShowcase } from '@/components/home/CollectionShowcase';
 import { FeaturedCategories } from '@/components/home/FeaturedCategories';
 import { FeaturedProducts } from '@/components/home/FeaturedProducts';
@@ -8,7 +9,6 @@ import { NewsletterSection } from '@/components/home/NewsletterSection';
 import { Testimonials } from '@/components/home/Testimonials';
 import { WhyChooseUs } from '@/components/home/WhyChooseUs';
 import { PUBLIC_API_URL } from '@/lib/publicCategories';
-import  MaintenancePage  from '@/components/maintanance/Maintanance';
 
 export const metadata: Metadata = {
   title: 'Royace Lighting - Luxury Chandeliers & Handcrafted Lighting',
@@ -33,16 +33,16 @@ export default async function HomePage() {
   const featured = await getFeaturedProducts();
 
   return (
-    <div className="home-pagse">
-      {/* <HeroSection />
+    <div className="home-page">
+      <HeroSection />
+      <BannerVideoSection />
       <BrandStory />
       <FeaturedCategories />
       <FeaturedProducts products={featured} />
       <CollectionShowcase />
       <WhyChooseUs />
       <Testimonials />
-      <NewsletterSection /> */}
-      <MaintenancePage />
+      <NewsletterSection />
     </div>
   );
 }

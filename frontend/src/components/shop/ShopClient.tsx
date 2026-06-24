@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { ProductCard } from '../products/ProductCard';
 import type { PublicCategory } from '@/lib/publicCategories';
 
@@ -21,7 +21,7 @@ const SORT_OPTIONS = [
 ];
 
 interface ShopClientProps {
-  initialData: { products: any[]; total: number; pages: number };
+  initialData: { products: any[]; total: number };
   searchParams: Record<string, string | undefined>;
   categories: PublicCategory[];
 }
@@ -32,7 +32,6 @@ export function ShopClient({ initialData, searchParams, categories }: ShopClient
 
   const currentCategory = searchParams.category || searchParams.collection || '';
   const currentSearch = searchParams.search || '';
-  const currentPage = Number(searchParams.page) || 1;
   const currentSort = searchParams.sortBy || 'createdAt';
   const [searchInput, setSearchInput] = useState(currentSearch);
 
@@ -41,7 +40,7 @@ export function ShopClient({ initialData, searchParams, categories }: ShopClient
       const params = new URLSearchParams();
       const merged = { ...searchParams, ...updates };
       Object.entries(merged).forEach(([k, v]) => {
-        if (v) params.set(k, v);
+        if (v && k !== 'page') params.set(k, v);
       });
       router.push(`/shop?${params.toString()}`);
     },
@@ -53,7 +52,7 @@ export function ShopClient({ initialData, searchParams, categories }: ShopClient
     updateUrl({ search: searchInput || undefined, page: undefined });
   };
 
-  const { products, total, pages } = initialData;
+  const { products, total } = initialData;
   const categoryOptions = [
     { label: 'All Pieces', value: '' },
     ...categories.map((category) => ({
@@ -396,65 +395,6 @@ export function ShopClient({ initialData, searchParams, categories }: ShopClient
               </div>
             )}
 
-            {/* Pagination */}
-            {pages > 1 && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.25rem',
-                  marginTop: '4rem',
-                  paddingTop: '3rem',
-                  borderTop: '1px solid rgba(250,247,240,0.06)',
-                }}
-              >
-                <button
-                  onClick={() => updateUrl({ page: String(currentPage - 1) })}
-                  disabled={currentPage <= 1}
-                  className="btn-icon"
-                  style={{ opacity: currentPage <= 1 ? 0.3 : 1 }}
-                >
-                  <ChevronLeft size={16} strokeWidth={1.5} />
-                </button>
-
-                {Array.from({ length: pages }, (_, i) => i + 1)
-                  .filter((p) => Math.abs(p - currentPage) <= 2)
-                  .map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => updateUrl({ page: String(p) })}
-                      style={{
-                        width: 40,
-                        height: 40,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: '0.72rem',
-                        letterSpacing: '0.06em',
-                        background: p === currentPage ? 'linear-gradient(135deg, var(--rolex-green), var(--forest))' : 'transparent',
-                        color: p === currentPage ? 'var(--ivory)' : 'rgba(250,247,240,0.4)',
-                        border: `1px solid ${p === currentPage ? 'rgba(228,199,124,0.55)' : 'rgba(0,96,57,0.18)'}`,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        fontWeight: p === currentPage ? 600 : 300,
-                      }}
-                    >
-                      {p}
-                    </button>
-                  ))}
-
-                <button
-                  onClick={() => updateUrl({ page: String(currentPage + 1) })}
-                  disabled={currentPage >= pages}
-                  className="btn-icon"
-                  style={{ opacity: currentPage >= pages ? 0.3 : 1 }}
-                >
-                  <ChevronRight size={16} strokeWidth={1.5} />
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>

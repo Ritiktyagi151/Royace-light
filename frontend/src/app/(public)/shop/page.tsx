@@ -18,8 +18,8 @@ async function getProducts(params: Record<string, string | undefined>) {
     if (params.sortBy?.includes('_desc')) query.set('order', 'desc');
     if (params.minPrice) query.set('minPrice', params.minPrice);
     if (params.maxPrice) query.set('maxPrice', params.maxPrice);
-    query.set('page', params.page || '1');
-    query.set('limit', '16');
+    query.set('page', '1');
+    query.set('limit', '10000');
 
     const res = await fetch(
       `${PUBLIC_API_URL}/products?${query.toString()}`,
@@ -29,10 +29,9 @@ async function getProducts(params: Record<string, string | undefined>) {
     return {
       products: data.data?.products || data.products || [],
       total: data.data?.total || data.total || 0,
-      pages: data.data?.pages || data.pages || 1,
     };
   } catch {
-    return { products: [], total: 0, pages: 1 };
+    return { products: [], total: 0 };
   }
 }
 

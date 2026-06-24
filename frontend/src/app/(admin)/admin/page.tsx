@@ -100,7 +100,7 @@ export default function AdminDashboard() {
                 {orderStatusData.map((entry, index) => (
                   <rect key={index} fill={entry.fill} />
                 ))}
-              </Bar>
+              </Bar>  
             </BarChart>
           </ResponsiveContainer>
         </div>

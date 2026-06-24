@@ -11,7 +11,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
     <AnimatePresence mode="wait">
       <motion.main
         key={pathname}
-        className="min-h-screen"
+        className="min-h-screen pt-[100px]"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -8 }}
