@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MouseEvent, PointerEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -44,18 +44,21 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [openAccordion, setOpenAccordion] = useState<string | null>('details');
 
   const imageBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '');
-  const orderedAssets = product.imageAssets?.length
-    ? [...product.imageAssets].sort((a: any, b: any) => Number(a.order || 0) - Number(b.order || 0))
-    : [];
-  const primaryAsset = orderedAssets.find((asset: any) => asset.isPrimary);
-  const productImages = orderedAssets.length
-    ? [
-        ...(primaryAsset ? [primaryAsset] : []),
-        ...orderedAssets.filter((asset: any) => asset !== primaryAsset),
-      ]
-        .map((asset: any) => asset.webpUrl || asset.url)
-        .filter(Boolean)
-    : [...new Set([product.primaryImage, ...(product.images || []), product.image].filter(Boolean))];
+  const productImages = useMemo(() => {
+    const orderedAssets = product.imageAssets?.length
+      ? [...product.imageAssets].sort((a: any, b: any) => Number(a.order || 0) - Number(b.order || 0))
+      : [];
+    const primaryAsset = orderedAssets.find((asset: any) => asset.isPrimary);
+
+    return orderedAssets.length
+      ? [
+          ...(primaryAsset ? [primaryAsset] : []),
+          ...orderedAssets.filter((asset: any) => asset !== primaryAsset),
+        ]
+          .map((asset: any) => asset.webpUrl || asset.url)
+          .filter(Boolean)
+      : [...new Set([product.primaryImage, ...(product.images || []), product.image].filter(Boolean))];
+  }, [product.imageAssets, product.image, product.images, product.primaryImage]);
   const getImageUrl = (img?: string) =>
     img?.startsWith('http') ? img : `${imageBase}${img}`;
 
@@ -104,6 +107,20 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   const selectedImageIndex = productImages.findIndex((img: string) => img === selectedImage);
   const activeImageIndex = selectedImageIndex >= 0 ? selectedImageIndex : 0;
+  useEffect(() => {
+    if (productImages.length < 2) return;
+
+    const sliderTimer = window.setInterval(() => {
+      setSelectedImage((currentImage: string) => {
+        const currentIndex = productImages.findIndex((img: string) => img === currentImage);
+        const nextIndex = (currentIndex >= 0 ? currentIndex + 1 : 0) % productImages.length;
+        return productImages[nextIndex];
+      });
+    }, 4000);
+
+    return () => window.clearInterval(sliderTimer);
+  }, [productImages]);
+
   const selectImageByOffset = (offset: number) => {
     if (productImages.length < 2) return;
     const nextIndex = (activeImageIndex + offset + productImages.length) % productImages.length;
