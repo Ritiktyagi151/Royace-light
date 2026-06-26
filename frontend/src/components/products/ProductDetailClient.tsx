@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { MouseEvent, PointerEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -106,19 +106,6 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   const selectedImageIndex = productImages.findIndex((img: string) => img === selectedImage);
   const activeImageIndex = selectedImageIndex >= 0 ? selectedImageIndex : 0;
-  useEffect(() => {
-    if (productImages.length < 2) return;
-
-    const sliderTimer = window.setInterval(() => {
-      setSelectedImage((currentImage: string) => {
-        const currentIndex = productImages.findIndex((img: string) => img === currentImage);
-        const nextIndex = (currentIndex >= 0 ? currentIndex + 1 : 0) % productImages.length;
-        return productImages[nextIndex];
-      });
-    }, 4000);
-
-    return () => window.clearInterval(sliderTimer);
-  }, [productImages]);
 
   const selectImageByOffset = (offset: number) => {
     if (productImages.length < 2) return;
