@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_URL } from './urls';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const BASE_URL = API_URL;
 
 export const adminApi = axios.create({ baseURL: BASE_URL });
 

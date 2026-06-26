@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addToCartThunk } from '../../store/slices/cartSlice';
 import { openAuthModal, openCartDrawer, addToast } from '../../store/slices/uiSlice';
+import { getAssetUrl } from '@/lib/urls';
 
 interface Product {
   _id: string;
@@ -44,7 +45,6 @@ export function ProductCard({ product }: ProductCardProps) {
       ? Math.round(((product.retailPrice - product.sellingPrice) / product.retailPrice) * 100)
       : 0;
 
-  const imageBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '');
   const orderedAssets = product.imageAssets?.length
     ? [...product.imageAssets].sort((a, b) => Number(a.order || 0) - Number(b.order || 0))
     : [];
@@ -63,8 +63,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const categoryLabel = typeof product.category === 'object'
     ? product.category?.name || product.category?.slug || ''
     : product.category;
-  const getImgUrl = (img?: string) =>
-    img?.startsWith('http') ? img : img ? `${imageBase}${img}` : null;
+  const getImgUrl = (img?: string) => getAssetUrl(img) || null;
 
   const primaryImg = getImgUrl(productImages[0]);
   const secondaryImg = productImages[1] ? getImgUrl(productImages[1]) : null;

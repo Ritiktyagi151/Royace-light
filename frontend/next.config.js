@@ -2,17 +2,17 @@
 const nextConfig = {
   images: {
     remotePatterns: [
-      { protocol: 'http', hostname: 'localhost' },
-      { protocol: 'http', hostname: '66.116.232.29' },
-      { protocol: 'https', hostname: 'api.royace.in' },
-      { protocol: 'https', hostname: '**' },
+      { protocol: "http", hostname: "localhost" },
+      { protocol: "http", hostname: "66.116.232.29" },
+      { protocol: "https", hostname: "api.royace.in" },
+      { protocol: "https", hostname: "**" },
     ],
   },
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/:path*`,
+        source: "/api/:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/:path*`,
       },
     ];
   },

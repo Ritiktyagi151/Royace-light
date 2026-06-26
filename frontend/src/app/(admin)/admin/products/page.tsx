@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, Image as ImageIcon, X, Loader2, Search, GripVertical, Star, ExternalLink, Crop } from 'lucide-react';
 import { adminApi } from '@/lib/adminApi';
 import Pagination from '@/components/Pagination';
+import { getAssetUrl } from '@/lib/urls';
 
 const EMPTY_FORM = {
   name: '', description: '', costPrice: '', sellingPrice: '', retailPrice: '',
@@ -160,8 +161,7 @@ export default function AdminProductsPage() {
   };
 
   const getImageSrc = (image?: string) => {
-    if (!image) return '';
-    return image.startsWith('http') || image.startsWith('blob') ? image : `${imageBase}${image}`;
+    return getAssetUrl(image);
   };
 
   const getProductWebsiteUrl = (product: any) => {
@@ -513,7 +513,6 @@ export default function AdminProductsPage() {
     saveProduct.mutate(fd);
   };
 
-  const imageBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '');
   const editingProductUrl = editingProduct ? getProductWebsiteUrl(editingProduct) : '';
 
   return (

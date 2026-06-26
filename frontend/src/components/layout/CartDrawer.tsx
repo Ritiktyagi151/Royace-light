@@ -12,6 +12,7 @@ import {
   updateCartItemThunk,
   selectCartTotal,
 } from '../../store/slices/cartSlice';
+import { getAssetUrl } from '@/lib/urls';
 
 const FREE_THRESHOLD = 150000;
 
@@ -21,7 +22,6 @@ export function CartDrawer() {
   const { items } = useAppSelector((s) => s.cart);
   const { token } = useAppSelector((s) => s.auth);
   const subtotal = useAppSelector(selectCartTotal);
-  const imageBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '');
 
   useEffect(() => {
     if (cartDrawerOpen && token) dispatch(fetchCartThunk(token));
@@ -182,7 +182,7 @@ export function CartDrawer() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
               {items.map((item, idx) => {
-                const imageUrl = item.image?.startsWith('http') ? item.image : `${imageBase}${item.image}`;
+                const imageUrl = getAssetUrl(item.image);
                 return (
                   <div
                     key={`${item.productId}-${item.color}`}

@@ -20,6 +20,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addToCartThunk } from '../../store/slices/cartSlice';
 import { openAuthModal, openCartDrawer, addToast } from '../../store/slices/uiSlice';
+import { getAssetUrl } from '@/lib/urls';
 
 interface ProductDetailClientProps {
   product: any;
@@ -43,7 +44,6 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>('details');
 
-  const imageBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '');
   const productImages = useMemo(() => {
     const orderedAssets = product.imageAssets?.length
       ? [...product.imageAssets].sort((a: any, b: any) => Number(a.order || 0) - Number(b.order || 0))
@@ -59,8 +59,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           .filter(Boolean)
       : [...new Set([product.primaryImage, ...(product.images || []), product.image].filter(Boolean))];
   }, [product.imageAssets, product.image, product.images, product.primaryImage]);
-  const getImageUrl = (img?: string) =>
-    img?.startsWith('http') ? img : `${imageBase}${img}`;
+  const getImageUrl = (img?: string) => getAssetUrl(img);
 
   const [selectedImage, setSelectedImage] = useState(product.primaryImage || productImages[0] || '');
   const imageUrl = getImageUrl(selectedImage);

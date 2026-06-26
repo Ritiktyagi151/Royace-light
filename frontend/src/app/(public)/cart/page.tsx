@@ -12,6 +12,7 @@ import {
   selectCartTotal,
 } from '@/store/slices/cartSlice';
 import { addToast, openAuthModal } from '@/store/slices/uiSlice';
+import { getAssetUrl } from '@/lib/urls';
 
 const FREE_THRESHOLD = 150000;
 
@@ -21,7 +22,6 @@ export default function CartPage() {
   const { token } = useAppSelector((s) => s.auth);
   const subtotal = useAppSelector(selectCartTotal);
   const freeInstall = subtotal >= FREE_THRESHOLD;
-  const imageBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '');
 
   useEffect(() => {
     if (token) dispatch(fetchCartThunk(token));
@@ -131,7 +131,7 @@ export default function CartPage() {
           {/* Cart items */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
             {items.map((item, i) => {
-              const imageUrl = item.image?.startsWith('http') ? item.image : `${imageBase}${item.image}`;
+              const imageUrl = getAssetUrl(item.image);
               return (
                 <div
                   className="cart-item-row"

@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchCartThunk, clearCart, selectCartTotal } from '@/store/slices/cartSlice';
 import { openAuthModal, addToast } from '@/store/slices/uiSlice';
 import { createRazorpayOrderAPI, placeOrderAPI } from '@/lib/api';
+import { getAssetUrl } from '@/lib/urls';
 
 const STEPS = [
   { id: 1, label: 'Address', icon: MapPin },
@@ -57,7 +58,6 @@ export default function CheckoutPage() {
     amount?: number;
   } | null>(null);
 
-  const imageBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '');
 
   useEffect(() => {
     if (!token) return;
@@ -464,7 +464,7 @@ export default function CheckoutPage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0', marginBottom: '2.5rem' }}>
                 {items.map((item) => {
-                  const imageUrl = item.image?.startsWith('http') ? item.image : `${imageBase}${item.image}`;
+                  const imageUrl = getAssetUrl(item.image);
                   return (
                     <div key={`${item.productId}-${item.color}`}
                       style={{ display: 'flex', gap: '1.25rem', padding: '1.5rem 0', borderBottom: '1px solid rgba(250,247,240,0.06)' }}>

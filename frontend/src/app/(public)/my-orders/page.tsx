@@ -6,6 +6,7 @@ import { Package, ArrowRight, ChevronDown, Truck, CheckCircle, Clock, XCircle, A
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { openAuthModal } from '@/store/slices/uiSlice';
 import { fetchOrdersAPI } from '@/lib/api';
+import { getAssetUrl } from '@/lib/urls';
 
 const STATUS_CONFIG: Record<string, { label: string; className: string; icon: any; progress: number }> = {
   placed:     { label: 'Order Placed',  className: 'status-placed',     icon: Clock,          progress: 20  },
@@ -32,7 +33,6 @@ export default function MyOrdersPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  const imageBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '');
 
   if (!token) {
     return (
@@ -203,7 +203,7 @@ export default function MyOrdersPage() {
                     {/* Items */}
                     {order.items?.map((item: any, ii: number) => {
                       const itemImage = item.image || item.product?.image;
-                      const imgUrl = itemImage?.startsWith('http') ? itemImage : `${imageBase}${itemImage}`;
+                      const imgUrl = getAssetUrl(itemImage);
                       return (
                         <div key={ii} style={{ display: 'flex', gap: '1rem', paddingBottom: '1rem', marginBottom: '1rem', borderBottom: '1px solid rgba(250,247,240,0.05)' }}>
                           <div style={{ width: 56, height: 64, background: 'linear-gradient(180deg, var(--forest-2), var(--charcoal-3))', flexShrink: 0, overflow: 'hidden' }}>

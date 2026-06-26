@@ -1,3 +1,5 @@
+import { API_URL, getAssetUrl } from './urls';
+
 export type PublicCategory = {
   _id?: string;
   name: string;
@@ -13,9 +15,7 @@ type CategoryFetchOptions = RequestInit & {
 };
 
 export const PUBLIC_API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
-const PUBLIC_ASSET_URL = PUBLIC_API_URL.replace(/\/api\/?$/, '');
+  API_URL;
 
 export const FALLBACK_CATEGORIES: PublicCategory[] = [
   {
@@ -57,8 +57,7 @@ function normalizeImage(image: unknown, name: string) {
   if (typeof image === 'string' && image.trim()) {
     const trimmed = image.trim();
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
-    if (trimmed.startsWith('/')) return `${PUBLIC_ASSET_URL}${trimmed}`;
-    return trimmed;
+    return getAssetUrl(trimmed);
   }
 
   return `https://source.unsplash.com/featured/900x1200/?${encodeURIComponent(

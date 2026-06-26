@@ -7,6 +7,7 @@ import {
   X, Loader2, AlertTriangle, Package, ExternalLink,
 } from 'lucide-react';
 import { vendorApi } from '@/lib/vendorApi';
+import { getAssetUrl } from '@/lib/urls';
 
 const EMPTY_FORM = {
   name: '', description: '', costPrice: '', sellingPrice: '',
@@ -39,8 +40,6 @@ export default function VendorProductsPage() {
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-
-  const imageBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '');
 
   const { data: products, isLoading } = useQuery({
     queryKey: ['vendor-products'],
@@ -104,8 +103,7 @@ export default function VendorProductsPage() {
   };
 
   const getImageSrc = (image?: string) => {
-    if (!image) return '';
-    return image.startsWith('http') || image.startsWith('blob') ? image : `${imageBase}${image}`;
+    return getAssetUrl(image);
   };
 
   const getProductWebsiteUrl = (product: any) => {
