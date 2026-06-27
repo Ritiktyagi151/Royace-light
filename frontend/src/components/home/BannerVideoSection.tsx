@@ -1,64 +1,66 @@
-import Link from 'next/link';
-import { ArrowRight, Play } from 'lucide-react';
+import Link from "next/link";
+import { SectionReveal } from "./SectionReveal";
 
-export function BannerVideoSection() {
+export default function ExperienceStoresSection() {
   return (
-    <section className="bg-obsidian px-6 py-16 text-ivory lg:px-10 lg:py-24">
-      <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
-        <div className="flex min-h-[420px] flex-col justify-between bg-forest p-8 sm:p-10">
-          <div>
-            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.3em] text-gold-light">
-              New Arrival Showcase
-            </p>
-            <h2 className="max-w-xl font-serif text-4xl leading-tight text-ivory sm:text-5xl">
-              Statement chandeliers and warm decorative light for refined rooms.
-            </h2>
-            <p className="mt-6 max-w-lg text-sm leading-7 text-cream/75">
-              Explore lighting pieces shaped around scale, finish, glow, and the
-              mood of the room. Built for homes, villas, hotels, and curated
-              interior projects.
-            </p>
-          </div>
+    <SectionReveal className="relative mt-8 overflow-hidden bg-[#dfe8d8] bg-[url('/images/green-texture.png')] bg-cover bg-center py-16 lg:mt-16 lg:py-12">
+      {/* Left Content */}
+      <div className="mx-auto max-w-7xl px-6 lg:px-12">
+        <div className="max-w-xl py-10 lg:py-16">
+          <h2 className="font-serif text-[48px] leading-none text-[#3a2a1d] sm:text-[60px] lg:text-[86px]">
+            Experience Stores
+          </h2>
 
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link
-              href="/shop"
-              className="inline-flex items-center gap-2 border border-gold bg-gold px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-obsidian transition hover:bg-gold-light"
-            >
-              Shop Collection
-              <ArrowRight size={15} strokeWidth={1.6} />
-            </Link>
-            <Link
-              href="/bespoke"
-              className="inline-flex items-center gap-2 border border-ivory/20 px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-ivory transition hover:border-gold hover:text-gold-light"
-            >
-              Bespoke
-            </Link>
+          <p className="mt-4 text-sm uppercase tracking-[0.6em] text-[#3a2a1d]/80 lg:text-lg">
+            ACROSS INDIA
+          </p>
+
+          <p className="mt-10 text-xl text-[#3a2a1d] lg:text-[24px]">
+            Spaces Designed To Inspire
+          </p>
+
+          <Link
+            href="/stores"
+            className="mt-10 inline-flex bg-[#3d2d22] px-8 py-4 text-sm font-medium uppercase tracking-[0.15em] text-white transition hover:bg-[#281d15]"
+          >
+            Visit Our Stores
+          </Link>
+        </div>
+      </div>
+
+      {/* Floating Video */}
+      <div className="absolute inset-0 hidden lg:block">
+        <div className="absolute right-6 top-6 w-[520px] xl:right-10 xl:w-[680px] 2xl:w-[760px]">
+          <div className="overflow-hidden border-[5px] border-[#8a7355] bg-white shadow-2xl">
+            <video
+              src="/videos/hero-video.mp4"
+              poster="/images/store-poster.jpg"
+              autoPlay
+              muted
+              loop
+              playsInline
+              controls
+              className="aspect-[4/3] w-full object-cover"
+            />
           </div>
         </div>
+      </div>
 
-        <div className="relative min-h-[420px] overflow-hidden border border-ivory/10 bg-charcoal shadow-luxury">
+      {/* Mobile / Tablet Video */}
+      <div className="mt-12 px-6 lg:hidden">
+        <div className="overflow-hidden border-[4px] border-[#8a7355] shadow-xl">
           <video
-            className="h-full min-h-[420px] w-full object-cover"
             src="/videos/hero-video.mp4"
-            poster="/images/royace-logo.png"
+            poster="/images/store-poster.jpg"
             autoPlay
             muted
             loop
             playsInline
             controls
+            className="aspect-[4/3] w-full object-cover"
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-obsidian/65 via-transparent to-transparent" />
-          <div className="pointer-events-none absolute bottom-6 left-6 flex items-center gap-3 text-ivory">
-            <span className="flex h-11 w-11 items-center justify-center border border-gold/50 bg-obsidian/55 backdrop-blur">
-              <Play size={16} fill="currentColor" strokeWidth={1.5} />
-            </span>
-            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-cream/80">
-              Royace Video
-            </span>
-          </div>
         </div>
       </div>
-    </section>
+    </SectionReveal>
   );
 }

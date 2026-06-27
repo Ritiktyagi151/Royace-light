@@ -11,7 +11,7 @@ import {
   updateCartItemThunk,
   selectCartTotal,
 } from '@/store/slices/cartSlice';
-import { addToast, openAuthModal } from '@/store/slices/uiSlice';
+import { addToast } from '@/store/slices/uiSlice';
 import { getAssetUrl } from '@/lib/urls';
 
 const FREE_THRESHOLD = 150000;
@@ -34,9 +34,9 @@ export default function CartPage() {
         title="Sign in to view your cart"
         desc="Your saved pieces will appear here."
         action={
-          <button className="btn-primary" onClick={() => dispatch(openAuthModal('login'))} style={{ fontSize: '0.6rem' }}>
+          <Link href="/login?redirect=/cart" className="btn-primary" style={{ fontSize: '0.6rem' }}>
             Sign In
-          </button>
+          </Link>
         }
       />
     );
@@ -90,10 +90,7 @@ export default function CartPage() {
         </div>
       </div>
 
-      <div
-        className="max-w-7xl mx-auto cart-layout"
-        style={{ padding: '3rem 1.5rem 6rem', display: 'grid', gridTemplateColumns: '1fr 380px', gap: '3rem' }}
-      >
+      <div className="cart-layout mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-12 pb-24 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12">
         {/* Items */}
         <div>
           {/* Free installation bar */}
@@ -134,28 +131,15 @@ export default function CartPage() {
               const imageUrl = getAssetUrl(item.image);
               return (
                 <div
-                  className="cart-item-row"
+                  className="cart-item-row grid grid-cols-[84px_minmax(0,1fr)] gap-4 border-b border-white/10 py-6 sm:grid-cols-[100px_minmax(0,1fr)_auto] sm:gap-6 sm:py-8"
                   key={`${item.productId}-${item.color}`}
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: '100px 1fr auto',
-                    gap: '1.5rem',
-                    padding: '2rem 0',
-                    borderBottom: '1px solid rgba(250,247,240,0.07)',
                     animation: `fadeUp 0.5s ease ${i * 0.08}s both`,
                   }}
                 >
                   {/* Image */}
                   <div
-                    style={{
-                      position: 'relative',
-                      width: 100,
-                      height: 112,
-                      overflow: 'hidden',
-                      background: 'linear-gradient(180deg, var(--forest-2), var(--charcoal-2))',
-                      border: '1px solid rgba(0,96,57,0.18)',
-                      flexShrink: 0,
-                    }}
+                    className="relative h-[96px] w-[84px] shrink-0 overflow-hidden border border-[rgba(0,96,57,0.18)] bg-[linear-gradient(180deg,var(--forest-2),var(--charcoal-2))] sm:h-[112px] sm:w-[100px]"
                   >
                     {item.image ? (
                       <Image src={imageUrl} alt={item.name} fill style={{ objectFit: 'cover' }} />
@@ -239,7 +223,7 @@ export default function CartPage() {
                   </div>
 
                   {/* Remove */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', paddingTop: '0.25rem' }}>
+                  <div className="col-start-2 flex items-start pt-1 sm:col-start-auto">
                     <button
                       onClick={() => token && dispatch(removeFromCartThunk({ token, productId: item.productId, color: item.color }))}
                       style={{
@@ -287,13 +271,11 @@ export default function CartPage() {
         {/* Summary */}
         <div>
           <div
-            className="cart-summary-panel"
+            className="cart-summary-panel lg:sticky lg:top-[100px]"
             style={{
               background: 'linear-gradient(180deg, rgba(6,47,36,0.72), var(--charcoal-2))',
               border: '1px solid rgba(0,96,57,0.24)',
               padding: '2rem',
-              position: 'sticky',
-              top: '100px',
             }}
           >
             <p

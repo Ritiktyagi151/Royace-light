@@ -43,7 +43,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
         variants={staggerContainer}
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.12 }}
+        viewport={{ once: false, amount: 0.12 }}
       >
         {products.slice(0, 8).map((product) => (
           <motion.div key={product._id} variants={cardReveal}>

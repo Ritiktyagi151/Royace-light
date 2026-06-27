@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Package, ArrowRight, ChevronDown, Truck, CheckCircle, Clock, XCircle, AlertCircle } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { openAuthModal } from '@/store/slices/uiSlice';
 import { fetchOrdersAPI } from '@/lib/api';
 import { getAssetUrl } from '@/lib/urls';
+import { AccountShell } from '@/components/account/AccountShell';
 
 const STATUS_CONFIG: Record<string, { label: string; className: string; icon: any; progress: number }> = {
   placed:     { label: 'Order Placed',  className: 'status-placed',     icon: Clock,          progress: 20  },
@@ -43,35 +43,29 @@ export default function MyOrdersPage() {
         <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.8rem', fontWeight: 300, fontStyle: 'italic', color: 'rgba(250,247,240,0.6)' }}>
           Sign in to view your orders
         </h2>
-        <button className="btn-primary" style={{ fontSize: '0.6rem' }} onClick={() => dispatch(openAuthModal('login'))}>
+        <Link href="/login?redirect=/my-orders" className="btn-primary" style={{ fontSize: '0.6rem' }}>
           Sign In
-        </button>
+        </Link>
       </EmptyWrapper>
     );
   }
 
   if (loading) {
     return (
-      <div
-        style={{
-          background:
-            'linear-gradient(180deg, var(--forest-2) 0%, var(--charcoal) 35%, var(--coffee) 100%)',
-          minHeight: '100vh',
-        }}
-      >
-        <PageHeader />
-        <div className="max-w-4xl mx-auto" style={{ padding: '3rem 1.5rem' }}>
+      <AccountShell title="My Orders" eyebrow="Account">
+        <div style={{ padding: '0 0 2rem' }}>
           {[1, 2, 3].map((i) => (
             <div key={i} className="skeleton" style={{ height: 140, marginBottom: '1px', background: undefined }} />
           ))}
         </div>
-      </div>
+      </AccountShell>
     );
   }
 
   if (orders.length === 0) {
     return (
-      <EmptyWrapper>
+      <AccountShell title="My Orders" eyebrow="Account">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.25rem', padding: '3rem 1rem', textAlign: 'center' }}>
         <div style={{ width: 80, height: 80, border: '1px solid rgba(0,96,57,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Package size={32} strokeWidth={1} style={{ color: 'rgba(0,96,57,0.4)' }} />
         </div>
@@ -84,21 +78,14 @@ export default function MyOrdersPage() {
         <Link href="/shop" className="btn-primary" style={{ fontSize: '0.6rem' }}>
           Explore Collections <ArrowRight size={14} />
         </Link>
-      </EmptyWrapper>
+        </div>
+      </AccountShell>
     );
   }
 
   return (
-    <div
-      style={{
-        background:
-          'linear-gradient(180deg, var(--forest-2) 0%, var(--charcoal) 35%, var(--coffee) 100%)',
-        minHeight: '100vh',
-      }}
-    >
-      <PageHeader />
-
-      <div className="max-w-4xl mx-auto" style={{ padding: '3rem 1.5rem 6rem' }}>
+    <AccountShell title="My Orders" eyebrow="Account">
+      <div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
           {orders.map((order, oi) => {
             const statusKey = String(order.status || 'placed').toLowerCase();
@@ -265,7 +252,7 @@ export default function MyOrdersPage() {
           })}
         </div>
       </div>
-    </div>
+    </AccountShell>
   );
 }
 

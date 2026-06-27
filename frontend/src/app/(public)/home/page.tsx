@@ -1,14 +1,17 @@
 import { Metadata } from 'next';
 import { BrandStory } from '@/components/home/BrandStory';
-import { BannerVideoSection } from '@/components/home/BannerVideoSection';
+
 import { CollectionShowcase } from '@/components/home/CollectionShowcase';
 import { FeaturedCategories } from '@/components/home/FeaturedCategories';
 import { FeaturedProducts } from '@/components/home/FeaturedProducts';
 import { HeroSection } from '@/components/home/HeroSection';
+import HomePromoMosaic from '@/components/home/HomePromoMosaic';
 import { NewsletterSection } from '@/components/home/NewsletterSection';
 import { Testimonials } from '@/components/home/Testimonials';
 import { WhyChooseUs } from '@/components/home/WhyChooseUs';
 import { PUBLIC_API_URL } from '@/lib/publicCategories';
+import ExperienceStoresSection from '@/components/home/BannerVideoSection';
+
 
 export const metadata: Metadata = {
   title: 'Royace Lighting - Luxury Chandeliers & Handcrafted Lighting',
@@ -35,7 +38,8 @@ export default async function HomePage() {
   return (
     <div className="home-page">
       <HeroSection />
-      <BannerVideoSection />
+      <HomePromoMosaic />
+      <ExperienceStoresSection />
       <BrandStory />
       <FeaturedCategories />
       <FeaturedProducts products={featured} />

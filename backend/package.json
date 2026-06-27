@@ -10,6 +10,7 @@
     "start:prod": "node dist/main.js",
     "db:debug": "node scripts/debug-db.js",
     "seed:admin": "node scripts/seed-admin.js",
+    "user:reactivate": "node scripts/reactivate-user.js",
     "seed:categories": "node scripts/seed-categories.js",
     "import:royace-data": "node scripts/import-royace-data.js",
     "sync:category-images": "node scripts/sync-category-images.js",

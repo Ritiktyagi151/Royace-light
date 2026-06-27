@@ -26,23 +26,38 @@ export class CategoriesService {
       .replace(/-+/g, '-');
   }
 
+  private withExistingImage(category: CategoryDocument) {
+    const data = category.toObject ? category.toObject() : category;
+    if (data.image && !this.uploadExists(data.image)) {
+      data.image = null;
+    }
+    return data;
+  }
+
+  private uploadExists(imagePath: string) {
+    if (!imagePath.startsWith('/uploads/')) return true;
+    return fs.existsSync(path.join(process.cwd(), 'uploads', path.basename(imagePath)));
+  }
+
   // ─── Public: all active categories ────────────────────────
   async findAllActive(): Promise<Category[]> {
-    return this.categoryModel
+    const categories = await this.categoryModel
       .find({ isActive: true })
       .sort({ sortOrder: 1, name: 1 });
+    return categories.map((category) => this.withExistingImage(category)) as Category[];
   }
 
   // ─── Public: single by slug ───────────────────────────────
   async findBySlug(slug: string): Promise<Category> {
     const category = await this.categoryModel.findOne({ slug, isActive: true });
     if (!category) throw new NotFoundException(`Category "${slug}" not found`);
-    return category;
+    return this.withExistingImage(category) as Category;
   }
 
   // ─── Admin: all categories ────────────────────────────────
   async findAll(): Promise<Category[]> {
-    return this.categoryModel.find().sort({ sortOrder: 1, name: 1 });
+    const categories = await this.categoryModel.find().sort({ sortOrder: 1, name: 1 });
+    return categories.map((category) => this.withExistingImage(category)) as Category[];
   }
 
   // ─── Admin: paginated categories (optional)
@@ -53,14 +68,19 @@ export class CategoriesService {
       this.categoryModel.find().sort({ sortOrder: 1, name: 1 }).skip((pageNum - 1) * lim).limit(lim),
       this.categoryModel.countDocuments(),
     ]);
-    return { categories, total, page: pageNum, pages: Math.ceil(total / lim) };
+    return {
+      categories: categories.map((category) => this.withExistingImage(category)),
+      total,
+      page: pageNum,
+      pages: Math.ceil(total / lim),
+    };
   }
 
   // ─── Admin: find by ID ────────────────────────────────────
   async findById(id: string): Promise<Category> {
     const category = await this.categoryModel.findById(id);
     if (!category) throw new NotFoundException('Category not found');
-    return category;
+    return this.withExistingImage(category) as Category;
   }
 
   // ─── Admin: create ────────────────────────────────────────

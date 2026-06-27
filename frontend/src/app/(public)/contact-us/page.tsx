@@ -1,7 +1,18 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowUpRight, Clock, Mail, MapPin, MessageSquare, Phone } from 'lucide-react';
-import { LEGAL_CONTACT } from '@/components/legal/PolicyPage';
+import {
+  LEGAL_CONTACT,
+  legalCardClass,
+  legalHeroClass,
+  legalHeroTextClass,
+  legalHeroTitleClass,
+  legalMetaClass,
+  legalMetaItemClass,
+  legalMetaLabelClass,
+  legalMetaValueClass,
+  legalPageClass,
+} from '@/components/legal/PolicyPage';
 import { mailTo } from '@/lib/contact';
 
 export const metadata: Metadata = {
@@ -76,30 +87,30 @@ const faqs = [
 
 export default function ContactUsPage() {
   return (
-    <main className="legal-page contact-page">
-      <section className="legal-hero">
-        <div>
+    <main className={legalPageClass}>
+      <section className={legalHeroClass}>
+        <div className="mx-auto w-[min(1120px,100%)]">
           <p className="luxury-kicker">Contact Us</p>
-          <h1>Contact Royace Lighting</h1>
-          <p>
+          <h1 className={legalHeroTitleClass}>Contact Royace Lighting</h1>
+          <p className={legalHeroTextClass}>
             Speak with our team for decorative lighting orders, luxury chandeliers,
             pendant lights, made-to-order commissions, payment support, delivery
             updates, returns, refunds, and warranty assistance.
           </p>
-          <dl className="legal-meta">
-            <div>
-              <dt>Company</dt>
-              <dd>{LEGAL_CONTACT.companyName}</dd>
+          <dl className={legalMetaClass}>
+            <div className={legalMetaItemClass}>
+              <dt className={legalMetaLabelClass}>Company</dt>
+              <dd className={legalMetaValueClass}>{LEGAL_CONTACT.companyName}</dd>
             </div>
-            <div>
-              <dt>GSTIN</dt>
-              <dd>{LEGAL_CONTACT.gstNumber}</dd>
+            <div className={legalMetaItemClass}>
+              <dt className={legalMetaLabelClass}>GSTIN</dt>
+              <dd className={legalMetaValueClass}>{LEGAL_CONTACT.gstNumber}</dd>
             </div>
           </dl>
         </div>
       </section>
 
-      <section className="contact-shell" aria-labelledby="company-details">
+      <section className="mx-auto grid w-[min(1240px,100%)] items-start gap-[clamp(1.5rem,4vw,3rem)] px-6 py-[clamp(3rem,6vw,5rem)] lg:grid-cols-[minmax(0,1fr)_minmax(340px,430px)] max-md:px-4" aria-labelledby="company-details">
         <div className="contact-details">
           <div className="section-heading section-heading-left">
             <p className="luxury-kicker">Support Desk</p>
@@ -111,30 +122,30 @@ export default function ContactUsPage() {
             </p>
           </div>
 
-          <div className="contact-card-grid">
+          <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
             {contactCards.map(({ title, detail, helper, href, Icon }) => (
-              <article className="contact-card" key={title}>
-                <Icon size={20} strokeWidth={1.5} />
-                <h3>{title}</h3>
-                <Link className="contact-card-detail" href={href}>
+              <article className={`${legalCardClass} min-h-[210px] p-5 max-md:min-h-0`} key={title}>
+                <Icon size={20} strokeWidth={1.5} className="text-[var(--gold-light)]" />
+                <h3 className="mt-4 font-sans text-[0.76rem] font-bold uppercase leading-[1.45] tracking-[0.16em] text-[var(--ivory)]">{title}</h3>
+                <Link className="mt-3 inline-block text-[0.88rem] leading-[1.55] text-[rgba(250,247,240,0.88)] no-underline transition-colors hover:text-[var(--gold-light)]" href={href}>
                   {detail}
                 </Link>
-                <p>{helper}</p>
+                <p className={contactMutedClass}>{helper}</p>
               </article>
             ))}
           </div>
 
-          <div className="map-placeholder" role="region" aria-label="Royace Lighting location">
+          <div className={`${legalCardClass} mt-4 grid min-h-[320px] place-items-center bg-[linear-gradient(135deg,rgba(6,47,36,0.72),rgba(16,11,7,0.86)),repeating-linear-gradient(45deg,rgba(228,199,124,0.04)_0,rgba(228,199,124,0.04)_1px,transparent_1px,transparent_18px)] p-8 text-center max-md:min-h-[260px]`} role="region" aria-label="Royace Lighting location">
             <div>
-              <MapPin size={30} strokeWidth={1.4} />
+              <MapPin size={30} strokeWidth={1.4} className="text-[var(--gold-light)]" />
             </div>
-            <h2>Visit by Appointment</h2>
-            <p>
+            <h2 className="font-serif text-[clamp(1.45rem,2.6vw,2rem)] italic text-[var(--ivory)]">Visit by Appointment</h2>
+            <p className={contactMutedClass}>
               Our team can help schedule showroom visits, project meetings, and
               trade consultations at the confirmed Royace Lighting location.
             </p>
             <Link
-              className="rl-button rl-button-outline contact-map-link"
+              className="rl-button rl-button-outline mt-5 inline-flex items-center gap-2"
               href={LEGAL_CONTACT.mapUrl}
               target="_blank"
               rel="noreferrer"
@@ -145,17 +156,17 @@ export default function ContactUsPage() {
           </div>
         </div>
 
-        <aside className="contact-form-panel" aria-labelledby="inquiry-form">
-          <div className="contact-form-heading">
-            <MessageSquare size={22} strokeWidth={1.4} />
+        <aside className={`${legalCardClass} p-[clamp(1.35rem,3vw,2rem)] lg:sticky lg:top-[110px]`} aria-labelledby="inquiry-form">
+          <div className="flex items-center gap-4 border-b border-[rgba(228,199,124,0.12)] pb-4">
+            <MessageSquare size={22} strokeWidth={1.4} className="text-[var(--gold-light)]" />
             <div>
               <p className="overline-text">Inquiry Form</p>
-              <h2 id="inquiry-form">Send Us a Message</h2>
+              <h2 className="mt-1 font-serif text-[clamp(1.45rem,2.4vw,2rem)] italic text-[var(--ivory)]" id="inquiry-form">Send Us a Message</h2>
             </div>
           </div>
 
           <form
-            className="contact-form"
+            className="mt-5 grid grid-cols-2 gap-4 max-md:grid-cols-1 [&_button]:col-span-full [&_button]:w-full [&_input]:w-full [&_input]:border [&_input]:border-[rgba(228,199,124,0.18)] [&_input]:bg-[rgba(5,4,3,0.54)] [&_input]:px-4 [&_input]:py-3.5 [&_input]:text-[0.82rem] [&_input]:tracking-[0.02em] [&_input]:text-[var(--ivory)] [&_input]:outline-none [&_input]:transition [&_input]:placeholder:text-[rgba(250,247,240,0.32)] [&_input:focus]:border-[rgba(228,199,124,0.52)] [&_input:focus]:bg-[rgba(0,96,57,0.16)] [&_input:focus]:shadow-[0_0_0_3px_rgba(199,164,90,0.08)] [&_label]:grid [&_label]:gap-2 [&_label]:font-sans [&_label]:text-[0.58rem] [&_label]:font-bold [&_label]:uppercase [&_label]:leading-[1.4] [&_label]:tracking-[0.16em] [&_label]:text-[var(--gold-light)] [&_select]:w-full [&_select]:border [&_select]:border-[rgba(228,199,124,0.18)] [&_select]:bg-[rgba(5,4,3,0.54)] [&_select]:px-4 [&_select]:py-3.5 [&_select]:text-[0.82rem] [&_select]:tracking-[0.02em] [&_select]:text-[var(--ivory)] [&_select]:outline-none [&_select:focus]:border-[rgba(228,199,124,0.52)] [&_select:focus]:bg-[rgba(0,96,57,0.16)] [&_select:focus]:shadow-[0_0_0_3px_rgba(199,164,90,0.08)] [&_textarea]:w-full [&_textarea]:resize-y [&_textarea]:border [&_textarea]:border-[rgba(228,199,124,0.18)] [&_textarea]:bg-[rgba(5,4,3,0.54)] [&_textarea]:px-4 [&_textarea]:py-3.5 [&_textarea]:text-[0.82rem] [&_textarea]:tracking-[0.02em] [&_textarea]:text-[var(--ivory)] [&_textarea]:outline-none [&_textarea]:transition [&_textarea]:placeholder:text-[rgba(250,247,240,0.32)] [&_textarea:focus]:border-[rgba(228,199,124,0.52)] [&_textarea:focus]:bg-[rgba(0,96,57,0.16)] [&_textarea:focus]:shadow-[0_0_0_3px_rgba(199,164,90,0.08)]"
             action={mailTo('Royace Lighting website enquiry')}
             method="post"
             encType="text/plain"
@@ -200,7 +211,7 @@ export default function ContactUsPage() {
                 placeholder="Example: chandelier for dining room, pendant light, order item"
               />
             </label>
-            <label className="contact-form-wide">
+            <label className="col-span-full">
               Message
               <textarea
                 name="message"
@@ -209,7 +220,7 @@ export default function ContactUsPage() {
                 required
               />
             </label>
-            <p className="contact-form-help">
+            <p className="col-span-full mt-3 text-[0.8rem] leading-[1.75] text-[rgba(250,247,240,0.64)]">
               For damaged products, please email photographs, packaging images,
               invoice copy, and unboxing video to {LEGAL_CONTACT.email} along
               with your order ID.
@@ -221,7 +232,7 @@ export default function ContactUsPage() {
         </aside>
       </section>
 
-      <section className="contact-faq-section" aria-labelledby="contact-faqs">
+      <section className="mx-auto w-[min(1240px,100%)] px-6 pb-[clamp(5rem,8vw,7rem)] max-md:px-4" aria-labelledby="contact-faqs">
         <div className="section-heading">
           <p className="luxury-kicker">Help Centre</p>
           <h2 id="contact-faqs">Contact Us FAQs</h2>
@@ -231,11 +242,11 @@ export default function ContactUsPage() {
           </p>
         </div>
 
-        <div className="contact-faq-grid">
+        <div className="grid grid-cols-3 gap-4 max-lg:grid-cols-2 max-md:grid-cols-1">
           {faqs.map((faq) => (
-            <article className="contact-faq-card" key={faq.question}>
-              <h3>{faq.question}</h3>
-              <p>{faq.answer}</p>
+            <article className={`${legalCardClass} min-h-[250px] p-5 max-md:min-h-0`} key={faq.question}>
+              <h3 className="mt-4 font-sans text-[0.76rem] font-bold uppercase leading-[1.45] tracking-[0.16em] text-[var(--ivory)]">{faq.question}</h3>
+              <p className={contactMutedClass}>{faq.answer}</p>
             </article>
           ))}
         </div>
@@ -243,3 +254,5 @@ export default function ContactUsPage() {
     </main>
   );
 }
+
+const contactMutedClass = 'mt-3 text-[0.8rem] leading-[1.75] text-[rgba(250,247,240,0.64)]';

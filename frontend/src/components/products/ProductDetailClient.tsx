@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { MouseEvent, PointerEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ShoppingBag,
   Heart,
@@ -21,6 +22,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addToCartThunk } from '../../store/slices/cartSlice';
 import { openAuthModal, openCartDrawer, addToast } from '../../store/slices/uiSlice';
 import { getAssetUrl } from '@/lib/urls';
+import { selectIsWishlisted, toggleWishlistItem } from '@/store/slices/wishlistSlice';
 
 interface ProductDetailClientProps {
   product: any;
@@ -33,6 +35,7 @@ const DELIVERY_HIGHLIGHTS = [
 ];
 
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { token } = useAppSelector((s) => s.auth);
 
@@ -40,7 +43,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
-  const [wishlisted, setWishlisted] = useState(false);
+  const wishlisted = useAppSelector(selectIsWishlisted(product._id));
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>('details');
 
@@ -102,6 +105,26 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     dispatch(addToast({ message: 'Link copied to clipboard', type: 'info' }));
+  };
+
+  const handleWishlistToggle = () => {
+    const wishlistItem = {
+      productId: product._id,
+      name: product.name,
+      slug: product.slug,
+      image: productImages[0],
+      price: product.sellingPrice,
+    };
+    if (!token) {
+      localStorage.setItem('royace_pending_wishlist', JSON.stringify(wishlistItem));
+      router.push('/login?redirect=/wishlist');
+      return;
+    }
+    dispatch(toggleWishlistItem(wishlistItem));
+    dispatch(addToast({
+      message: wishlisted ? 'Removed from wishlist' : 'Added to wishlist',
+      type: 'success',
+    }));
   };
 
   const selectedImageIndex = productImages.findIndex((img: string) => img === selectedImage);
@@ -562,7 +585,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             </button>
             <button
               className="btn-icon"
-              onClick={() => setWishlisted(!wishlisted)}
+              onClick={handleWishlistToggle}
               style={{
                 color: wishlisted ? '#ef4444' : 'rgba(250,247,240,0.5)',
                 borderColor: wishlisted ? 'rgba(239,68,68,0.3)' : 'rgba(250,247,240,0.1)',

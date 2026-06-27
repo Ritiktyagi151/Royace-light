@@ -18,7 +18,7 @@ export function WhyChooseUs() {
         variants={staggerContainer}
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.25 }}
+        viewport={{ once: false, amount: 0.25 }}
       >
         {reasons.map(({ icon: Icon, title, desc }) => (
           <motion.div key={title} variants={cardReveal}>

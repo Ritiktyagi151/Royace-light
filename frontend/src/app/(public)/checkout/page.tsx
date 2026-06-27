@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Check, CreditCard, MapPin, Package, Lock, ChevronDown } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchCartThunk, clearCart, selectCartTotal } from '@/store/slices/cartSlice';
-import { openAuthModal, addToast } from '@/store/slices/uiSlice';
+import { addToast } from '@/store/slices/uiSlice';
 import { createRazorpayOrderAPI, placeOrderAPI } from '@/lib/api';
 import { getAssetUrl } from '@/lib/urls';
 
@@ -78,9 +78,9 @@ export default function CheckoutPage() {
         <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: '2rem', fontWeight: 300, fontStyle: 'italic', color: 'rgba(250,247,240,0.7)' }}>
           Sign in to checkout
         </h2>
-        <button className="btn-primary" onClick={() => dispatch(openAuthModal('login'))} style={{ fontSize: '0.6rem' }}>
+        <Link href="/login?redirect=/checkout" className="btn-primary" style={{ fontSize: '0.6rem' }}>
           Sign In
-        </button>
+        </Link>
       </div>
     );
   }
@@ -379,7 +379,7 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto checkout-layout" style={{ padding: '3rem 1.5rem 6rem', display: 'grid', gridTemplateColumns: '1fr 340px', gap: '3rem', alignItems: 'start' }}>
+      <div className="checkout-layout mx-auto grid max-w-5xl grid-cols-1 items-start gap-10 px-4 py-12 pb-24 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-12">
 
         {/* Main form area */}
         <div>
@@ -389,7 +389,7 @@ export default function CheckoutPage() {
             <div style={{ animation: 'fadeUp 0.4s ease forwards' }}>
               <SectionTitle num="01" label="Delivery Address" />
 
-              <div className="checkout-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div className="checkout-two-col mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <LuxuryField
                   label="Full Name" value={address.fullName} error={errors.fullName}
                   onChange={(v) => setAddress({ ...address, fullName: v })}
@@ -415,7 +415,7 @@ export default function CheckoutPage() {
                 style={{ marginBottom: '1rem' }}
               />
 
-              <div className="checkout-three-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '2.5rem' }}>
+              <div className="checkout-three-col mb-10 grid grid-cols-1 gap-4 md:grid-cols-3">
                 <LuxuryField
                   label="City" value={address.city} error={errors.city}
                   onChange={(v) => setAddress({ ...address, city: v })}
@@ -443,7 +443,7 @@ export default function CheckoutPage() {
                 />
               </div>
 
-              <div className="checkout-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="checkout-actions flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(250,247,240,0.3)', textDecoration: 'none', transition: 'color 0.2s ease' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(250,247,240,0.6)')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(250,247,240,0.3)')}
@@ -466,8 +466,10 @@ export default function CheckoutPage() {
                 {items.map((item) => {
                   const imageUrl = getAssetUrl(item.image);
                   return (
-                    <div key={`${item.productId}-${item.color}`}
-                      style={{ display: 'flex', gap: '1.25rem', padding: '1.5rem 0', borderBottom: '1px solid rgba(250,247,240,0.06)' }}>
+                    <div
+                      key={`${item.productId}-${item.color}`}
+                      className="flex flex-col gap-4 border-b border-white/10 py-6 sm:flex-row sm:items-start sm:gap-5"
+                    >
                       <div style={{ position: 'relative', width: 72, height: 80, overflow: 'hidden', background: 'linear-gradient(180deg, var(--forest-2), var(--charcoal-2))', flexShrink: 0 }}>
                         {item.image && <img src={imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                       </div>
@@ -486,7 +488,7 @@ export default function CheckoutPage() {
 
               {/* Address summary */}
               <div style={{ background: 'linear-gradient(180deg, rgba(6,47,36,0.62), var(--charcoal-2))', border: '1px solid rgba(0,96,57,0.24)', padding: '1.5rem', marginBottom: '2.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p style={{ fontSize: '0.58rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--gold-light)', marginBottom: '0.75rem' }}>Delivering to</p>
                     <p style={{ fontSize: '0.78rem', color: 'var(--ivory)', marginBottom: '0.25rem' }}>{address.fullName}</p>
@@ -502,7 +504,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div className="checkout-actions" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div className="checkout-actions flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
                 <button onClick={() => setStep(1)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(250,247,240,0.3)', background: 'none', border: 'none', cursor: 'pointer', transition: 'color 0.2s ease' }}>
                   <ArrowLeft size={12} /> Back
                 </button>
@@ -550,7 +552,7 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              <div className="checkout-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="checkout-actions flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
                 <button onClick={() => setStep(2)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(250,247,240,0.3)', background: 'none', border: 'none', cursor: 'pointer', transition: 'color 0.2s ease' }}>
                   <ArrowLeft size={12} /> Back
                 </button>
@@ -569,7 +571,7 @@ export default function CheckoutPage() {
         </div>
 
         {/* Order summary sidebar */}
-        <div className="checkout-summary-panel" style={{ position: 'sticky', top: '100px' }}>
+        <div className="checkout-summary-panel lg:sticky lg:top-[100px]">
           <div style={{ background: 'linear-gradient(180deg, rgba(6,47,36,0.72), var(--charcoal-2))', border: '1px solid rgba(0,96,57,0.24)', padding: '1.75rem' }}>
             <p style={{ fontSize: '0.58rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1.5rem' }}>
               Order Summary

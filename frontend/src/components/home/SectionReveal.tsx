@@ -13,7 +13,7 @@ export function SectionReveal({ children, delay = 0, ...props }: SectionRevealPr
     <motion.section
       initial={{ opacity: 0, y: 34 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.18 }}
+      viewport={{ once: false, amount: 0.18, margin: '0px 0px -8% 0px' }}
       transition={{ duration: 0.8, ease: premiumEase, delay }}
       {...props}
     >
@@ -34,10 +34,11 @@ export const staggerContainer: Variants = {
 };
 
 export const cardReveal: Variants = {
-  hidden: { opacity: 0, y: 28 },
+  hidden: { opacity: 0, y: 28, scale: 0.98 },
   show: {
     opacity: 1,
     y: 0,
+    scale: 1,
     transition: { duration: 0.65, ease: premiumEase },
   },
 };

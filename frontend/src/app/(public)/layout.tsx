@@ -1,6 +1,22 @@
 import { ReactNode } from 'react';
-import { PublicChrome } from '@/components/layout/PublicChrome';
+import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
+import { CartDrawer } from '@/components/layout/CartDrawer';
+import { AuthModal } from '@/components/auth/AuthModal';
+import { Toaster } from '@/components/ui/Toaster';
+import { PageTransition } from '@/components/layout/PageTransition';
+import { WhatsAppButton } from '@/components/layout/WhatsAppButton';
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
-  return <PublicChrome>{children}</PublicChrome>;
+  return (
+    <div className="public-site">
+      <Navbar />
+      <PageTransition>{children}</PageTransition>
+      <Footer />
+      <CartDrawer />
+      <AuthModal />
+      <Toaster />
+      <WhatsAppButton />
+    </div>
+  );
 }

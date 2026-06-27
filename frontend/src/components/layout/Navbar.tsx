@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingBag, Search, User, Menu, X, ChevronDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Heart, Search, ShoppingCart, Truck, User, Menu, X, ChevronDown } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { openAuthModal } from '../../store/slices/uiSlice';
 import { logout } from '../../store/slices/authSlice';
 import { selectCartCount } from '../../store/slices/cartSlice';
 import { openCartDrawer } from '../../store/slices/uiSlice';
+import { selectWishlistCount } from '@/store/slices/wishlistSlice';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { usePublicCategories } from '@/hooks/usePublicCategories';
 import { categoryHref, FALLBACK_CATEGORIES } from '@/lib/publicCategories';
@@ -20,9 +22,11 @@ const NAV_LINKS = [
 ];
 
 export function Navbar() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, token } = useAppSelector((s) => s.auth);
   const cartCount = useAppSelector(selectCartCount);
+  const wishlistCount = useAppSelector(selectWishlistCount);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
@@ -253,7 +257,7 @@ export function Navbar() {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
 
               {/* Search */}
               <button
@@ -264,13 +268,125 @@ export function Navbar() {
                 <Search size={16} strokeWidth={1.5} />
               </button>
 
+              {/* Wishlist */}
+              <button
+                onClick={() => {
+                  router.push(token ? '/wishlist' : '/login?redirect=/wishlist');
+                }}
+                aria-label="Wishlist"
+                className="relative hidden sm:inline-flex items-center"
+                style={{
+                  gap: '0.45rem',
+                  color: 'rgba(250,247,240,0.88)',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '0.35rem 0.15rem',
+                  cursor: 'pointer',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '0.82rem',
+                  fontWeight: 500,
+                  letterSpacing: '0',
+                }}
+              >
+                <Heart size={20} strokeWidth={1.9} />
+                <span>Wishlist</span>
+                {wishlistCount > 0 && (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: '-2px',
+                      right: '-8px',
+                      width: '14px',
+                      height: '14px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, var(--rolex-green), var(--forest))',
+                      color: 'var(--ivory)',
+                      border: '1px solid rgba(228,199,124,0.45)',
+                      fontSize: '0.5rem',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {wishlistCount}
+                  </span>
+                )}
+              </button>
+
               {/* Cart */}
               <button
-                className="btn-icon relative"
+                className="relative hidden sm:inline-flex items-center"
+                onClick={() => dispatch(openCartDrawer())}
+                aria-label="Cart"
+                style={{
+                  gap: '0.45rem',
+                  color: 'rgba(250,247,240,0.88)',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '0.35rem 0.15rem',
+                  cursor: 'pointer',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '0.82rem',
+                  fontWeight: 500,
+                  letterSpacing: '0',
+                }}
+              >
+                <ShoppingCart size={20} strokeWidth={1.9} />
+                <span>Cart</span>
+                {cartCount > 0 && (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: '-2px',
+                      right: '-7px',
+                      width: '14px',
+                      height: '14px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, var(--rolex-green), var(--forest))',
+                      color: 'var(--ivory)',
+                      border: '1px solid rgba(228,199,124,0.45)',
+                      fontSize: '0.5rem',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+
+              <button
+                className="hidden lg:inline-flex items-center"
+                onClick={() => {
+                  router.push(token ? '/my-orders' : '/login?redirect=/my-orders');
+                }}
+                aria-label="Track Your Order"
+                style={{
+                  gap: '0.45rem',
+                  color: 'rgba(250,247,240,0.88)',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '0.35rem 0.15rem',
+                  cursor: 'pointer',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '0.82rem',
+                  fontWeight: 500,
+                  letterSpacing: '0',
+                }}
+              >
+                <Truck size={20} strokeWidth={1.9} />
+                <span>Track Your Order</span>
+              </button>
+
+              <button
+                className="sm:hidden btn-icon relative"
                 onClick={() => dispatch(openCartDrawer())}
                 aria-label="Cart"
               >
-                <ShoppingBag size={16} strokeWidth={1.5} />
+                <ShoppingCart size={16} strokeWidth={1.5} />
                 {cartCount > 0 && (
                   <span
                     style={{

@@ -113,22 +113,22 @@ export function ShopClient({ initialData, searchParams, categories }: ShopClient
           }}
         >
           {/* Search */}
-          <form className="shop-search-form" onSubmit={handleSearch} style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+          <form className="shop-search-form relative flex w-full items-center sm:w-auto" onSubmit={handleSearch}>
             <Search size={14} style={{ position: 'absolute', left: '1rem', color: 'rgba(250,247,240,0.3)', pointerEvents: 'none' }} />
             <input
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search the collection..."
-              className="input-luxury"
-              style={{ paddingLeft: '2.75rem', width: '260px', fontSize: '0.75rem' }}
+              className="input-luxury w-full pl-11 text-[0.75rem] sm:w-[260px]"
             />
           </form>
 
-          <div className="shop-control-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="shop-control-actions flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
             {/* Sort */}
             <select
               value={currentSort}
               onChange={(e) => updateUrl({ sortBy: e.target.value, page: undefined })}
+              className="w-full sm:w-auto"
               style={{
                 background: 'rgba(0,96,57,0.12)',
                 border: '1px solid rgba(0,96,57,0.24)',
@@ -151,6 +151,7 @@ export function ShopClient({ initialData, searchParams, categories }: ShopClient
             {/* Filter toggle */}
             <button
               onClick={() => setFiltersOpen(!filtersOpen)}
+              className="w-full justify-center sm:w-auto"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -224,24 +225,21 @@ export function ShopClient({ initialData, searchParams, categories }: ShopClient
           </div>
         )}
 
-        <div className="shop-content-layout" style={{ display: 'flex', gap: '2.5rem' }}>
+        <div className="shop-content-layout flex flex-col gap-8 lg:flex-row lg:gap-10">
           {/* Sidebar */}
           {filtersOpen && (
             <aside
-              className="shop-filters"
+              className="shop-filters w-full shrink-0 lg:w-[220px]"
               style={{
-                width: '220px',
-                flexShrink: 0,
                 animation: 'fadeIn 0.25s ease forwards',
               }}
             >
               <div
+                className="lg:sticky lg:top-[100px]"
                 style={{
                   background: 'linear-gradient(180deg, rgba(6,47,36,0.78), var(--charcoal-2))',
                   border: '1px solid rgba(0,96,57,0.24)',
                   padding: '1.75rem',
-                  position: 'sticky',
-                  top: '100px',
                 }}
               >
                 <p
@@ -334,7 +332,7 @@ export function ShopClient({ initialData, searchParams, categories }: ShopClient
           )}
 
           {/* Products grid */}
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="min-w-0 flex-1">
             {products.length === 0 ? (
               <div
                 style={{

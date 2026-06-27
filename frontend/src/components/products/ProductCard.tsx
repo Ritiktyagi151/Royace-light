@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addToCartThunk } from '../../store/slices/cartSlice';
 import { openAuthModal, openCartDrawer, addToast } from '../../store/slices/uiSlice';
 import { getAssetUrl } from '@/lib/urls';
+import { selectIsWishlisted, toggleWishlistItem } from '@/store/slices/wishlistSlice';
 
 interface Product {
   _id: string;
@@ -38,7 +39,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const { token } = useAppSelector((s) => s.auth);
   const [hovered, setHovered] = useState(false);
   const [adding, setAdding] = useState(false);
-  const [wishlisted, setWishlisted] = useState(false);
+  const wishlisted = useAppSelector(selectIsWishlisted(product._id));
 
   const discount =
     product.retailPrice > product.sellingPrice
@@ -87,7 +88,23 @@ export function ProductCard({ product }: ProductCardProps) {
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setWishlisted(!wishlisted);
+    const wishlistItem = {
+      productId: product._id,
+      name: product.name,
+      slug: product.slug,
+      image: productImages[0],
+      price: product.sellingPrice,
+    };
+    if (!token) {
+      localStorage.setItem('royace_pending_wishlist', JSON.stringify(wishlistItem));
+      router.push('/login?redirect=/wishlist');
+      return;
+    }
+    dispatch(toggleWishlistItem(wishlistItem));
+    dispatch(addToast({
+      message: wishlisted ? 'Removed from wishlist' : 'Added to wishlist',
+      type: 'success',
+    }));
   };
 
   const productHref = `/product/${product.slug || product._id}`;

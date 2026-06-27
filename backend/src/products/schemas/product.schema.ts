@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export type ProductDocument = Product & Document;
 
@@ -174,7 +176,15 @@ const getOrderedImageAssets = (assets?: ProductImageAsset[]) =>
     ? [...assets].sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0))
     : [];
 
-const getDisplayImage = (asset?: ProductImageAsset) => asset?.webpUrl || asset?.url || null;
+const uploadExists = (imagePath?: string) => {
+  if (!imagePath || !imagePath.startsWith('/uploads/')) return Boolean(imagePath);
+  return fs.existsSync(path.join(process.cwd(), 'uploads', path.basename(imagePath)));
+};
+
+const getDisplayImage = (asset?: ProductImageAsset) => {
+  const imagePath = asset?.webpUrl || asset?.url || null;
+  return uploadExists(imagePath || undefined) ? imagePath : null;
+};
 
 // Virtual: derive image URLs from imageAssets without storing duplicate fields.
 ProductSchema.virtual('images').get(function (this: Product) {
