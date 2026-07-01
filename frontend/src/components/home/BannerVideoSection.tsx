@@ -3,7 +3,7 @@ import { SectionReveal } from "./SectionReveal";
 
 export default function ExperienceStoresSection() {
   return (
-    <SectionReveal className="relative mt-8 overflow-hidden bg-[#dfe8d8] bg-[url('/images/green-texture.png')] bg-cover bg-center py-16 lg:mt-16 lg:py-12">
+    <SectionReveal direction="right" className="relative mt-8 overflow-hidden bg-[#dfe8d8] bg-[url('/images/green-texture.png')] bg-cover bg-center py-16 lg:mt-16 lg:py-12">
       {/* Left Content */}
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <div className="max-w-xl py-10 lg:py-16">
@@ -33,7 +33,7 @@ export default function ExperienceStoresSection() {
         <div className="absolute right-6 top-6 w-[520px] xl:right-10 xl:w-[680px] 2xl:w-[760px]">
           <div className="overflow-hidden border-[5px] border-[#8a7355] bg-white shadow-2xl">
             <video
-              src="/videos/hero-video.mp4"
+              src="/videos/store-video.mp4"
               poster="/images/store-poster.jpg"
               autoPlay
               muted

@@ -98,7 +98,7 @@ export default function AdminVendorsPage() {
                       {vendor.isActive ? 'Suspend' : 'Activate'}
                     </button>
                     <a
-                      href={`/products?vendorId=${vendor._id}`}
+                      href="/admin/products"
                       className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700"
                     >
                       <Package size={13} /> Products

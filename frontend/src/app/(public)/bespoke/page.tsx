@@ -42,24 +42,24 @@ const capabilities = [
 export default function BespokePage() {
   return (
     <main className="bg-obsidian text-ivory">
-      <section className="relative isolate overflow-hidden px-6 pb-20 pt-28 sm:pt-32 lg:px-10">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(120deg,rgba(29,18,11,0.78),rgba(5,4,3,0.9)_45%,rgba(0,61,43,0.62))]" />
-        <div className="mx-auto max-w-7xl">
+      <section className="relative isolate flex min-h-[450px] overflow-hidden px-6 pb-10 pt-28 sm:pt-32 lg:h-[450px] lg:px-10 lg:pb-12">
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(120deg,rgba(42,26,16,0.72),rgba(23,49,38,0.9)_45%,rgba(0,61,43,0.68))]" />
+        <div className="mx-auto w-full max-w-7xl self-end">
           <div className="max-w-4xl">
-            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.32em] text-gold-light">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.32em] text-gold-light">
               Bespoke Lighting
             </p>
-            <h1 className="font-serif text-5xl leading-[1.02] text-ivory sm:text-6xl lg:text-7xl">
+            <h1 className="font-serif text-[clamp(2.35rem,5.5vw,4.8rem)] leading-[1.02] text-ivory">
               Custom lighting for spaces that need their own signature.
             </h1>
-            <p className="mt-7 max-w-2xl text-base leading-8 text-cream/75 sm:text-lg">
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-cream/75 sm:text-base">
               Commission chandeliers, pendant arrangements, wall lights, and
               decorative fixtures built around your room, project mood, material
               palette, and installation realities.
             </p>
             <Link
               href="/contact-us"
-              className="mt-10 inline-flex items-center gap-2 border border-gold bg-gold px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-obsidian transition hover:bg-gold-light"
+              className="mt-7 inline-flex items-center gap-2 border border-gold bg-gold px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-obsidian transition hover:bg-gold-light"
             >
               Start A Bespoke Enquiry
               <ArrowUpRight size={15} strokeWidth={1.6} />

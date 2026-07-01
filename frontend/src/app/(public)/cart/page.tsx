@@ -34,7 +34,7 @@ export default function CartPage() {
         title="Sign in to view your cart"
         desc="Your saved pieces will appear here."
         action={
-          <Link href="/login?redirect=/cart" className="btn-primary" style={{ fontSize: '0.6rem' }}>
+          <Link href="/login" className="btn-primary" style={{ fontSize: '0.6rem' }}>
             Sign In
           </Link>
         }

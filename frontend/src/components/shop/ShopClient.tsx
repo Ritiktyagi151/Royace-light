@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { ProductCard } from '../products/ProductCard';
 import type { PublicCategory } from '@/lib/publicCategories';
+import { buildShopPath, type ShopUrlParams } from '@/lib/shopUrls';
 
 const PRICE_RANGES = [
   { label: 'Under ₹10,000', min: '', max: '10000' },
@@ -22,7 +23,7 @@ const SORT_OPTIONS = [
 
 interface ShopClientProps {
   initialData: { products: any[]; total: number };
-  searchParams: Record<string, string | undefined>;
+  searchParams: ShopUrlParams;
   categories: PublicCategory[];
 }
 
@@ -36,13 +37,9 @@ export function ShopClient({ initialData, searchParams, categories }: ShopClient
   const [searchInput, setSearchInput] = useState(currentSearch);
 
   const updateUrl = useCallback(
-    (updates: Record<string, string | undefined>) => {
-      const params = new URLSearchParams();
+    (updates: ShopUrlParams) => {
       const merged = { ...searchParams, ...updates };
-      Object.entries(merged).forEach(([k, v]) => {
-        if (v && k !== 'page') params.set(k, v);
-      });
-      router.push(`/shop?${params.toString()}`);
+      router.push(buildShopPath(merged));
     },
     [searchParams, router],
   );

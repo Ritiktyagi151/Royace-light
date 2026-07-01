@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap");
 
 @layer base {
   :root {
@@ -23,10 +23,10 @@
     --coffee-2: #2a1a10;
     --coffee-3: #3a2416;
 
-    --obsidian: #050403;
-    --charcoal: #100b07;
-    --charcoal-2: #17100a;
-    --charcoal-3: #21160d;
+    --obsidian: #12261d;
+    --charcoal: #173126;
+    --charcoal-2: #1f3a2f;
+    --charcoal-3: #2a4336;
     --slate: #2a2520;
     --smoke: #3d3830;
 
@@ -38,7 +38,7 @@
     --burgundy: #4a1622;
 
     /* Glass surfaces */
-    --glass-dark: rgba(15, 12, 8, 0.75);
+    --glass-dark: rgba(23, 49, 38, 0.75);
     --glass-light: rgba(250, 247, 240, 0.08);
     --glass-gold: rgba(199, 164, 90, 0.12);
 
@@ -47,9 +47,9 @@
       0 0 60px rgba(199, 164, 90, 0.22), 0 0 120px rgba(0, 96, 57, 0.14);
     --glow-gold-sm: 0 0 30px rgba(199, 164, 90, 0.18);
     --shadow-luxury:
-      0 32px 80px rgba(8, 6, 4, 0.6), 0 8px 24px rgba(8, 6, 4, 0.3);
-    --shadow-card: 0 16px 48px rgba(8, 6, 4, 0.4);
-    --shadow-sm: 0 4px 16px rgba(8, 6, 4, 0.3);
+      0 32px 80px rgba(8, 32, 23, 0.42), 0 8px 24px rgba(8, 32, 23, 0.24);
+    --shadow-card: 0 16px 48px rgba(8, 32, 23, 0.3);
+    --shadow-sm: 0 4px 16px rgba(8, 32, 23, 0.24);
 
     /* shadcn overrides */
     --background: 30 20% 4%;
@@ -97,6 +97,18 @@
     overflow-x: hidden;
   }
 
+  .public-site *,
+  .public-site .font-serif,
+  .public-site .font-display,
+  .public-site .font-cormorant,
+  .public-site .cormorant,
+  .public-site .display-xl,
+  .public-site .display-serif,
+  .public-site .price-display {
+    font-family: "DM Sans", sans-serif !important;
+    font-style: normal !important;
+  }
+
   .public-site ::selection {
     background: rgba(0, 96, 57, 0.42);
     color: var(--ivory);
@@ -122,8 +134,9 @@
   .public-site h4,
   .public-site h5,
   .public-site h6 {
-    font-family: "Playfair Display", serif;
-    font-weight: 400;
+    font-family: "DM Sans", sans-serif;
+    font-weight: 500;
+    font-style: normal;
     letter-spacing: 0.01em;
     line-height: 1.1;
   }
@@ -1034,8 +1047,8 @@
     background:
       linear-gradient(
         90deg,
-        rgba(5, 4, 3, 0.86),
-        rgba(5, 4, 3, 0.36) 48%,
+        rgba(18, 38, 29, 0.74),
+        rgba(23, 49, 38, 0.34) 48%,
         rgba(0, 96, 57, 0.34)
       ),
       radial-gradient(
@@ -1043,7 +1056,7 @@
         rgba(199, 164, 90, 0.18),
         transparent 28%
       ),
-      linear-gradient(180deg, rgba(5, 4, 3, 0.25), var(--obsidian));
+      linear-gradient(180deg, rgba(18, 38, 29, 0.22), var(--obsidian));
   }
 
   .home-hero-content {

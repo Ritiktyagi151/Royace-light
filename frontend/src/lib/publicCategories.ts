@@ -1,4 +1,5 @@
 import { API_URL, getAssetUrl } from './urls';
+import { buildShopPath } from './shopUrls';
 
 export type PublicCategory = {
   _id?: string;
@@ -123,5 +124,5 @@ export async function fetchPublicCategories(options?: CategoryFetchOptions) {
 
 export function categoryHref(category: Pick<PublicCategory, '_id' | 'slug'>) {
   const value = category.slug || category._id || '';
-  return value ? `/shop?category=${encodeURIComponent(value)}` : '/shop';
+  return value ? buildShopPath({ category: value }) : '/shop';
 }

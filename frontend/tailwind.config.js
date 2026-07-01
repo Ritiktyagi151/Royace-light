@@ -9,10 +9,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        obsidian: '#050403',
-        charcoal: '#100B07',
-        'charcoal-2': '#17100A',
-        'charcoal-3': '#21160D',
+        obsidian: '#12261D',
+        charcoal: '#173126',
+        'charcoal-2': '#1F3A2F',
+        'charcoal-3': '#2A4336',
         slate: '#2A2520',
         smoke: '#3D3830',
         ivory: '#FAF7F0',
@@ -75,9 +75,9 @@ module.exports = {
       },
       fontFamily: {
         sans: ['DM Sans', 'sans-serif'],
-        serif: ['Playfair Display', 'serif'],
-        display: ['Playfair Display', 'serif'],
-        cormorant: ['Cormorant', 'serif'],
+        serif: ['DM Sans', 'sans-serif'],
+        display: ['DM Sans', 'sans-serif'],
+        cormorant: ['DM Sans', 'sans-serif'],
         body: ['DM Sans', 'sans-serif'],
       },
       borderRadius: {

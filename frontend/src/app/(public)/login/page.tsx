@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginThunk, registerThunk } from '@/store/slices/authSlice';
@@ -11,10 +11,9 @@ import { addWishlistItem, WishlistItem } from '@/store/slices/wishlistSlice';
 
 export default function CustomerLoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const { token, loading } = useAppSelector((state) => state.auth);
-  const redirectTo = searchParams.get('redirect') || '/wishlist';
+  const redirectTo = '/wishlist';
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -238,10 +237,10 @@ function PasswordToggle({ show, onClick }: { show: boolean; onClick: () => void 
 }
 
 const panelStyle: React.CSSProperties = {
-  background: 'linear-gradient(180deg, rgba(6,47,36,0.76), rgba(15,12,8,0.82))',
+  background: 'linear-gradient(180deg, rgba(6,47,36,0.76), rgba(31,58,47,0.82))',
   border: '1px solid rgba(0,96,57,0.28)',
   padding: 'clamp(1.5rem, 4vw, 2.5rem)',
-  boxShadow: '0 28px 70px rgba(8,6,4,0.35)',
+  boxShadow: '0 28px 70px rgba(8,32,23,0.28)',
 };
 
 const panelTitleStyle: React.CSSProperties = {

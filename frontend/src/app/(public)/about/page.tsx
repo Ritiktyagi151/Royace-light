@@ -38,24 +38,24 @@ const stats = [
 export default function AboutPage() {
   return (
     <main className="bg-obsidian text-ivory">
-      <section className="relative isolate overflow-hidden px-6 pb-20 pt-28 sm:pt-32 lg:px-10">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(135deg,rgba(0,96,57,0.42),rgba(5,4,3,0.88)_46%,rgba(74,22,34,0.36))]" />
+      <section className="relative isolate flex min-h-[450px] overflow-hidden px-6 pb-10 pt-28 sm:pt-32 lg:h-[450px] lg:px-10 lg:pb-12">
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(135deg,rgba(0,96,57,0.48),rgba(23,49,38,0.9)_46%,rgba(74,22,34,0.24))]" />
         <div className="absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-t from-obsidian to-transparent" />
 
-        <div className="mx-auto grid max-w-7xl items-end gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="mx-auto grid w-full max-w-7xl items-end gap-8 self-end lg:grid-cols-[1.05fr_0.72fr]">
           <div>
-            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.32em] text-gold-light">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.32em] text-gold-light">
               About Royace
             </p>
-            <h1 className="max-w-4xl font-serif text-5xl leading-[1.02] text-ivory sm:text-6xl lg:text-7xl">
+            <h1 className="max-w-4xl font-serif text-[clamp(2.35rem,5.5vw,4.8rem)] leading-[1.02] text-ivory">
               Lighting made for rooms with presence.
             </h1>
-            <p className="mt-7 max-w-2xl text-base leading-8 text-cream/75 sm:text-lg">
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-cream/75 sm:text-base">
               Royace Lighting creates decorative lighting for homes, villas, hotels,
               boutiques, and interior projects where the fixture is part of the
               architecture of the room.
             </p>
-            <div className="mt-10 flex flex-wrap gap-3">
+            <div className="mt-7 flex flex-wrap gap-3">
               <Link
                 href="/shop"
                 className="inline-flex items-center gap-2 rounded-none border border-gold bg-gold px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-obsidian transition hover:bg-gold-light"
@@ -72,12 +72,12 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="border border-ivory/10 bg-charcoal/80 p-6 shadow-luxury backdrop-blur">
-            <div className="aspect-[4/5] overflow-hidden bg-forest">
+          <div className="hidden border border-ivory/10 bg-charcoal/80 p-4 shadow-luxury backdrop-blur lg:block">
+            <div className="h-[260px] overflow-hidden bg-forest">
               <img
                 src="/images/royace%20logo_page-0001.jpg"
                 alt="Royace Lighting brand mark"
-                className="h-full w-full object-contain p-10"
+                className="h-full w-full object-contain p-8"
               />
             </div>
           </div>

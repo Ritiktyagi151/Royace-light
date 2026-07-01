@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Heart, Search, ShoppingCart, Truck, User, Menu, X, ChevronDown } from 'lucide-react';
+import { Heart, Search, ShoppingCart, Truck, User, Menu, X, ChevronDown, Phone } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { openAuthModal } from '../../store/slices/uiSlice';
 import { logout } from '../../store/slices/authSlice';
@@ -13,13 +13,38 @@ import { selectWishlistCount } from '@/store/slices/wishlistSlice';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { usePublicCategories } from '@/hooks/usePublicCategories';
 import { categoryHref, FALLBACK_CATEGORIES } from '@/lib/publicCategories';
+import { SITE_CONTACT } from '@/lib/contact';
+import { buildShopPath } from '@/lib/shopUrls';
 
 const NAV_LINKS = [
+  { label: 'About', href: '/about' },
   { label: 'Collections', href: '#', hasMega: true },
   { label: 'Bespoke', href: '/bespoke' },
-  { label: 'About', href: '/about' },
+  { label: 'Blog', href: '/blog' },
+  
   { label: 'Contact', href: '/contact-us' },
 ];
+
+const actionButtonClass =
+  'relative hidden h-11 items-center gap-1.5 border-0 bg-transparent px-1 text-[0.78rem] font-medium tracking-normal text-[#faf7f0e0] transition hover:text-[var(--gold)] lg:inline-flex';
+
+const tollFreeLinkClass =
+  'hidden h-11 shrink-0 items-center gap-2 border border-[#e4c77c33] bg-white/[0.03] px-3 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[var(--gold-light)] no-underline transition hover:border-[var(--gold)] hover:bg-[var(--green-muted)] xl:inline-flex';
+
+const countBadgeClass =
+  'absolute -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#e4c77c73] bg-[linear-gradient(135deg,var(--rolex-green),var(--forest))] text-[0.5rem] font-bold text-[var(--ivory)]';
+
+const navLinkClass =
+  'relative text-[0.6rem] font-normal uppercase tracking-[0.2em] text-[#faf7f0a6] no-underline transition hover:text-[var(--ivory)] after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-[linear-gradient(90deg,var(--gold),var(--rolex-green))] after:transition-all after:duration-300 hover:after:w-full xl:tracking-[0.24em]';
+
+const iconButtonClass =
+  'flex h-11 w-11 shrink-0 items-center justify-center border border-[#faf7f01a] bg-[#faf7f00a] text-[#faf7f099] transition-all duration-200 hover:border-[var(--green-border)] hover:bg-[var(--green-muted)] hover:text-[var(--gold-light)]';
+
+const outlineButtonClass =
+  'inline-flex items-center gap-2 border border-[#c7a45a66] bg-transparent font-medium uppercase tracking-[0.18em] text-[var(--gold-light)] transition-all duration-300 hover:border-[#e4c77c9e] hover:bg-[var(--green-muted)] hover:text-[var(--gold-light)] hover:shadow-[0_0_30px_rgba(0,96,57,0.22)]';
+
+const primaryButtonClass =
+  'inline-flex items-center gap-2 overflow-hidden border border-[var(--gold)] bg-[var(--gold)] font-medium uppercase tracking-[0.18em] text-[var(--obsidian)] transition-all duration-300 hover:bg-[linear-gradient(135deg,var(--gold-light),var(--gold-deep))] hover:shadow-[var(--glow-gold-sm)]';
 
 export function Navbar() {
   const router = useRouter();
@@ -57,68 +82,37 @@ export function Navbar() {
     if (searchOpen) setTimeout(() => searchRef.current?.focus(), 50);
   }, [searchOpen]);
 
-  const navBg = scrolled
-    ? 'rgba(3,32,22,0.92)'
-    : 'rgba(8,6,4,0)';
-  const navBorder = scrolled
-    ? 'rgba(0,96,57,0.28)'
-    : 'transparent';
-
   return (
     <div className="fixed left-0 right-0 top-0 z-50">
       {/* Announcement bar */}
-      <div
-        style={{
-          background: 'linear-gradient(90deg, var(--forest), var(--rolex-green), var(--forest))',
-          borderBottom: '1px solid rgba(228,199,124,0.24)',
-          fontSize: '0.58rem',
-          fontWeight: 500,
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          lineHeight: 0,
-          color: 'transparent',
-          overflow: 'hidden',
-          padding: '0.5rem 0',
-          fontFamily: "'DM Sans', sans-serif",
-        }}
-      >
-        <div
-          className="animate-marquee flex w-max items-center gap-10 whitespace-nowrap"
-          style={{ color: 'var(--ivory)', lineHeight: 1.4 }}
-        >
+      <div className="overflow-hidden border-b border-[#e4c77c3d] bg-[linear-gradient(90deg,var(--forest),var(--rolex-green),var(--forest))] py-2 text-[0.58rem] font-medium uppercase leading-none tracking-[0.3em] text-transparent">
+        <div className="flex w-max animate-[marquee_30s_linear_infinite] items-center gap-10 whitespace-nowrap text-[var(--ivory)] leading-[1.4] hover:[animation-play-state:paused]">
           {Array.from({ length: 2 }).map((_, groupIndex) => (
             <div key={groupIndex} className="flex items-center gap-10 px-5">
               <span>Complimentary White-Glove Installation</span>
-              <span aria-hidden="true" style={{ color: 'var(--gold-light)' }}>·</span>
+              <span aria-hidden="true" className="text-[var(--gold-light)]">·</span>
               <span>Orders Above ₹1,50,000</span>
-              <span aria-hidden="true" style={{ color: 'var(--gold-light)' }}>·</span>
+              <span aria-hidden="true" className="text-[var(--gold-light)]">·</span>
               <span>Luxury Chandeliers And Bespoke Lighting</span>
-              <span aria-hidden="true" style={{ color: 'var(--gold-light)' }}>·</span>
+              <span aria-hidden="true" className="text-[var(--gold-light)]">·</span>
             </div>
           ))}
         </div>
       </div>
 
       <header
-        className="transition-all duration-500"
-        style={{
-          background: navBg,
-          borderBottom: `1px solid ${navBorder}`,
-          backdropFilter: scrolled ? 'blur(20px) saturate(1.5)' : 'none',
-        }}
+        className={`border-b transition-all duration-500 ${
+          scrolled
+            ? 'border-[#00603947] bg-[#032016eb] backdrop-blur-[20px] saturate-150'
+            : 'border-transparent bg-transparent'
+        }`}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="flex items-center justify-between h-[68px]">
+        <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8 xl:px-10">
+          <div className="flex h-[72px] items-center gap-4 lg:gap-6">
 
             <Link
               href="/"
-              className="brand-logo"
-              style={{
-                textDecoration: 'none',
-                lineHeight: 1,
-                display: 'flex',
-                alignItems: 'center',
-              }}
+              className="flex shrink-0 items-center leading-none no-underline"
             >
               <Image
                 src="/images/royace-logo.png"
@@ -126,16 +120,12 @@ export function Navbar() {
                 width={156}
                 height={48}
                 priority
-                style={{
-                  width: 'clamp(118px, 12vw, 156px)',
-                  height: 'auto',
-                  display: 'block',
-                }}
+                className="block h-auto w-[clamp(118px,11vw,154px)]"
               />
             </Link>
 
             {/* Desktop nav */}
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden min-w-0 flex-1 items-center justify-center gap-5 lg:flex xl:gap-7">
               {NAV_LINKS.map((link) =>
                 link.hasMega ? (
                   <div
@@ -144,97 +134,40 @@ export function Navbar() {
                     onMouseEnter={() => setMegaOpen(true)}
                     onMouseLeave={() => setMegaOpen(false)}
                   >
-                    <button
-                      className="nav-item flex items-center gap-1"
-                      style={{ color: 'rgba(250,247,240,0.65)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                    >
+                    <button className={`${navLinkClass} flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0`}>
                       {link.label}
                       <ChevronDown
                         size={10}
-                        style={{
-                          transition: 'transform 0.3s ease',
-                          transform: megaOpen ? 'rotate(180deg)' : 'rotate(0)',
-                        }}
+                        className={`transition-transform duration-300 ${megaOpen ? 'rotate-180' : 'rotate-0'}`}
                       />
                     </button>
 
                     {/* Mega Menu */}
                     <div
-                      style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: '50%',
-                        marginTop: '1.5rem',
-                        width: 'min(840px, calc(100vw - 3rem))',
-                        maxHeight: 'calc(100vh - 150px)',
-                        overflowY: 'auto',
-                        background: 'linear-gradient(180deg, rgba(6,47,36,0.98), rgba(15,12,8,0.97))',
-                        border: '1px solid rgba(0,96,57,0.28)',
-                        backdropFilter: 'blur(24px)',
-                        padding: '2rem',
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(138px, 1fr))',
-                        gap: '1rem',
-                        opacity: megaOpen ? 1 : 0,
-                        visibility: megaOpen ? 'visible' : 'hidden',
-                        transition: 'opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease',
-                        transform: megaOpen
-                          ? 'translateX(-50%) translateY(0)'
-                          : 'translateX(-50%) translateY(-8px)',
-                        boxShadow: '0 40px 80px rgba(8,6,4,0.6)',
-                      }}
+                      className={`absolute left-1/2 top-full mt-6 grid max-h-[calc(100vh-150px)] w-[min(840px,calc(100vw-3rem))] -translate-x-1/2 grid-cols-[repeat(auto-fit,minmax(138px,1fr))] gap-4 overflow-y-auto border border-[#00603947] bg-[linear-gradient(180deg,rgba(18,38,29,0.98),rgba(31,58,47,0.96))] p-8 shadow-[0_40px_80px_rgba(8,32,23,0.42)] backdrop-blur-3xl transition-all duration-200 ${
+                        megaOpen
+                          ? 'visible translate-y-0 opacity-100'
+                          : 'invisible -translate-y-2 opacity-0'
+                      }`}
                     >
                       {collectionItems.map((col) => (
                         <Link
                           key={col.href}
                           href={col.href}
-                          style={{ textDecoration: 'none' }}
+                          className="group no-underline"
                           onClick={() => setMegaOpen(false)}
                         >
-                          <div
-                            style={{
-                              position: 'relative',
-                              aspectRatio: '4/3',
-                              overflow: 'hidden',
-                              marginBottom: '0.6rem',
-                              background: 'var(--ivory)',
-                            }}
-                          >
+                          <div className="relative mb-2.5 aspect-[4/3] overflow-hidden bg-[var(--ivory)]">
                             <img
                               src={col.image}
                               alt={col.label}
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                transition: 'transform 0.5s ease',
-                                filter: 'brightness(0.7)',
-                              }}
-                              onMouseEnter={(e) => { (e.target as HTMLImageElement).style.transform = 'scale(1.08)'; }}
-                              onMouseLeave={(e) => { (e.target as HTMLImageElement).style.transform = 'scale(1)'; }}
+                              className="h-full w-full object-cover brightness-75 transition-transform duration-500 group-hover:scale-110"
                             />
                           </div>
-                          <p
-                            style={{
-                              fontFamily: "'DM Sans', sans-serif",
-                              fontSize: '0.62rem',
-                              fontWeight: 500,
-                              letterSpacing: '0.18em',
-                              textTransform: 'uppercase',
-                              color: 'var(--ivory)',
-                              marginBottom: '0.2rem',
-                            }}
-                          >
+                          <p className="mb-1 text-[0.62rem] font-medium uppercase tracking-[0.18em] text-[var(--ivory)]">
                             {col.label}
                           </p>
-                          <p
-                            style={{
-                              fontFamily: "'DM Sans', sans-serif",
-                              fontSize: '0.58rem',
-                              letterSpacing: '0.1em',
-                              color: 'rgba(250,247,240,0.35)',
-                            }}
-                          >
+                          <p className="text-[0.58rem] tracking-[0.1em] text-[#faf7f059]">
                             {col.desc}
                           </p>
                         </Link>
@@ -245,10 +178,7 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="nav-item"
-                    style={{ color: 'rgba(250,247,240,0.65)', textDecoration: 'none' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--ivory)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(250,247,240,0.65)')}
+                    className={navLinkClass}
                   >
                     {link.label}
                   </Link>
@@ -257,58 +187,35 @@ export function Navbar() {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center gap-2">
+            <div className="ml-auto flex shrink-0 items-center gap-1.5 xl:gap-2">
 
               {/* Search */}
               <button
-                className="btn-icon"
+                className={iconButtonClass}
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
               >
                 <Search size={16} strokeWidth={1.5} />
               </button>
 
+              <Link href={SITE_CONTACT.phoneHref} className={tollFreeLinkClass}>
+                <Phone size={15} strokeWidth={1.8} />
+                <span>Toll Free</span>
+                <span className="tracking-[0.08em]">{SITE_CONTACT.phone.replace('+91 ', '')}</span>
+              </Link>
+
               {/* Wishlist */}
               <button
                 onClick={() => {
-                  router.push(token ? '/wishlist' : '/login?redirect=/wishlist');
+                  router.push(token ? '/wishlist' : '/login');
                 }}
                 aria-label="Wishlist"
-                className="relative hidden sm:inline-flex items-center"
-                style={{
-                  gap: '0.45rem',
-                  color: 'rgba(250,247,240,0.88)',
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '0.35rem 0.15rem',
-                  cursor: 'pointer',
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '0.82rem',
-                  fontWeight: 500,
-                  letterSpacing: '0',
-                }}
+                className={actionButtonClass}
               >
                 <Heart size={20} strokeWidth={1.9} />
-                <span>Wishlist</span>
+                <span className="hidden xl:inline">Wishlist</span>
                 {wishlistCount > 0 && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '-2px',
-                      right: '-8px',
-                      width: '14px',
-                      height: '14px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, var(--rolex-green), var(--forest))',
-                      color: 'var(--ivory)',
-                      border: '1px solid rgba(228,199,124,0.45)',
-                      fontSize: '0.5rem',
-                      fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
+                  <span className={`${countBadgeClass} -right-2`}>
                     {wishlistCount}
                   </span>
                 )}
@@ -316,96 +223,38 @@ export function Navbar() {
 
               {/* Cart */}
               <button
-                className="relative hidden sm:inline-flex items-center"
+                className={actionButtonClass}
                 onClick={() => dispatch(openCartDrawer())}
                 aria-label="Cart"
-                style={{
-                  gap: '0.45rem',
-                  color: 'rgba(250,247,240,0.88)',
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '0.35rem 0.15rem',
-                  cursor: 'pointer',
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '0.82rem',
-                  fontWeight: 500,
-                  letterSpacing: '0',
-                }}
               >
                 <ShoppingCart size={20} strokeWidth={1.9} />
-                <span>Cart</span>
+                <span className="hidden xl:inline">Cart</span>
                 {cartCount > 0 && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '-2px',
-                      right: '-7px',
-                      width: '14px',
-                      height: '14px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, var(--rolex-green), var(--forest))',
-                      color: 'var(--ivory)',
-                      border: '1px solid rgba(228,199,124,0.45)',
-                      fontSize: '0.5rem',
-                      fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
+                  <span className={`${countBadgeClass} -right-[7px]`}>
                     {cartCount}
                   </span>
                 )}
               </button>
 
               <button
-                className="hidden lg:inline-flex items-center"
+                className="hidden h-11 items-center gap-1.5 border-0 bg-transparent px-1 text-[0.78rem] font-medium tracking-normal text-[#faf7f0e0] transition hover:text-[var(--gold)] 2xl:inline-flex"
                 onClick={() => {
-                  router.push(token ? '/my-orders' : '/login?redirect=/my-orders');
+                  router.push(token ? '/my-orders' : '/login');
                 }}
                 aria-label="Track Your Order"
-                style={{
-                  gap: '0.45rem',
-                  color: 'rgba(250,247,240,0.88)',
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '0.35rem 0.15rem',
-                  cursor: 'pointer',
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '0.82rem',
-                  fontWeight: 500,
-                  letterSpacing: '0',
-                }}
               >
                 <Truck size={20} strokeWidth={1.9} />
                 <span>Track Your Order</span>
               </button>
 
               <button
-                className="sm:hidden btn-icon relative"
+                className={`${iconButtonClass} relative sm:hidden`}
                 onClick={() => dispatch(openCartDrawer())}
                 aria-label="Cart"
               >
                 <ShoppingCart size={16} strokeWidth={1.5} />
                 {cartCount > 0 && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '6px',
-                      right: '6px',
-                      width: '14px',
-                      height: '14px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, var(--rolex-green), var(--forest))',
-                      color: 'var(--ivory)',
-                      border: '1px solid rgba(228,199,124,0.45)',
-                      fontSize: '0.5rem',
-                      fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
+                  <span className={`${countBadgeClass} right-1.5 top-1.5`}>
                     {cartCount}
                   </span>
                 )}
@@ -413,24 +262,15 @@ export function Navbar() {
 
               {/* Auth */}
               {token ? (
-                <div className="relative group hidden md:block">
-                  <button
-                    className="btn-icon"
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', width: 'auto', padding: '0 0.75rem' }}
-                  >
+                <div className="group relative hidden md:block">
+                  <button className={`${iconButtonClass} w-auto gap-1.5 px-3`}>
                     <User size={14} strokeWidth={1.5} />
-                    <span style={{ fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(250,247,240,0.6)' }}>
+                    <span className="text-[0.6rem] uppercase tracking-[0.18em] text-[#faf7f099]">
                       {user?.name?.split(' ')[0]}
                     </span>
                   </button>
                   <div
-                    className="absolute right-0 top-full mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
-                    style={{
-                      background: 'linear-gradient(180deg, rgba(6,47,36,0.98), rgba(15,12,8,0.97))',
-                      border: '1px solid rgba(0,96,57,0.25)',
-                      backdropFilter: 'blur(20px)',
-                      boxShadow: '0 24px 48px rgba(8,6,4,0.5)',
-                    }}
+                    className="invisible absolute right-0 top-full mt-2 w-48 border border-[#00603940] bg-[linear-gradient(180deg,rgba(18,38,29,0.98),rgba(31,58,47,0.96))] opacity-0 shadow-[0_24px_48px_rgba(8,32,23,0.38)] backdrop-blur-[20px] transition-all duration-200 group-hover:visible group-hover:opacity-100"
                   >
                     {[
                       { label: 'My Orders', href: '/my-orders' },
@@ -439,41 +279,14 @@ export function Navbar() {
                       <Link
                         key={item.href}
                         href={item.href}
-                        style={{
-                          display: 'block',
-                          padding: '0.85rem 1.25rem',
-                          fontSize: '0.62rem',
-                          letterSpacing: '0.2em',
-                          textTransform: 'uppercase',
-                          color: 'rgba(250,247,240,0.5)',
-                          textDecoration: 'none',
-                          borderBottom: '1px solid rgba(250,247,240,0.06)',
-                          transition: 'color 0.15s',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--gold)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(250,247,240,0.5)')}
+                        className="block border-b border-[#faf7f00f] px-5 py-3.5 text-[0.62rem] uppercase tracking-[0.2em] text-[#faf7f080] no-underline transition hover:text-[var(--gold)]"
                       >
                         {item.label}
                       </Link>
                     ))}
                     <button
                       onClick={() => dispatch(logout())}
-                      style={{
-                        width: '100%',
-                        textAlign: 'left',
-                        padding: '0.85rem 1.25rem',
-                        fontSize: '0.62rem',
-                        letterSpacing: '0.2em',
-                        textTransform: 'uppercase',
-                        color: 'rgba(220,100,100,0.7)',
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'color 0.15s',
-                        display: 'block',
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(220,100,100,0.7)')}
+                      className="block w-full cursor-pointer border-0 bg-transparent px-5 py-3.5 text-left text-[0.62rem] uppercase tracking-[0.2em] text-[#dc6464b3] transition hover:text-red-500"
                     >
                       Sign Out
                     </button>
@@ -482,8 +295,7 @@ export function Navbar() {
               ) : (
                 <button
                   onClick={() => dispatch(openAuthModal('login'))}
-                  className="hidden md:inline-flex btn-outline ml-1"
-                  style={{ padding: '0.5rem 1.25rem', fontSize: '0.58rem' }}
+                  className={`${outlineButtonClass} ml-1 hidden px-4 py-2 text-[0.56rem] lg:inline-flex xl:px-5 xl:text-[0.58rem]`}
                 >
                   Sign In
                 </button>
@@ -491,7 +303,7 @@ export function Navbar() {
 
               {/* Mobile hamburger */}
               <button
-                className="md:hidden btn-icon"
+                className={`${iconButtonClass} lg:hidden`}
                 onClick={() => setMobileOpen(!mobileOpen)}
               >
                 {mobileOpen ? <X size={16} strokeWidth={1.5} /> : <Menu size={16} strokeWidth={1.5} />}
@@ -502,17 +314,11 @@ export function Navbar() {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div
-            style={{
-              background: 'linear-gradient(180deg, rgba(6,47,36,0.98), rgba(15,12,8,0.98))',
-              borderTop: '1px solid rgba(0,96,57,0.24)',
-              padding: '1.5rem 1.5rem 2rem',
-              animation: 'fadeUp 0.3s ease forwards',
-            }}
-          >
+          <div className="animate-[fadeUp_0.3s_ease_forwards] border-t border-[#0060393d] bg-[linear-gradient(180deg,rgba(18,38,29,0.98),rgba(31,58,47,0.96))] px-6 pb-8 pt-6">
             {[
               ...collectionItems.map((item) => ({ label: item.label, href: item.href })),
               { label: 'Bespoke', href: '/bespoke' },
+              { label: 'Blog', href: '/blog' },
               { label: 'About', href: '/about' },
               { label: 'Contact', href: '/contact-us' },
             ].map((link) => (
@@ -520,17 +326,7 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                style={{
-                  display: 'block',
-                  padding: '0.85rem 0',
-                  fontSize: '0.65rem',
-                  letterSpacing: '0.25em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(250,247,240,0.55)',
-                  textDecoration: 'none',
-                  borderBottom: '1px solid rgba(250,247,240,0.05)',
-                  transition: 'color 0.2s ease',
-                }}
+                className="block border-b border-[#faf7f00d] py-3.5 text-[0.65rem] uppercase tracking-[0.25em] text-[#faf7f08c] no-underline transition hover:text-[var(--gold)]"
               >
                 {link.label}
               </Link>
@@ -538,8 +334,7 @@ export function Navbar() {
             {!token && (
               <button
                 onClick={() => { dispatch(openAuthModal('login')); setMobileOpen(false); }}
-                className="btn-primary w-full mt-6"
-                style={{ justifyContent: 'center', fontSize: '0.6rem' }}
+                className={`${primaryButtonClass} mt-6 flex w-full justify-center px-6 py-3 text-[0.6rem]`}
               >
                 Sign In
               </button>
@@ -551,73 +346,40 @@ export function Navbar() {
       {/* Search modal */}
       {searchOpen && (
         <div
-          className="drawer-overlay"
-          style={{ zIndex: 200 }}
+          className="fixed inset-0 z-[200] animate-[fadeIn_0.25s_ease_forwards] bg-[#032016bd] backdrop-blur"
           onClick={() => setSearchOpen(false)}
         >
           <div
-            style={{
-              position: 'absolute',
-              top: '100px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '100%',
-              maxWidth: '640px',
-              padding: '0 1.5rem',
-              animation: 'scaleIn 0.25s ease forwards',
-            }}
+            className="animate-[scaleIn_0.25s_ease_forwards] absolute left-1/2 top-[100px] w-full max-w-[640px] -translate-x-1/2 px-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              style={{
-                background: 'linear-gradient(180deg, rgba(6,47,36,0.98), rgba(15,12,8,0.97))',
-                border: '1px solid rgba(0,96,57,0.3)',
-                backdropFilter: 'blur(24px)',
-                padding: '1.5rem',
-                boxShadow: '0 40px 80px rgba(8,6,4,0.7)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Search size={16} style={{ color: 'var(--gold-light)', flexShrink: 0 }} />
+            <div className="border border-[#0060394d] bg-[linear-gradient(180deg,rgba(18,38,29,0.98),rgba(31,58,47,0.96))] p-6 shadow-[0_40px_80px_rgba(8,32,23,0.46)] backdrop-blur-3xl">
+              <div className="flex items-center gap-4">
+                <Search size={16} className="shrink-0 text-[var(--gold-light)]" />
                 <input
                   ref={searchRef}
                   value={searchQ}
                   onChange={(e) => setSearchQ(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && searchQ.trim()) {
-                      window.location.href = `/shop?search=${encodeURIComponent(searchQ.trim())}`;
+                      window.location.href = buildShopPath({ search: searchQ.trim() });
                       setSearchOpen(false);
                     }
                     if (e.key === 'Escape') setSearchOpen(false);
                   }}
                   placeholder="Search lighting collections..."
-                  style={{
-                    flex: 1,
-                    background: 'transparent',
-                    border: 'none',
-                    outline: 'none',
-                    color: 'var(--ivory)',
-                    fontSize: '1rem',
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: 300,
-                    letterSpacing: '0.04em',
-                  }}
+                  className="flex-1 border-0 bg-transparent text-base font-light tracking-[0.04em] text-[var(--ivory)] outline-none placeholder:text-[#faf7f04d]"
                 />
-                <button onClick={() => setSearchOpen(false)} style={{ color: 'rgba(250,247,240,0.3)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                <button
+                  onClick={() => setSearchOpen(false)}
+                  className="cursor-pointer border-0 bg-transparent text-[#faf7f04d] transition hover:text-[var(--gold)]"
+                  aria-label="Close search"
+                >
                   <X size={16} />
                 </button>
               </div>
-              <div
-                style={{
-                  marginTop: '1rem',
-                  paddingTop: '1rem',
-                  borderTop: '1px solid rgba(250,247,240,0.06)',
-                  display: 'flex',
-                  gap: '0.5rem',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <span style={{ fontSize: '0.55rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(250,247,240,0.25)', marginRight: '0.25rem' }}>
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-[#faf7f00f] pt-4">
+                <span className="mr-1 text-[0.55rem] uppercase tracking-[0.2em] text-[#faf7f040]">
                   Browse:
                 </span>
                 {browseItems.map((cat) => (
@@ -625,18 +387,7 @@ export function Navbar() {
                     key={cat.href}
                     href={cat.href}
                     onClick={() => setSearchOpen(false)}
-                    style={{
-                      fontSize: '0.58rem',
-                      letterSpacing: '0.16em',
-                      textTransform: 'uppercase',
-                      color: 'rgba(250,247,240,0.4)',
-                      textDecoration: 'none',
-                      padding: '0.25rem 0.6rem',
-                      border: '1px solid rgba(250,247,240,0.08)',
-                      transition: 'all 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--gold)'; e.currentTarget.style.borderColor = 'rgba(0,96,57,0.3)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(250,247,240,0.4)'; e.currentTarget.style.borderColor = 'rgba(250,247,240,0.08)'; }}
+                    className="border border-[#faf7f014] px-2.5 py-1 text-[0.58rem] uppercase tracking-[0.16em] text-[#faf7f066] no-underline transition hover:border-[#0060394d] hover:text-[var(--gold)]"
                   >
                     {cat.label}
                   </Link>

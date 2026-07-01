@@ -97,7 +97,7 @@ export function ProductCard({ product }: ProductCardProps) {
     };
     if (!token) {
       localStorage.setItem('royace_pending_wishlist', JSON.stringify(wishlistItem));
-      router.push('/login?redirect=/wishlist');
+      router.push('/login');
       return;
     }
     dispatch(toggleWishlistItem(wishlistItem));

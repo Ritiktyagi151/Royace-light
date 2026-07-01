@@ -43,7 +43,7 @@ export default function MyOrdersPage() {
         <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.8rem', fontWeight: 300, fontStyle: 'italic', color: 'rgba(250,247,240,0.6)' }}>
           Sign in to view your orders
         </h2>
-        <Link href="/login?redirect=/my-orders" className="btn-primary" style={{ fontSize: '0.6rem' }}>
+        <Link href="/login" className="btn-primary" style={{ fontSize: '0.6rem' }}>
           Sign In
         </Link>
       </EmptyWrapper>

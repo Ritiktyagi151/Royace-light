@@ -3,13 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { cardReveal, SectionReveal, staggerContainer } from "./SectionReveal";
+import { cardReveal, cardRevealRight, SectionReveal, staggerContainer } from "./SectionReveal";
+import { buildShopPath } from "@/lib/shopUrls";
 
 const promoTiles = [
   {
     title: "Lamps",
     kicker: "Table & Floor Statements",
-    href: "/shop?category=table-lamps",
+    href: buildShopPath({ category: "table-lamps" }),
     image:
       "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=1600&q=80",
     sale: true,
@@ -18,14 +19,14 @@ const promoTiles = [
   {
     title: "Chandeliers",
     kicker: "Crystal & Vintage Centrepieces",
-    href: "/shop?category=chandeliers",
+    href: buildShopPath({ category: "chandeliers" }),
     image:
       "https://images.unsplash.com/photo-1572955034096-233ea61a78d8?auto=format&fit=crop&w=1200&q=80",
   },
   {
     title: "Pendants",
     kicker: "Hanging Silhouettes",
-    href: "/shop?category=pendants",
+    href: buildShopPath({ category: "pendants" }),
     image:
       "https://images.unsplash.com/photo-1540932239986-30128078f3c5?auto=format&fit=crop&w=1200&q=80",
     className: "lg:row-span-2", // Column 3: Full Height 👍
@@ -33,7 +34,7 @@ const promoTiles = [
   {
     title: "Outdoor",
     kicker: "Gates, Walls & Gardens",
-    href: "/shop?category=outdoor",
+    href: buildShopPath({ category: "outdoor" }),
     image:
       "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80", // Column 2 ke bottom me auto-fit ho jayega
   },
@@ -41,7 +42,7 @@ const promoTiles = [
 
 export default function HomePromoMosaic() {
   return (
-    <SectionReveal className="bg-[#f5efe6] p-3 md:p-4">
+    <SectionReveal direction="left" className="bg-[#f5efe6] p-3 md:p-4">
       <motion.div
         className="grid auto-rows-[320px] gap-3 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] lg:grid-rows-[270px_270px]"
         variants={staggerContainer}
@@ -52,7 +53,7 @@ export default function HomePromoMosaic() {
         {promoTiles.map((tile) => (
           <motion.div
             key={tile.title}
-            variants={cardReveal}
+            variants={promoTiles.indexOf(tile) % 2 === 0 ? cardReveal : cardRevealRight}
             className={tile.className || ""}
           >
             <Link
@@ -69,7 +70,7 @@ export default function HomePromoMosaic() {
               />
 
               {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#12261d]/78 via-[#173126]/25 to-transparent" />
 
               {/* Sale Content */}
               {tile.sale && (

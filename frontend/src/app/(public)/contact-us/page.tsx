@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowUpRight, Clock, Mail, MapPin, MessageSquare, Phone } from 'lucide-react';
+import { ContactUsClient } from '@/components/contact/ContactUsClient';
 import {
   LEGAL_CONTACT,
   legalCardClass,
@@ -86,6 +87,8 @@ const faqs = [
 ];
 
 export default function ContactUsPage() {
+  return <ContactUsClient />;
+
   return (
     <main className={legalPageClass}>
       <section className={legalHeroClass}>

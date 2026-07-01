@@ -5,6 +5,7 @@ import { ProductCard } from '@/components/products/ProductCard';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { PUBLIC_API_URL } from '@/lib/publicCategories';
+import { buildShopPath } from '@/lib/shopUrls';
 
 async function getProduct(id: string) {
   try {
@@ -84,7 +85,7 @@ export default async function ProductDetailPage({
                 </h2>
               </div>
               <Link
-                href={`/shop?category=${categoryRef}`}
+                href={buildShopPath({ category: categoryRef })}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.6rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold-light)', textDecoration: 'none' }}
               >
                 View All <ArrowRight size={12} />

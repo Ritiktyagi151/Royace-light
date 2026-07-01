@@ -23,6 +23,7 @@ import { addToCartThunk } from '../../store/slices/cartSlice';
 import { openAuthModal, openCartDrawer, addToast } from '../../store/slices/uiSlice';
 import { getAssetUrl } from '@/lib/urls';
 import { selectIsWishlisted, toggleWishlistItem } from '@/store/slices/wishlistSlice';
+import { buildShopPath } from '@/lib/shopUrls';
 
 interface ProductDetailClientProps {
   product: any;
@@ -117,7 +118,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     };
     if (!token) {
       localStorage.setItem('royace_pending_wishlist', JSON.stringify(wishlistItem));
-      router.push('/login?redirect=/wishlist');
+      router.push('/login');
       return;
     }
     dispatch(toggleWishlistItem(wishlistItem));
@@ -275,7 +276,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           {[
             { label: 'Home', href: '/' },
             { label: 'Shop', href: '/shop' },
-            { label: categoryLabel, href: `/shop?category=${categoryHref}` },
+            { label: categoryLabel, href: buildShopPath({ category: categoryHref }) },
             { label: product.name, href: null },
           ].map((crumb, i, arr) => (
             <span key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

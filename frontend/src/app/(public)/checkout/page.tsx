@@ -78,7 +78,7 @@ export default function CheckoutPage() {
         <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: '2rem', fontWeight: 300, fontStyle: 'italic', color: 'rgba(250,247,240,0.7)' }}>
           Sign in to checkout
         </h2>
-        <Link href="/login?redirect=/checkout" className="btn-primary" style={{ fontSize: '0.6rem' }}>
+        <Link href="/login" className="btn-primary" style={{ fontSize: '0.6rem' }}>
           Sign In
         </Link>
       </div>

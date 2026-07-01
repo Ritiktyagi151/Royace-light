@@ -34,7 +34,7 @@ export function AccountShell({
 
   useEffect(() => {
     const savedToken = localStorage.getItem('nc_token');
-    if (!token && !savedToken) router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
+    if (!token && !savedToken) router.replace('/login');
   }, [token, pathname, router]);
 
   const handleLogout = () => {
@@ -53,7 +53,7 @@ export function AccountShell({
         </h1>
 
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(220px,280px)_1fr]">
-          <aside className="border border-[rgba(0,96,57,0.26)] bg-[linear-gradient(180deg,rgba(6,47,36,0.74),rgba(15,12,8,0.82))] py-1">
+          <aside className="border border-[rgba(0,96,57,0.26)] bg-[linear-gradient(180deg,rgba(6,47,36,0.74),rgba(31,58,47,0.82))] py-1">
             <nav aria-label="Account navigation">
               {SIDEBAR_ITEMS.map((item) => {
                 const active = pathname === item.href;
@@ -113,7 +113,7 @@ export function AccountPlaceholder({
 }
 
 export const accountStyles = {
-  card: 'border border-[rgba(0,96,57,0.26)] bg-[linear-gradient(180deg,rgba(6,47,36,0.68),rgba(15,12,8,0.78))] p-[clamp(1.35rem,3vw,2rem)] shadow-[0_26px_70px_rgba(8,6,4,0.28)]',
+  card: 'border border-[rgba(0,96,57,0.26)] bg-[linear-gradient(180deg,rgba(6,47,36,0.68),rgba(31,58,47,0.78))] p-[clamp(1.35rem,3vw,2rem)] shadow-[0_26px_70px_rgba(8,32,23,0.24)]',
   twoColumn: 'grid gap-8 sm:grid-cols-[repeat(auto-fit,minmax(240px,1fr))]',
   sectionTitle: 'mb-4 font-sans text-[0.78rem] font-bold uppercase tracking-[0.16em] text-[var(--ivory)]',
   subTitle: 'mb-3 font-sans text-[0.72rem] font-bold uppercase tracking-[0.12em] text-[rgba(250,247,240,0.78)]',

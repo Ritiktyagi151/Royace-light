@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { storyPillars } from './home-data';
-import { cardReveal, SectionReveal, staggerContainer } from './SectionReveal';
+import { cardReveal, cardRevealRight, SectionReveal, staggerContainer } from './SectionReveal';
 
 export function BrandStory() {
   return (
-    <SectionReveal className="luxury-section">
+    <SectionReveal direction="left" className="luxury-section">
       <div className="grid grid-cols-1 md:grid-cols-[0.85fr_1.15fr] items-stretch overflow-hidden rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-950">
         {/* ---------- Copy column ---------- */}
         <div className="flex flex-col justify-center gap-0 px-6 py-10 sm:px-10 sm:py-14 order-2 md:order-1">
@@ -42,11 +42,11 @@ export function BrandStory() {
             whileInView="show"
             viewport={{ once: false, amount: 0.25 }}
           >
-            {storyPillars.map(({ icon: Icon, title, desc }) => (
+            {storyPillars.map(({ icon: Icon, title, desc }, index) => (
               <motion.div
                 className="group flex items-start gap-3.5"
                 key={title}
-                variants={cardReveal}
+                variants={index % 2 === 0 ? cardReveal : cardRevealRight}
               >
                 <span
                   aria-hidden="true"
