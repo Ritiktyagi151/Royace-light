@@ -7,7 +7,7 @@ export function HeroSection() {
     <section className="relative left-1/2 h-[88vh] w-screen -translate-x-1/2 overflow-hidden bg-obsidian text-ivory">
       <motion.video
         className="absolute inset-0 h-full w-full object-cover"
-        src="/videos/hero-video.mp4"
+        src="/videos/video-project22.mp4"
         // poster="/images/royace-logo.png"
         autoPlay
         muted

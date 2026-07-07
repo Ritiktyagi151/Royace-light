@@ -70,7 +70,7 @@ export default function AdminSettingsPage() {
                 value={(form as any)[key]}
                 onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-                placeholder="••••••••"
+                placeholder="********"
               />
             </div>
           ))}

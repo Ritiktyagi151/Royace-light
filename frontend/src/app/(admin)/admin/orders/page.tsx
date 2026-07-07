@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, ChevronDown, Truck, ExternalLink, Loader2 } from 'lucide-react';
+import { AlertCircle, Truck, ExternalLink, Loader2 } from 'lucide-react';
 import { adminApi } from '@/lib/adminApi';
 
 const STATUSES = ['', 'Placed', 'Confirmed', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'];
@@ -23,6 +23,7 @@ export default function AdminOrdersPage() {
   const [filterStatus, setFilterStatus] = useState('');
   const [page, setPage] = useState(1);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [statusError, setStatusError] = useState('');
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-orders', page, filterStatus],
@@ -37,9 +38,16 @@ export default function AdminOrdersPage() {
   const updateStatus = useMutation({
     mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
       adminApi.patch(`/orders/admin/${orderId}/status`, { status }),
+    onMutate: () => setStatusError(''),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
       queryClient.invalidateQueries({ queryKey: ['admin-order-stats'] });
+    },
+    onError: (error: any) => {
+      const message = error?.response?.status === 401
+        ? 'Please login with a real admin account before changing order status.'
+        : error?.response?.data?.message || 'Unable to update order status. Please try again.';
+      setStatusError(message);
     },
   });
 
@@ -68,6 +76,13 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
+      {statusError && (
+        <div className="flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <AlertCircle size={16} />
+          {statusError}
+        </div>
+      )}
+
       {/* Table */}
       <div className="admin-card overflow-hidden">
         <div className="overflow-x-auto">
@@ -93,7 +108,7 @@ export default function AdminOrdersPage() {
                     </tr>
                   ))
                 : orders.map((order: any) => (
-                    <>
+                    <Fragment key={order._id}>
                       <tr key={order._id} className="table-row cursor-pointer"
                         onClick={() => setExpandedOrder(expandedOrder === order._id ? null : order._id)}>
                         <td className="px-5 py-4 text-sm font-mono font-medium text-gray-800">
@@ -104,7 +119,7 @@ export default function AdminOrdersPage() {
                           <p className="text-xs text-gray-400">{order.userId?.email}</p>
                         </td>
                         <td className="px-5 py-4 text-sm text-gray-600">{order.items.length} item(s)</td>
-                        <td className="px-5 py-4 text-sm font-semibold text-gray-900">₹{order.amount}</td>
+                        <td className="px-5 py-4 text-sm font-semibold text-gray-900">Rs. {order.amount}</td>
                         <td className="px-5 py-4">
                           <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${order.payment ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-100 text-gray-600 border-gray-200'}`}>
                             {order.payment ? 'Paid Online' : 'COD'}
@@ -128,23 +143,28 @@ export default function AdminOrdersPage() {
                               <Truck size={13} /> {order.delivery.waybill}
                             </a>
                           ) : (
-                            <span className="text-xs text-gray-400">—</span>
+                            <span className="text-xs text-gray-400">-</span>
                           )}
                         </td>
                         <td className="px-5 py-4">
                           <select
                             value={order.status}
+                            disabled={updateStatus.isPending && updateStatus.variables?.orderId === order._id}
                             onChange={(e) => {
                               e.stopPropagation();
                               updateStatus.mutate({ orderId: order._id, status: e.target.value });
                             }}
                             onClick={(e) => e.stopPropagation()}
-                            className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-900 cursor-pointer"
+                            onMouseDown={(e) => e.stopPropagation()}
+                            className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-900 cursor-pointer disabled:cursor-wait disabled:opacity-60"
                           >
                             {STATUSES.filter(Boolean).map((s) => (
                               <option key={s} value={s}>{s}</option>
                             ))}
                           </select>
+                          {updateStatus.isPending && updateStatus.variables?.orderId === order._id && (
+                            <Loader2 className="ml-2 inline animate-spin text-gray-400" size={14} />
+                          )}
                         </td>
                       </tr>
 
@@ -161,11 +181,11 @@ export default function AdminOrdersPage() {
                                     <div key={idx} className="flex justify-between text-sm bg-white rounded-lg px-3 py-2 border border-gray-100">
                                       <div>
                                         <span className="font-medium">{item.name}</span>
-                                        {item.color && <span className="text-gray-400 ml-2">· {item.color}</span>}
+                                        {item.color && <span className="text-gray-400 ml-2">- {item.color}</span>}
                                       </div>
                                       <div className="text-right">
-                                        <span className="text-gray-500">×{item.quantity}</span>
-                                        <span className="font-semibold ml-3">₹{item.price * item.quantity}</span>
+                                        <span className="text-gray-500">x{item.quantity}</span>
+                                        <span className="font-semibold ml-3">Rs. {item.price * item.quantity}</span>
                                       </div>
                                     </div>
                                   ))}
@@ -178,7 +198,7 @@ export default function AdminOrdersPage() {
                                 <div className="bg-white rounded-lg px-4 py-3 border border-gray-100 text-sm text-gray-600 space-y-1 mb-4">
                                   <p><span className="font-medium text-gray-800">Method:</span> {order.paymentMethod === 'online' || order.paymentMethod === 'razorpay' ? 'Online Payment' : 'Cash on Delivery'}</p>
                                   <p><span className="font-medium text-gray-800">Status:</span> {order.payment ? 'Paid' : 'Pending'}</p>
-                                  <p><span className="font-medium text-gray-800">Amount:</span> ₹{Number(order.amount || 0).toLocaleString('en-IN')}</p>
+                                  <p><span className="font-medium text-gray-800">Amount:</span> Rs. {Number(order.amount || 0).toLocaleString('en-IN')}</p>
                                   {order.paymentId && <p><span className="font-medium text-gray-800">Payment ID:</span> {order.paymentId}</p>}
                                   {order.razorpayOrderId && <p><span className="font-medium text-gray-800">Razorpay Order ID:</span> {order.razorpayOrderId}</p>}
                                 </div>
@@ -188,7 +208,7 @@ export default function AdminOrdersPage() {
                                   <p>{order.address.addressLineOne}</p>
                                   {order.address.addressLineTwo && <p>{order.address.addressLineTwo}</p>}
                                   <p>{order.address.city}, {order.address.state} - {order.address.pinCode}</p>
-                                  <p className="font-medium text-gray-800">📞 {order.address.phone}</p>
+                                  <p className="font-medium text-gray-800">Phone: {order.address.phone}</p>
                                 </div>
 
                                 {order.delivery?.waybill && (
@@ -204,7 +224,7 @@ export default function AdminOrdersPage() {
 
                                 {order.status === 'Confirmed' && !order.delivery?.waybill && (
                                   <p className="mt-3 text-xs text-orange-600 bg-orange-50 rounded-lg px-3 py-2">
-                                    ⚡ Delhivery shipment being created...
+                                    Delhivery shipment being created...
                                   </p>
                                 )}
                               </div>
@@ -212,7 +232,7 @@ export default function AdminOrdersPage() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </Fragment>
                   ))}
             </tbody>
           </table>

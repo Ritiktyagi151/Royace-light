@@ -59,7 +59,7 @@ export function AdminLogin() {
                 type={showPass ? 'text' : 'password'} required value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-11 text-sm text-gray-900 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
-                placeholder="••••••••"
+                placeholder="********"
               />
               <button type="button" onClick={() => setShowPass(!showPass)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">

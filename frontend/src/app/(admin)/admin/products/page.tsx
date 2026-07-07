@@ -588,9 +588,9 @@ export default function AdminProductsPage() {
                       </td>
                       <td className="px-5 py-4 text-sm text-gray-500 capitalize">{p.category?.name || p.category}</td>
                       <td className="px-5 py-4">
-                        <p className="text-sm font-semibold text-gray-900">₹{p.sellingPrice}</p>
+                        <p className="text-sm font-semibold text-gray-900">Rs. {p.sellingPrice}</p>
                         {p.retailPrice > p.sellingPrice && (
-                          <p className="text-xs text-gray-400 line-through">₹{p.retailPrice}</p>
+                          <p className="text-xs text-gray-400 line-through">Rs. {p.retailPrice}</p>
                         )}
                       </td>
                       <td className="px-5 py-4">
@@ -798,9 +798,9 @@ export default function AdminProductsPage() {
                 </div>
 
                 {[
-                  { key: 'costPrice', label: 'Cost Price (₹) *' },
-                  { key: 'sellingPrice', label: 'Selling Price (₹) *' },
-                  { key: 'retailPrice', label: 'Retail Price (₹) *' },
+                  { key: 'costPrice', label: 'Cost Price (Rs.) *' },
+                  { key: 'sellingPrice', label: 'Selling Price (Rs.) *' },
+                  { key: 'retailPrice', label: 'Retail Price (Rs.) *' },
                   { key: 'totalQuantity', label: 'Stock Quantity *' },
                 ].map(({ key, label }) => (
                   <div key={key}>

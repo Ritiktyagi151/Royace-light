@@ -92,7 +92,7 @@ export function VendorLogin() {
                   required type="tel" value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  placeholder="+91 98765 43210"
+                  placeholder="+91 98911 19199"
                 />
               </div>
             </>

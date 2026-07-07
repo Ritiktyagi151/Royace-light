@@ -7,6 +7,13 @@ export const metadata: Metadata = {
   title: 'Royace Lighting - Luxury Chandeliers & Handcrafted Lighting',
   description:
     'Bespoke chandeliers and luxury lighting for extraordinary interiors.',
+  icons: {
+    icon: [
+      { url: '/royace-logo.png', type: 'image/png' },
+    ],
+    shortcut: '/royace-logo.png',
+    apple: '/royace-logo.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -15,6 +22,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="icon" href="/royace-logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/royace-logo.png" />
       </head>
       <body suppressHydrationWarning>
         <Providers>{children}</Providers>

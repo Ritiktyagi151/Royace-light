@@ -31,7 +31,7 @@ export default function AdminDashboard() {
   });
 
   const stats = [
-    { label: 'Total Revenue', value: `₹${(statsData?.revenue || 0).toLocaleString()}`, icon: IndianRupee, color: 'bg-green-50 text-green-600', change: '+12%' },
+    { label: 'Total Revenue', value: `Rs. ${(statsData?.revenue || 0).toLocaleString()}`, icon: IndianRupee, color: 'bg-green-50 text-green-600', change: '+12%' },
     { label: 'Total Orders', value: statsData?.total || 0, icon: ShoppingBag, color: 'bg-blue-50 text-blue-600', change: '+8%' },
     { label: 'Products', value: productsData?.total || 0, icon: Package, color: 'bg-purple-50 text-purple-600', change: '+3' },
     { label: 'Delivered', value: statsData?.delivered || 0, icon: CheckCircle, color: 'bg-orange-50 text-orange-600', change: '' },
@@ -109,17 +109,17 @@ export default function AdminDashboard() {
         <div className="admin-card p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-gray-900">Recent Orders</h3>
-            <a href="/admin/orders" className="text-xs text-gray-500 hover:text-gray-700 font-medium">View all →</a>
+            <a href="/admin/orders" className="text-xs text-gray-500 hover:text-gray-700 font-medium">View all -</a>
           </div>
           <div className="space-y-3">
             {recentOrders?.map((order: any) => (
               <div key={order._id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                 <div>
                   <p className="text-sm font-medium text-gray-900">#{String(order._id).slice(-6).toUpperCase()}</p>
-                  <p className="text-xs text-gray-500">{order.userId?.name || 'Customer'} · {order.items.length} item(s)</p>
+                  <p className="text-xs text-gray-500">{order.userId?.name || 'Customer'} - {order.items.length} item(s)</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">₹{order.amount}</p>
+                  <p className="text-sm font-semibold text-gray-900">Rs. {order.amount}</p>
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_STYLES[order.status] || 'bg-gray-100 text-gray-600'}`}>
                     {order.status}
                   </span>

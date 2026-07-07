@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 };
 
 const featuredPost = {
+  slug: 'choose-right-chandelier-size-luxury-living-room',
   title: 'How to Choose the Right Chandelier Size for a Luxury Living Room',
   excerpt:
     'A practical guide to scale, ceiling height, finish, and light layering for statement spaces.',
@@ -21,6 +22,7 @@ const featuredPost = {
 
 const posts = [
   {
+    slug: 'warm-white-vs-neutral-white-home-lighting',
     title: 'Warm White vs Neutral White: What Works Best at Home',
     excerpt:
       'Understand color temperature and how it changes the mood of dining rooms, bedrooms, and foyers.',
@@ -31,6 +33,7 @@ const posts = [
       'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=1200&q=85',
   },
   {
+    slug: 'bespoke-lighting-villas-installation-planning',
     title: 'Bespoke Lighting for Villas: What to Plan Before Installation',
     excerpt:
       'From slab points to ceiling reinforcement, these details keep custom lighting projects smooth.',
@@ -41,6 +44,7 @@ const posts = [
       'https://images.unsplash.com/photo-1540932239986-30128078f3c5?auto=format&fit=crop&w=1200&q=85',
   },
   {
+    slug: 'maintaining-crystal-chandeliers-shine',
     title: 'Maintaining Crystal Chandeliers Without Losing Their Shine',
     excerpt:
       'Simple care routines for preserving brilliance, finish quality, and fixture longevity.',
@@ -51,6 +55,7 @@ const posts = [
       'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=85',
   },
   {
+    slug: 'layered-lighting-ideas-dining-rooms',
     title: 'Layered Lighting Ideas for Dining Rooms',
     excerpt:
       'Combine chandeliers, wall lights, and accent lamps to create depth without visual clutter.',
@@ -59,6 +64,39 @@ const posts = [
     readTime: '4 min read',
     image:
       'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=85',
+  },
+  {
+    slug: 'foyer-chandelier-ideas-grand-entrance',
+    title: 'Foyer Chandelier Ideas for a Grand Entrance',
+    excerpt:
+      'Create a strong first impression with the right chandelier scale, drop, and finish for entrance areas.',
+    category: 'Inspiration',
+    date: 'April 18, 2026',
+    readTime: '4 min read',
+    image:
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85',
+  },
+  {
+    slug: 'hotel-lobby-lighting-lessons-for-homes',
+    title: 'Hotel Lobby Lighting Lessons You Can Use at Home',
+    excerpt:
+      'Borrow hospitality lighting principles to make home interiors feel warmer, layered, and more luxurious.',
+    category: 'Luxury Design',
+    date: 'April 7, 2026',
+    readTime: '5 min read',
+    image:
+      'https://images.unsplash.com/photo-1551918120-9739cb430c6d?auto=format&fit=crop&w=1200&q=85',
+  },
+  {
+    slug: 'choosing-wall-lights-for-bedroom-ambience',
+    title: 'Choosing Wall Lights for Bedroom Ambience',
+    excerpt:
+      'Use wall lights to frame bedsides, soften corners, and add hotel-style comfort without clutter.',
+    category: 'Bedroom Lighting',
+    date: 'March 24, 2026',
+    readTime: '4 min read',
+    image:
+      'https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=1200&q=85',
   },
 ];
 
@@ -107,14 +145,17 @@ export default function BlogPage() {
             </Link>
           </div>
 
-          <article className="grid overflow-hidden border border-[#173126]/12 bg-white shadow-[0_24px_70px_rgba(23,49,38,0.08)] lg:grid-cols-[1.15fr_0.85fr]">
+          <Link
+            href={`/blog/${featuredPost.slug}`}
+            className="group grid overflow-hidden border border-[#173126]/12 bg-white shadow-[0_24px_70px_rgba(23,49,38,0.08)] transition hover:-translate-y-1 hover:shadow-[0_30px_80px_rgba(23,49,38,0.12)] lg:grid-cols-[1.15fr_0.85fr]"
+          >
             <div className="relative min-h-[320px] lg:min-h-[520px]">
               <Image
                 src={featuredPost.image}
                 alt={featuredPost.title}
                 fill
                 sizes="(max-width: 1024px) 100vw, 58vw"
-                className="object-cover"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
             </div>
             <div className="flex flex-col justify-center p-6 sm:p-9 lg:p-12">
@@ -135,8 +176,11 @@ export default function BlogPage() {
                   <Clock size={14} /> {featuredPost.readTime}
                 </span>
               </div>
+              <span className="mt-8 inline-flex w-fit items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[#006039]">
+                Read article <ArrowRight size={14} />
+              </span>
             </div>
-          </article>
+          </Link>
         </div>
       </section>
 
@@ -153,7 +197,8 @@ export default function BlogPage() {
 
           <div className="grid gap-px bg-[#173126]/12 sm:grid-cols-2 lg:grid-cols-4">
             {posts.map((post) => (
-              <article key={post.title} className="group bg-white">
+              <Link key={post.slug} href={`/blog/${post.slug}`} className="group bg-white">
+                <article>
                 <div className="relative aspect-[4/3] overflow-hidden bg-[#f5efe6]">
                   <Image
                     src={post.image}
@@ -178,7 +223,8 @@ export default function BlogPage() {
                     <span>{post.readTime}</span>
                   </div>
                 </div>
-              </article>
+                </article>
+              </Link>
             ))}
           </div>
         </div>

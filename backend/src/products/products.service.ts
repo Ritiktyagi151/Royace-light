@@ -66,7 +66,7 @@ export class ProductsService {
 
     const filter: any = { isActive: true };
     if (category) filter.category = await this.resolveCategoryFilter(category);
-    if (search) filter.$text = { $search: search };
+    if (search) Object.assign(filter, this.buildProductSearchFilter(search));
     if (minPrice || maxPrice) {
       filter.sellingPrice = {};
       if (minPrice) filter.sellingPrice.$gte = +minPrice;
@@ -149,7 +149,7 @@ export class ProductsService {
   async findAllAdmin(query: ProductQueryDto & { vendorId?: string }) {
     const filter: any = {};
     if (query.category) filter.category = await this.resolveCategoryFilter(query.category);
-    if (query.search) filter.$text = { $search: query.search };
+    if (query.search) Object.assign(filter, this.buildProductSearchFilter(query.search));
     if (query.vendorId) filter.vendorId = new Types.ObjectId(query.vendorId);
     const page = +query.page || 1;
     const limit = +query.limit || 20;
@@ -317,6 +317,33 @@ export class ProductsService {
 
   private extractSeries(sku: string) {
     return sku.split(/[-_\s]/)[0] || sku;
+  }
+
+  private buildProductSearchFilter(search: string) {
+    const cleaned = this.cleanString(search);
+    if (!cleaned) return {};
+
+    const regex = new RegExp(this.escapeRegex(cleaned), 'i');
+
+    return {
+      $or: [
+        { name: regex },
+        { sku: regex },
+        { slug: regex },
+        { series: regex },
+        { description: regex },
+        { tags: regex },
+        { material: regex },
+        { colors: regex },
+        { finish: regex },
+        { lightSource: regex },
+        { remark: regex },
+      ],
+    };
+  }
+
+  private escapeRegex(value: string) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   private resolveSort(sortBy = 'createdAt', order: 'asc' | 'desc' = 'desc') {

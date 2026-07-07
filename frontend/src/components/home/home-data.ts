@@ -106,12 +106,12 @@ export const showcaseItems = [
     label: 'The Presidential Suite',
     title: 'Low-slung crystal forms for intimate luxury.',
     image:
-      'https://plus.unsplash.com/premium_photo-1761033811768-ca65b391de85?', // Detailed glamour shot looking directly up into a tiered crystal fixture
+      '/images/homepage-img/showcase.jfif', // Detailed glamour shot looking directly up into a tiered crystal fixture
   },
   {
     label: 'The Grand Foyer',
     title: 'Vertical chandeliers tuned for scale, arrival, and drama.',
     image:
-      'https://images.unsplash.com/photo-1598070659798-d5b2c591f832', // Dramatic, towering modern spiraling ceiling chandelier
+      '/images/homepage-img/showcase1.jfif', // Dramatic, towering modern spiraling ceiling chandelier
   },
 ];

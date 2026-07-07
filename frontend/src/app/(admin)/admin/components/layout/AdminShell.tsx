@@ -9,7 +9,7 @@ import {
   ChevronLeft, ChevronRight, LogOut, Menu, X, Settings,
   BarChart3, Bell,
 } from 'lucide-react';
-import { useAdminSelector, useAdminDispatch, adminLogout, setAdminAuth } from '@/store/admin/store';
+import { useAdminSelector, useAdminDispatch, adminLogout } from '@/store/admin/store';
 import { AdminLogin } from '../auth/AdminLogin';
 
 const NAV_ITEMS = [
@@ -31,26 +31,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   if (!token) {
-    // In development, offer a quick preview bypass so the admin UI can be inspected
-    if (process.env.NODE_ENV === 'development') {
-      return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-          <div className="space-y-4">
-            <AdminLogin />
-            <div className="text-center">
-              <p className="text-sm text-gray-500 mb-2">Development preview: view the admin UI without logging in.</p>
-              <button
-                onClick={() => dispatch(setAdminAuth({ token: 'dev-token', admin: { _id: 'dev', name: 'Dev Admin', email: 'dev@local', role: 'admin' } }))}
-                className="px-4 py-2 bg-gray-900 text-white rounded-lg"
-              >
-                Preview Admin UI
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
     return <AdminLogin />;
   }
 

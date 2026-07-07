@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, Image as ImageIcon, X, Loader2 } from 'lucide-react';
 import { adminApi } from '@/lib/adminApi';
 import Pagination from '@/components/Pagination';
+import { getAssetUrl } from '@/lib/urls';
 
 const EMPTY_FORM = {
   name: '', slug: '', description: '', emoji: '', sortOrder: 0, isActive: true,
@@ -52,7 +53,7 @@ export default function AdminCategoriesPage() {
 
   const openAdd = () => { setEditing(null); setForm({ ...EMPTY_FORM }); setImageFile(null); setImagePreview(''); setModalOpen(true); };
 
-  const openEdit = (c: any) => { setEditing(c); setForm({ name: c.name, slug: c.slug, description: c.description || '', emoji: c.emoji || '', sortOrder: c.sortOrder || 0, isActive: c.isActive }); setImagePreview(c.image || ''); setImageFile(null); setModalOpen(true); };
+  const openEdit = (c: any) => { setEditing(c); setForm({ name: c.name, slug: c.slug, description: c.description || '', emoji: c.emoji || '', sortOrder: c.sortOrder || 0, isActive: c.isActive }); setImagePreview(getAssetUrl(c.image) || ''); setImageFile(null); setModalOpen(true); };
 
   const closeModal = () => { setModalOpen(false); setEditing(null); };
 
@@ -93,7 +94,7 @@ export default function AdminCategoriesPage() {
             )) : categories?.map((c: any) => (
               <tr key={c._id} className="table-row border-b border-gray-50">
                 <td className="px-5 py-4"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0">
-                  {c.image ? <img src={c.image} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-300"><ImageIcon size={16} /></div>}
+                  {c.image ? <img src={getAssetUrl(c.image)} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-300"><ImageIcon size={16} /></div>}
                 </div><div><div className="text-sm font-medium text-gray-900">{c.name}</div><div className="text-xs text-gray-400">{c.description}</div></div></div></td>
                 <td className="px-5 py-4 text-sm text-gray-500">{c.slug}</td>
                 <td className="px-5 py-4">{c.emoji}</td>

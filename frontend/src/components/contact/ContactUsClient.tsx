@@ -123,7 +123,7 @@ export function ContactUsClient() {
               </label>
               <label className={labelClass}>
                 Phone Number
-                <input className={fieldClass} name="phone" type="tel" placeholder="+91 98765 43210" required />
+                <input className={fieldClass} name="phone" type="tel" placeholder="+91 98911 19199" required />
               </label>
               <label className={labelClass}>
                 Subject

@@ -1,12 +1,14 @@
 import { Metadata } from 'next';
 import { BrandStoryRedesign } from '@/components/home/BrandStoryRedesign';
 
+import { BlogSliderSection } from '@/components/home/BlogSliderSection';
 import { CollectionShowcase } from '@/components/home/CollectionShowcase';
 // import { FeaturedCategories } from '@/components/home/FeaturedCategories';
 import { FeaturedProducts } from '@/components/home/FeaturedProducts';
 import { HeroSection } from '@/components/home/HeroSection';
 import HomePromoMosaic from '@/components/home/HomePromoMosaic';
 import { NewsletterSection } from '@/components/home/NewsletterSection';
+import { ServiceHighlights } from '@/components/home/ServiceHighlights';
 import { Testimonials } from '@/components/home/Testimonials';
 import { WhyChooseUs } from '@/components/home/WhyChooseUs';
 import { fetchPublicCategories } from '@/lib/publicCategories';
@@ -26,12 +28,14 @@ export default async function HomePage() {
     <div className="home-page">
       <HeroSection />
       <HomePromoMosaic />
+      <ServiceHighlights />
       <ExperienceStoresSection />
       <BrandStoryRedesign />
       {/* <FeaturedCategories /> */}
       <FeaturedProducts collections={collections} />
       <CollectionShowcase />
       <WhyChooseUs />
+      <BlogSliderSection />
       <Testimonials />
       <NewsletterSection />
     </div>

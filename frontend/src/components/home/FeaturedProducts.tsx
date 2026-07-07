@@ -34,7 +34,7 @@ export function FeaturedProducts({ collections }: FeaturedProductsProps) {
   }
 
   return (
-    <SectionReveal direction="left" className="bg-[#f5efe6] px-4 py-16 text-[#173126] sm:px-6 lg:px-10 lg:py-24">
+    <div  className="bg-[#f5efe6] px-4 py-16 text-[#173126] sm:px-6 lg:px-10 lg:py-24">
       <div className="mx-auto max-w-7xl">
         <div className="mb-10 flex flex-col gap-6 border-b border-[#173126]/12 pb-8 md:flex-row md:items-end md:justify-between">
           <div className="max-w-3xl">
@@ -42,7 +42,7 @@ export function FeaturedProducts({ collections }: FeaturedProductsProps) {
               <span className="h-px w-9 bg-[#006039]" />
               Signature Collections
             </span>
-            <h2 className="mt-5 font-serif text-[clamp(2.1rem,5vw,4.5rem)] font-light italic leading-[0.98]">
+            <h2 className="mt-5 text-[clamp(2rem,8vw,3.75rem)] font-semibold leading-[1.04]">
               Curated lighting collections for refined interiors.
             </h2>
           </div>
@@ -63,7 +63,7 @@ export function FeaturedProducts({ collections }: FeaturedProductsProps) {
           <motion.div key={collection._id || collection.slug} variants={index % 2 === 0 ? cardReveal : cardRevealRight}>
             <Link
               href={categoryHref(collection)}
-              className="group relative flex min-h-[420px] overflow-hidden border border-[#173126]/10 bg-white text-white shadow-[0_24px_70px_rgba(23,49,38,0.12)] outline-none transition duration-300 hover:-translate-y-1 focus-visible:ring-2 focus-visible:ring-[#006039]/40"
+              className="group relative flex min-h-[340px] overflow-hidden border border-[#173126]/10 bg-white text-white shadow-[0_24px_70px_rgba(23,49,38,0.12)] outline-none transition duration-300 hover:-translate-y-1 focus-visible:ring-2 focus-visible:ring-[#006039]/40 sm:min-h-[380px] lg:min-h-[420px]"
             >
               {collection.image ? (
                 <Image
@@ -102,6 +102,6 @@ export function FeaturedProducts({ collections }: FeaturedProductsProps) {
           </motion.div>
         ))}
       </motion.div>
-    </SectionReveal>
+    </div>
   );
 }

@@ -199,20 +199,24 @@ export class OrdersService {
             dispatchedAt: new Date(),
           },
         });
+      } else {
+        console.warn(`Delhivery shipment not created for order ${orderId}: ${shipmentResult.error || 'Unknown error'}`);
       }
     }
 
     // ─── Email on Shipped ────────────────────────────────────
     if (dto.status === OrderStatus.SHIPPED && !order.emailSentShipped && user) {
       const updated = await this.orderModel.findById(orderId);
-      await this.emailService.sendOrderShippedEmail(user.email, updated);
-      await this.orderModel.findByIdAndUpdate(orderId, { emailSentShipped: true });
+      await this.emailService.sendOrderShippedEmail(user.email, updated)
+        .then(() => this.orderModel.findByIdAndUpdate(orderId, { emailSentShipped: true }))
+        .catch((err) => console.warn(`Order shipped email failed for ${orderId}: ${err.message}`));
     }
 
     // ─── Email on Delivered ──────────────────────────────────
     if (dto.status === OrderStatus.DELIVERED && !order.emailSentDelivered && user) {
-      await this.emailService.sendOrderDeliveredEmail(user.email, order);
-      await this.orderModel.findByIdAndUpdate(orderId, { emailSentDelivered: true });
+      await this.emailService.sendOrderDeliveredEmail(user.email, order)
+        .then(() => this.orderModel.findByIdAndUpdate(orderId, { emailSentDelivered: true }))
+        .catch((err) => console.warn(`Order delivered email failed for ${orderId}: ${err.message}`));
     }
 
     return this.orderModel.findById(orderId);

@@ -52,7 +52,7 @@ export function FeaturedCategories() {
           >
             <Link
               href={categoryHref(category)}
-              className="group relative flex min-h-[360px] overflow-hidden border border-[#173126]/10 bg-white text-white shadow-[0_24px_70px_rgba(23,49,38,0.12)] outline-none transition duration-300 hover:-translate-y-1 hover:border-[#006039]/35 focus-visible:border-[#006039] focus-visible:ring-2 focus-visible:ring-[#006039]/30 sm:min-h-[410px]"
+              className="group relative flex min-h-[320px] overflow-hidden border border-[#173126]/10 bg-white text-white shadow-[0_24px_70px_rgba(23,49,38,0.12)] outline-none transition duration-300 hover:-translate-y-1 hover:border-[#006039]/35 focus-visible:border-[#006039] focus-visible:ring-2 focus-visible:ring-[#006039]/30 sm:min-h-[380px] lg:min-h-[410px]"
             >
               <Image
                 src={category.image || FALLBACK_CATEGORIES[index % FALLBACK_CATEGORIES.length].image || ''}

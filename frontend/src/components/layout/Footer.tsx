@@ -42,7 +42,7 @@ const iconLinkClass =
   'flex h-9 w-9 items-center justify-center border border-white/10 bg-white/[0.04] text-white/60 transition hover:border-[var(--green-border)] hover:bg-[var(--green-muted)] hover:text-[var(--gold-light)]';
 
 const primaryLinkClass =
-  'inline-flex items-center justify-center gap-2 overflow-hidden border border-[var(--gold)] bg-[var(--gold)] px-10 py-4 text-[0.58rem] font-medium uppercase tracking-[0.18em] text-[var(--obsidian)] transition-all duration-300 hover:bg-[linear-gradient(135deg,var(--gold-light),var(--gold-deep))] hover:shadow-[var(--glow-gold-sm)]';
+  'inline-flex items-center justify-center gap-2 overflow-hidden border border-[var(--gold)] bg-[var(--gold)] px-6 py-4 text-center text-[0.58rem] font-medium uppercase tracking-[0.16em] text-[var(--obsidian)] transition-all duration-300 hover:bg-[linear-gradient(135deg,var(--gold-light),var(--gold-deep))] hover:shadow-[var(--glow-gold-sm)] sm:px-10 sm:tracking-[0.18em]';
 
 export function Footer() {
   const { data: fetchedCategories } = usePublicCategories();
@@ -59,7 +59,7 @@ export function Footer() {
   return (
     <footer className="border-t border-white/[0.06] bg-[var(--obsidian)]">
       {/* Top CTA band */}
-      <div className="border-b border-white/[0.06] bg-[radial-gradient(ellipse_at_center,rgba(0,96,57,0.06)_0%,transparent_70%)] px-6 py-16 text-center">
+      {/* <div className="border-b border-white/[0.06] bg-[radial-gradient(ellipse_at_center,rgba(0,96,57,0.06)_0%,transparent_70%)] px-6 py-16 text-center">
         <p className="mb-4 text-[0.58rem] font-semibold uppercase tracking-[0.28em] text-[var(--gold)]">Commission a Piece</p>
         <h3 className="mb-7 font-serif text-[clamp(1.8rem,4vw,3rem)] font-light italic text-[var(--ivory)]">
           Illuminate Your{' '}
@@ -68,7 +68,7 @@ export function Footer() {
         <Link href="/bespoke" className={primaryLinkClass}>
           Begin a Commission
         </Link>
-      </div>
+      </div> */}
 
       {/* Main footer grid */}
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 py-16 lg:grid-cols-12 lg:pb-12">
@@ -96,9 +96,9 @@ export function Footer() {
             ))}
           </div> */}
 
-          <div className="mb-8 grid max-w-[320px] grid-cols-3 border border-white/10 bg-white/[0.02]">
+          <div className="mb-8 grid max-w-[320px] grid-cols-3 border border-white/10 bg-white/[0.02] min-[420px]:grid-cols-3">
             {FOOTER_STATS.map((item) => (
-              <div key={item.label} className="border-r border-white/10 px-3 py-4 last:border-r-0">
+              <div key={item.label} className="border-b border-white/10 px-3 py-4 last:border-b-0 min-[420px]:border-b-0 min-[420px]:border-r min-[420px]:last:border-r-0">
                 <strong className="block font-serif text-base font-normal text-[var(--gold-light)]">
                   {item.value}
                 </strong>
@@ -212,7 +212,7 @@ export function Footer() {
         {/* Contact */}
         <div className="lg:col-span-3">
           <h4 className={footerHeadingClass}>
-            Atelier
+           Our Studio
           </h4>
           <ul className="m-0 flex list-none flex-col gap-4 p-0">
             <li className="flex items-start gap-3">
@@ -259,7 +259,7 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div
-        className="mx-auto flex max-w-7xl flex-row flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] px-6 py-5"
+        className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 border-t border-white/[0.06] px-6 py-5 text-center md:flex-row md:text-left"
       >
         <p className="text-[0.62rem] tracking-[0.1em] text-white/20">
           © 2026 Royace Lighting. All rights reserved.

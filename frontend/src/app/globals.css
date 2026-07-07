@@ -81,6 +81,21 @@
     box-sizing: border-box;
   }
 
+  .public-site img,
+  .public-site video,
+  .public-site canvas,
+  .public-site svg {
+    max-width: 100%;
+  }
+
+  .public-site a,
+  .public-site button,
+  .public-site input,
+  .public-site select,
+  .public-site textarea {
+    max-width: 100%;
+  }
+
   html {
     scroll-behavior: smooth;
   }
@@ -139,6 +154,16 @@
     font-style: normal;
     letter-spacing: 0.01em;
     line-height: 1.1;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -1600,6 +1625,45 @@
 }
 
 @media (max-width: 767px) {
+  html,
+  body,
+  .public-site {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .public-site section,
+  .public-site main,
+  .public-site footer,
+  .public-site header {
+    max-width: 100vw;
+  }
+
+  .public-site h1,
+  .public-site h2,
+  .public-site h3 {
+    overflow-wrap: anywhere;
+  }
+
+  .public-site p,
+  .public-site span,
+  .public-site strong,
+  .public-site a,
+  .public-site button {
+    overflow-wrap: anywhere;
+  }
+
+  .public-site input,
+  .public-site select,
+  .public-site textarea {
+    font-size: 16px !important;
+  }
+
+  .public-site [class*="text-5xl"],
+  .public-site [class*="text-4xl"] {
+    line-height: 1.08;
+  }
+
   .luxury-section {
     padding: 4.25rem 1rem;
   }

@@ -42,7 +42,7 @@ const promoTiles = [
 
 export default function HomePromoMosaic() {
   return (
-    <SectionReveal direction="left" className="bg-[#f5efe6] p-3 md:p-4">
+    <div className="bg-[#f5efe6] p-3 md:p-4">
       <motion.div
         className="grid auto-rows-[320px] gap-3 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] lg:grid-rows-[270px_270px]"
         variants={staggerContainer}
@@ -113,6 +113,6 @@ export default function HomePromoMosaic() {
           </motion.div>
         ))}
       </motion.div>
-    </SectionReveal>
+    </div>
   );
 }
