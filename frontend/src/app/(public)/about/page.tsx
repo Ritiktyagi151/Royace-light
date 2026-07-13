@@ -14,26 +14,26 @@ import {
 export const metadata: Metadata = {
   title: 'About Us | Royace Lighting',
   description:
-    'Learn about Royace Lighting, a luxury decorative lighting brand crafting chandeliers, pendant lights, wall lights, and bespoke lighting for refined interiors.',
+    'Learn about Royace Lighting, an Indian decorative lighting brand for chandeliers, pendant lights, wall lights, and custom project lighting.',
 };
 
 const values = [
   {
-    title: 'Craft-Led Detail',
+    title: 'Detail-led Craft',
     description:
-      'Every piece is considered through proportion, finish, glow, and installation practicality before it reaches a home or project site.',
+      'Every light is reviewed for proportion, finish, glow, and installation practicality before it reaches a home or project site.',
     Icon: Hammer,
   },
   {
     title: 'Material Honesty',
     description:
-      'We focus on metal, glass, crystal, texture, and warm light quality that feel composed in real interiors, not only in catalogues.',
+      'We focus on metal, glass, crystal, texture, and warm light quality that look refined in real Indian interiors, not only in catalogues.',
     Icon: BadgeCheck,
   },
   {
     title: 'Room-First Design',
     description:
-      'Scale, ceiling height, furniture layout, and mood guide each recommendation so the lighting belongs to the room.',
+      'Room size, ceiling height, furniture layout, wiring point, and mood guide every recommendation.',
     Icon: Lightbulb,
   },
 ];
@@ -96,13 +96,10 @@ export default function AboutPage() {
               About Royace
             </p>
             <h1 className="max-w-4xl font-serif text-[clamp(2.35rem,5.5vw,4.8rem)] leading-[1.02] text-emerald-950">
-              Lighting made for refined, memorable rooms.
+              Decorative lighting made for beautiful Indian homes and projects.
             </h1>
             <p className="mt-5 max-w-2xl text-sm leading-7 text-emerald-900/72 sm:text-base">
-              Royace Lighting creates decorative lighting for homes, villas, hotels,
-              boutiques, and interior projects where the fixture is part of the
-              architecture of the room. Our work blends premium materials, balanced
-              proportions, warm illumination, and dependable project guidance.
+              Royace Lighting creates chandeliers, pendants, wall lights, and custom decorative fixtures for homes, villas, hotels, offices, and commercial interiors. We combine premium materials, balanced proportions, warm illumination, and dependable project guidance.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
@@ -142,12 +139,10 @@ export default function AboutPage() {
               Our Approach
             </p>
             <h2 className="font-serif text-4xl leading-tight text-emerald-950 sm:text-5xl">
-              We design around atmosphere, proportion, and longevity.
+              We plan every light around the room, the finish, and the site.
             </h2>
             <p className="mt-5 text-sm leading-7 text-emerald-900/65">
-              Every Royace recommendation is shaped by the room first. We look at
-              how a fixture will sit in the interior during the day, how it will glow
-              at night, and how the finish will age with the rest of the space.
+              Every Royace recommendation starts with practical details: ceiling height, room use, furniture layout, finish palette, wiring point, and installation access. The aim is to make the light look premium and feel natural in the space.
             </p>
           </div>
           <div className="grid gap-5 sm:grid-cols-3">
@@ -187,7 +182,7 @@ export default function AboutPage() {
               How We Work
             </p>
             <h2 className="font-serif text-4xl leading-tight text-emerald-950 sm:text-5xl">
-              A thoughtful process from first idea to final glow.
+              A clear process from selection to dispatch.
             </h2>
           </div>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -215,13 +210,10 @@ export default function AboutPage() {
           <div className="border border-emerald-100 bg-white p-8 shadow-[0_20px_60px_rgba(6,95,70,0.09)] sm:p-10">
             <Sparkles className="mb-8 text-emerald-600" size={30} strokeWidth={1.4} />
             <h2 className="font-serif text-4xl leading-tight text-emerald-950">
-              For designers, homeowners, and project teams.
+              For homeowners, architects, interior designers, and project teams.
             </h2>
             <p className="mt-5 text-base leading-8 text-emerald-900/70">
-              From statement chandeliers to quiet wall lights, our work is guided by
-              the way people will actually live under the light. We help with product
-              selection, scale checks, finish direction, and custom requests where a
-              standard piece is not enough.
+              From statement chandeliers to subtle wall lights, our work is guided by how people will actually use the room. We help with product selection, scale checks, finish direction, and custom requirements when a standard piece is not enough.
             </p>
             <Link
               href="/contact-us"

@@ -176,6 +176,12 @@ export class CreateProductDto {
   @IsOptional()
   @Transform(({ value }) => parseStringArray(value))
   @IsArray()
+  @IsString({ each: true })
+  hiddenFields?: string[];
+
+  @IsOptional()
+  @Transform(({ value }) => parseStringArray(value))
+  @IsArray()
   existingImages?: string[];
 
   @IsOptional()

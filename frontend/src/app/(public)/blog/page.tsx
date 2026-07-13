@@ -5,7 +5,7 @@ import { ArrowRight, CalendarDays, Clock } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Lighting Journal — Royace Lighting',
-  description: 'Explore Royace Lighting guides, design notes, and expert ideas for luxury chandeliers and bespoke lighting.',
+  description: 'Explore practical lighting guides for Indian homes, villas, hotels, and commercial interiors.',
 };
 
 const featuredPost = {
@@ -34,9 +34,9 @@ const posts = [
   },
   {
     slug: 'bespoke-lighting-villas-installation-planning',
-    title: 'Bespoke Lighting for Villas: What to Plan Before Installation',
+    title: 'Custom Lighting for Villas: What to Plan Before Installation',
     excerpt:
-      'From slab points to ceiling reinforcement, these details keep custom lighting projects smooth.',
+      'From ceiling points to reinforcement, these details keep custom lighting projects smooth on site.',
     category: 'Bespoke',
     date: 'May 28, 2026',
     readTime: '5 min read',
@@ -115,13 +115,13 @@ export default function BlogPage() {
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(18,38,29,0.86),rgba(18,38,29,0.48),rgba(18,38,29,0.18))]" />
         <div className="relative mx-auto flex min-h-[318px] max-w-7xl flex-col justify-end px-5 pb-14 text-[#faf7f0] sm:px-6 lg:px-10">
           <p className="mb-4 text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-[#e4c77c]">
-            Royace Journal
+          Lighting Journal
           </p>
           <h1 className="max-w-3xl font-serif text-[clamp(2.4rem,6vw,5rem)] font-light italic leading-[0.96]">
             Ideas for beautifully lit spaces.
           </h1>
           <p className="mt-5 max-w-2xl text-sm leading-7 text-white/72">
-            Expert lighting guides, styling inspiration, and care notes for chandeliers, wall lights, pendants, and bespoke projects.
+            Practical guides, styling ideas, and care notes for chandeliers, wall lights, pendants, and custom lighting projects.
           </p>
         </div>
       </section>
@@ -134,7 +134,7 @@ export default function BlogPage() {
                 Featured Article
               </p>
               <h2 className="mt-3 font-serif text-[clamp(2rem,4vw,3.4rem)] font-light italic text-[#173126]">
-                Latest lighting insight
+                Latest Lighting Guide
               </h2>
             </div>
             <Link

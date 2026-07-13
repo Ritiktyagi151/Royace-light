@@ -8,6 +8,9 @@ export class RegisterDto {
   email: string;
 
   @IsString()
+  phone: string;
+
+  @IsString()
   @MinLength(6)
   password: string;
 }
@@ -27,6 +30,20 @@ export class ChangePasswordDto {
   @IsString()
   @MinLength(6)
   newPassword: string;
+}
+
+export class UpdateProfileDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+
+  @IsString()
+  @IsOptional()
+  phone?: string;
 }
 
 export class RegisterVendorDto {

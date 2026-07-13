@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { api } from '@/lib/api';
 
 interface AuthState {
-  user: { _id: string; name: string; email: string; role: string } | null;
+  user: { _id: string; name: string; email: string; role: string; phone?: string; isActive?: boolean } | null;
   token: string | null;
   loading: boolean;
   error: string | null;
@@ -29,7 +29,7 @@ export const loginThunk = createAsyncThunk(
 
 export const registerThunk = createAsyncThunk(
   'auth/register',
-  async (data: { name: string; email: string; password: string }, { rejectWithValue }) => {
+  async (data: { name: string; email: string; phone: string; password: string }, { rejectWithValue }) => {
     try {
       const res = await api.post('/auth/register', data);
       return res.data.data;
@@ -61,6 +61,7 @@ const authSlice = createSlice({
     logout(state) {
       state.user = null;
       state.token = null;
+      state.user = null;
       if (typeof window !== 'undefined') {
         localStorage.removeItem('nc_token');
         localStorage.removeItem('nc_user');
@@ -76,8 +77,16 @@ const authSlice = createSlice({
       .addCase(loginThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.token;
+        state.user = {
+          _id: action.payload.userId,
+          name: action.payload.name,
+          email: action.payload.email,
+          role: action.payload.role,
+          phone: action.payload.phone,
+        };
         if (typeof window !== 'undefined') {
           localStorage.setItem('nc_token', action.payload.token);
+          localStorage.setItem('nc_user', JSON.stringify(state.user));
         }
       })
       .addCase(loginThunk.rejected, (state, action) => {
@@ -88,8 +97,16 @@ const authSlice = createSlice({
       .addCase(registerThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.token;
+        state.user = {
+          _id: action.payload.userId,
+          name: action.payload.name,
+          email: action.payload.email,
+          role: action.payload.role,
+          phone: action.payload.phone,
+        };
         if (typeof window !== 'undefined') {
           localStorage.setItem('nc_token', action.payload.token);
+          localStorage.setItem('nc_user', JSON.stringify(state.user));
         }
       })
       .addCase(registerThunk.rejected, (state, action) => {
@@ -98,6 +115,9 @@ const authSlice = createSlice({
       })
       .addCase(fetchProfileThunk.fulfilled, (state, action) => {
         state.user = action.payload;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('nc_user', JSON.stringify(action.payload));
+        }
       });
   },
 });

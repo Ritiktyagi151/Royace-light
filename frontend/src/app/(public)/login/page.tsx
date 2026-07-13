@@ -19,6 +19,7 @@ export default function CustomerLoginPage() {
   const [loginPassword, setLoginPassword] = useState('');
   const [registerName, setRegisterName] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPhone, setRegisterPhone] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
@@ -62,6 +63,7 @@ export default function CustomerLoginPage() {
     const result = await dispatch(registerThunk({
       name: registerName,
       email: registerEmail,
+      phone: registerPhone,
       password: registerPassword,
     }));
     if (result.meta.requestStatus === 'fulfilled') {
@@ -162,13 +164,25 @@ export default function CustomerLoginPage() {
                 />
               </div>
               <div>
-                <label style={labelStyle}>Email / Mobile Number</label>
+                <label style={labelStyle}>Email</label>
                 <input
                   className="input-luxury"
                   required
+                  type="email"
                   value={registerEmail}
                   onChange={(event) => setRegisterEmail(event.target.value)}
-                  placeholder="Email or mobile number"
+                  placeholder="Email address"
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Mobile Number</label>
+                <input
+                  className="input-luxury"
+                  required
+                  type="tel"
+                  value={registerPhone}
+                  onChange={(event) => setRegisterPhone(event.target.value)}
+                  placeholder="Mobile number"
                 />
               </div>
               <div>

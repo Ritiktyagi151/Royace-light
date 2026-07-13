@@ -40,8 +40,55 @@ export async function createRazorpayOrderAPI(token: string, amount: number, orde
   return res.data.data || res.data;
 }
 
+export async function validateCouponAPI(token: string, code: string, subtotal: number) {
+  const res = await api.post('/coupons/validate', { code, subtotal }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data.data || res.data;
+}
+
 export async function fetchOrdersAPI(token: string) {
   const res = await api.get('/orders/my-orders', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data.data || res.data;
+}
+
+export async function requestReturnAPI(token: string, orderId: string, data: { reason: string; details?: string }) {
+  const res = await api.post(`/orders/${orderId}/return-request`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data.data || res.data;
+}
+
+export async function updateProfileAPI(token: string, data: { name: string; email: string; phone?: string }) {
+  const res = await api.patch('/auth/profile', data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data.data || res.data;
+}
+
+export async function changePasswordAPI(token: string, data: { currentPassword: string; newPassword: string }) {
+  const res = await api.patch('/auth/change-password', data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data.data || res.data;
+}
+
+export async function subscribeNewsletterAPI(email: string, source = 'website') {
+  const res = await api.post('/newsletter/subscribe', { email, source });
+  return res.data.data || res.data;
+}
+
+export async function fetchNewsletterPreferenceAPI(token: string) {
+  const res = await api.get('/newsletter/me', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data.data || res.data;
+}
+
+export async function updateNewsletterPreferenceAPI(token: string, isActive: boolean) {
+  const res = await api.patch('/newsletter/me', { isActive }, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data.data || res.data;

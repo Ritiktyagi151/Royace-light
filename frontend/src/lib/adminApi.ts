@@ -16,7 +16,10 @@ adminApi.interceptors.request.use((config) => {
 adminApi.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401 && typeof window !== 'undefined') {
+    const requestUrl = err.config?.url || '';
+    const isLoginRequest = requestUrl.includes('/auth/login');
+
+    if (err.response?.status === 401 && !isLoginRequest && typeof window !== 'undefined') {
       localStorage.removeItem('nc_admin_token');
       window.location.href = '/admin';
     }

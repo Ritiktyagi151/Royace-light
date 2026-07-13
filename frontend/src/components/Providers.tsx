@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { store } from '@/store/store';
 import { useAppDispatch } from '@/store/hooks';
-import { setToken } from '@/store/slices/authSlice';
+import { fetchProfileThunk, setToken } from '@/store/slices/authSlice';
 import { hydrateWishlist } from '@/store/slices/wishlistSlice';
 
 const queryClient = new QueryClient({
@@ -19,6 +19,7 @@ function AuthBootstrap() {
     const token = localStorage.getItem('nc_token');
     if (token) {
       dispatch(setToken(token));
+      dispatch(fetchProfileThunk());
     }
     const savedWishlist = localStorage.getItem('royace_wishlist');
     if (savedWishlist) {

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -11,7 +11,7 @@ import { buildShopPath } from '@/lib/shopUrls';
 
 const INFO_LINKS = [
   { label: 'About Royace', href: '/about' },
-  { label: 'Our Atelier', href: '/atelier' },
+  // { label: 'Our Atelier', href: '/atelier' },
   { label: 'Contact Us', href: '/contact-us' },
   { label: 'Privacy Policy', href: '/privacy-policy' },
   { label: 'Terms & Conditions', href: '/terms-and-conditions' },
@@ -22,12 +22,12 @@ const INFO_LINKS = [
 const SERVICE_LINKS = [
   { label: 'Bespoke Chandeliers', href: '/bespoke' },
   { label: 'Residential Projects', href: buildShopPath({ project: 'residential' }) },
-  { label: 'Hotel & Villa Lighting', href: buildShopPath({ project: 'hospitality' }) },
+  { label: 'Commercial Projects', href: buildShopPath({ project: 'hospitality' }) },
   { label: 'Installation Support', href: '/contact-us' },
 ];
 
 const FOOTER_STATS = [
-  { value: '2012', label: 'Since' },
+  { value: '15+', label: 'Years' },
   { value: '500+', label: 'Projects' },
   { value: 'PAN India', label: 'Delivery' },
 ];
@@ -36,7 +36,10 @@ const footerHeadingClass =
   'mb-6 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-[var(--gold)]';
 
 const footerLinkClass =
-  'text-[0.72rem] font-light tracking-[0.06em] text-[#faf7f0e6] no-underline transition hover:text-[var(--gold)]';
+  'text-[0.78rem] font-normal tracking-[0.04em] text-[#faf7f0f2] no-underline transition hover:text-[var(--gold)]';
+
+const footerCollectionLinkClass =
+  `${footerLinkClass} block whitespace-nowrap`;
 
 const iconLinkClass =
   'flex h-9 w-9 items-center justify-center border border-white/10 bg-white/[0.04] text-white/60 transition hover:border-[var(--green-border)] hover:bg-[var(--green-muted)] hover:text-[var(--gold-light)]';
@@ -53,8 +56,6 @@ export function Footer() {
       href: categoryHref(category),
     }));
   }, [fetchedCategories]);
-  const visibleCollections = collections.slice(0, 8);
-  const hasMoreCollections = collections.length > visibleCollections.length;
 
   return (
     <footer className="border-t border-white/[0.06] bg-[var(--obsidian)]">
@@ -71,9 +72,9 @@ export function Footer() {
       </div> */}
 
       {/* Main footer grid */}
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 py-16 lg:grid-cols-12 lg:pb-12">
+      <div className="mx-auto grid max-w-[1420px] grid-cols-1 gap-8 px-6 py-16 sm:px-10 lg:grid-cols-2 lg:pb-12 xl:grid-cols-[minmax(260px,1fr)_minmax(520px,1.75fr)_minmax(220px,0.8fr)_minmax(300px,1fr)]">
         {/* Brand col */}
-        <div className="lg:col-span-3">
+        <div>
           <Link href="/" className=" block w-fit" aria-label="Royace Lighting home">
             <Image
               src="/royace-logo.png"
@@ -85,7 +86,7 @@ export function Footer() {
           </Link>
          
           <p className="mb-8 max-w-[260px] text-[0.78rem] font-light leading-[1.9] tracking-[0.04em] text-[#faf7f0e6]">
-            Purveyors of handcrafted luxury lighting since 2012. Each piece an heirloom, crafted in our New Delhi atelier.
+            Decorative lighting for Indian homes, villas, hotels, offices, and commercial projects, supported by 15+ years of experience.
           </p>
 
           {/* <div className="mb-8 grid max-w-[300px] grid-cols-1 gap-2 text-[0.66rem] uppercase tracking-[0.16em] text-[rgba(250,247,240,0.58)] sm:grid-cols-2">
@@ -96,9 +97,9 @@ export function Footer() {
             ))}
           </div> */}
 
-          <div className="mb-8 grid max-w-[320px] grid-cols-3 border border-white/10 bg-white/[0.02] min-[420px]:grid-cols-3">
+          <div className="mb-8 grid max-w-[320px] grid-cols-3 gap-3">
             {FOOTER_STATS.map((item) => (
-              <div key={item.label} className="border-b border-white/10 px-3 py-4 last:border-b-0 min-[420px]:border-b-0 min-[420px]:border-r min-[420px]:last:border-r-0">
+              <div key={item.label} className="border border-white/10 bg-white/[0.02] px-3 py-4 text-center">
                 <strong className="block font-serif text-base font-normal text-[var(--gold-light)]">
                   {item.value}
                 </strong>
@@ -112,7 +113,7 @@ export function Footer() {
           {/* Socials */}
           <div className="flex gap-2">
             {[
-              { Icon: Instagram, href: '#' },
+              { Icon: Instagram, href: '' },
               { Icon: Facebook, href: '#' },
               { Icon: Twitter, href: '#' },
             ].map(({ Icon, href }, i) => (
@@ -129,31 +130,23 @@ export function Footer() {
         </div>
 
         {/* Collections */}
-        <div className="lg:col-span-2">
+        <div>
           <h4 className={footerHeadingClass}>
             Collections
           </h4>
-          <ul className="m-0 flex list-none flex-col gap-3.5 p-0">
-            {visibleCollections.map((item) => (
+          <ul className="m-0 grid list-none grid-cols-1 gap-x-10 gap-y-3.5 p-0 md:grid-cols-2">
+            {collections.map((item) => (
               <li key={`${item.label}-${item.href}`}>
-                <Link href={item.href} className={footerLinkClass}>
+                <Link href={item.href} className={footerCollectionLinkClass}>
                   {item.label}
                 </Link>
               </li>
             ))}
           </ul>
-          {hasMoreCollections && (
-            <Link
-              href="/shop"
-              className="mt-5 inline-flex items-center gap-2 border border-[rgba(228,199,124,0.35)] px-4 py-2 text-[0.58rem] font-semibold uppercase tracking-[0.2em] text-[var(--gold-light)] transition hover:border-[var(--gold)] hover:bg-[rgba(228,199,124,0.08)]"
-            >
-              View All
-            </Link>
-          )}
         </div>
 
         {/* Info */}
-        <div className="lg:col-span-2">
+        <div>
           <h4 className={footerHeadingClass}>
             Information
           </h4>
@@ -181,14 +174,11 @@ export function Footer() {
               Begin Enquiry
             </Link>
           </div> */}
-        </div>
 
-        {/* Services */}
-        <div className="lg:col-span-2">
-          <h4 className={footerHeadingClass}>
+          <h4 className={`${footerHeadingClass} mt-10`}>
             Services
           </h4>
-          <ul className="m-0 flex list-none flex-col gap-3 p-0">
+          <ul className="m-0 flex list-none flex-col gap-3.5 p-0">
             {SERVICE_LINKS.map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className={footerLinkClass}>
@@ -198,19 +188,10 @@ export function Footer() {
             ))}
           </ul>
 
-          <div className="mt-7 border border-[rgba(228,199,124,0.18)] bg-[rgba(0,96,57,0.08)] p-4">
-            <p className="text-[0.58rem] font-semibold uppercase tracking-[0.24em] text-[var(--gold-light)]">
-              Working Hours
-            </p>
-            <p className="mt-3 text-[0.7rem] leading-6 text-white/60">
-              Monday to Saturday<br />
-              10:30 AM - 7:00 PM
-            </p>
-          </div>
         </div>
 
         {/* Contact */}
-        <div className="lg:col-span-3">
+        <div>
           <h4 className={footerHeadingClass}>
            Our Studio
           </h4>
@@ -246,12 +227,22 @@ export function Footer() {
             </li>
           </ul>
 
+          <div className="mt-7 border border-[rgba(228,199,124,0.18)] bg-[rgba(0,96,57,0.08)] p-4">
+            <p className="text-[0.58rem] font-semibold uppercase tracking-[0.24em] text-[var(--gold-light)]">
+              Working Hours
+            </p>
+            <p className="mt-3 text-[0.7rem] leading-6 text-white/60">
+              Monday to Saturday<br />
+              10:30 AM - 7:00 PM
+            </p>
+          </div>
+
           <div className="mt-7 space-y-3 text-[0.68rem] leading-6 tracking-[0.04em] text-white/50">
             <p>
-              For architects, interior designers, homeowners, and hospitality projects.
+              For homeowners, architects, interior designers, builders, and commercial project teams.
             </p>
             <p>
-              Custom finishes, scale adjustments, and installation coordination available on request.
+              Custom finishes, size guidance, dispatch planning, and installation coordination are available on request.
             </p>
           </div>
         </div>
@@ -259,13 +250,13 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div
-        className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 border-t border-white/[0.06] px-6 py-5 text-center md:flex-row md:text-left"
+        className="mx-auto flex max-w-[1420px] flex-col items-center justify-between gap-3 border-t border-white/[0.08] px-6 py-5 text-center md:flex-row md:text-left"
       >
-        <p className="text-[0.62rem] tracking-[0.1em] text-white/20">
-          © 2026 Royace Lighting. All rights reserved.
+        <p className="text-[0.68rem] font-normal tracking-[0.08em] text-white/55">
+          &copy; 2026 Royace Lighting. All rights reserved.
         </p>
-        <p className="text-[0.62rem] tracking-[0.1em] text-white/20">
-        Design and Developed by <a href="https://www.jaikvik.com" target="_blank" rel="noopener noreferrer" className="text-[var(--gold)] no-underline transition hover:text-[var(--gold-light)]">Jaikvik Technology India Pvt Ltd</a>
+        <p className="text-[0.68rem] font-normal tracking-[0.08em] text-white/55">
+        Design and Developed by <a href="https://www.jaikvik.com" target="_blank" rel="noopener noreferrer" className="font-semibold text-[var(--gold-light)] no-underline transition hover:text-[var(--gold)]">Jaikvik Technology India Pvt Ltd</a>
         </p>
       </div>
     </footer>

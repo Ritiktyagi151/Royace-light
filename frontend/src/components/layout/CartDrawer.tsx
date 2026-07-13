@@ -168,7 +168,7 @@ export function CartDrawer() {
                 Your cart is empty
               </p>
               <p style={{ fontSize: '0.72rem', color: 'rgba(250,247,240,0.3)', letterSpacing: '0.06em', textAlign: 'center' }}>
-                Discover our handcrafted lighting collections
+                Explore decorative lighting collections for your home or project
               </p>
               <Link
                 href="/shop"

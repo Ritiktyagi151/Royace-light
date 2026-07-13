@@ -1,62 +1,60 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Quote, Star, ChevronLeft, ChevronRight } from 'lucide-react';
-import { SectionReveal } from './SectionReveal';
 
-// ---- Data (moved inline — feel free to move back to home-data.ts) ----
 const testimonials = [
   {
     quote:
-      'Royace ka finish itna neat tha ki hume second coat ki zaroorat hi nahi padi. Site pe installation bhi bilkul time pe ho gayi.',
+      'The finish quality was neat and consistent. The chandelier suited our foyer exactly as the team had suggested.',
     author: 'Ankit Verma',
     role: 'Homeowner, Gurugram',
   },
   {
     quote:
-      'Scale of production aur quality control dono hi impressive hain. Hamare last 3 projects mein wahi vendor rahe hain.',
+      'Royace understood the design intent and helped us choose fixtures that matched the project palette without delays.',
     author: 'Priya Nair',
     role: 'Interior Designer, Bengaluru',
   },
   {
     quote:
-      'Batch to batch consistency milna rare hai is industry mein — Royace ne wo consistently deliver kiya.',
+      'The product consistency across batches was strong, which made it easier for us to use Royace across multiple sites.',
     author: 'Rohit Malhotra',
     role: 'Project Head, Malhotra Constructions',
   },
   {
     quote:
-      'Team ne site visit karke exact requirement samjhi, uske baad hi material finalize kiya. Professionalism top notch.',
+      'The team reviewed the site requirement properly before finalising the material and size. The process felt professional.',
     author: 'Sneha Kapoor',
     role: 'Architect, Studio Kapoor',
   },
   {
     quote:
-      'Delivery timeline hamesha honor hui, ek bhi delay nahi. Bade projects ke liye ye trust bahut matter karta hai.',
+      'The dispatch timeline was clearly communicated and followed. That reliability matters a lot on larger projects.',
     author: 'Vikram Singh',
     role: 'Site Supervisor, VS Infra',
   },
   {
     quote:
-      'Finish quality dekh kar clients khud impressed ho jaate hain. Reselection ke liye humesha Royace hi recommend karte hain.',
+      'Our clients noticed the finish quality immediately. Royace has become a dependable recommendation for decorative lighting.',
     author: 'Anjali Deshmukh',
     role: 'Interior Consultant, Pune',
   },
   {
     quote:
-      'Packaging se lekar on-site handling tak — har cheez professionally manage hui. Damage rate almost zero raha.',
+      'From packaging to site handling, everything was managed carefully. The products reached in good condition.',
     author: 'Karan Mehta',
     role: 'Contractor, Mehta Builders',
   },
   {
-    quote: 'Product range itni wide hai ki hume kabhi compromise nahi karna pada design ke liye.',
+    quote: 'The collection has enough variety for different rooms, so we did not have to compromise on design direction.',
     author: 'Neha Joshi',
     role: 'Homeowner, Ahmedabad',
   },
   {
     quote:
-      'After-sales support bhi utna hi strong hai jitna product quality. Kisi bhi query pe fast response milta hai.',
+      'The after-sales response was quick and helpful. Product quality and support both were handled well.',
     author: 'Arjun Rao',
     role: 'Facility Manager, Rao Estates',
   },
@@ -67,7 +65,6 @@ const CARDS_PER_VIEW = {
   desktop: 3,
 };
 
-// ---- Component ----
 export function Testimonials() {
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -103,16 +100,12 @@ export function Testimonials() {
   }, [maxIndex]);
 
   const visibleTestimonials = testimonials.slice(index, index + cardsPerView);
-  // wrap around if we're near the end
   if (visibleTestimonials.length < cardsPerView) {
     visibleTestimonials.push(...testimonials.slice(0, cardsPerView - visibleTestimonials.length));
   }
 
   return (
-    <div
-      
-      className="relative isolate overflow-hidden bg-[#dfe8d8] px-4 py-16 text-[#173126] sm:px-6 lg:px-10 lg:py-24"
-    >
+    <div className="relative isolate overflow-hidden bg-[#dfe8d8] px-4 py-16 text-[#173126] sm:px-6 lg:px-10 lg:py-24">
       <div className="pointer-events-none absolute inset-0 z-0 bg-[url('/images/green-texture.png')] bg-cover bg-center opacity-35 mix-blend-multiply" />
       <div className="pointer-events-none absolute inset-0 z-0 bg-[#dfe8d8]/70" />
 
@@ -120,14 +113,14 @@ export function Testimonials() {
         <div className="max-w-3xl">
           <span className="inline-flex items-center gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-[#006039]">
             <span className="h-px w-9 bg-[#006039]" />
-            Patron Notes
+            Customer Feedback
           </span>
           <h2 className="mt-5 text-3xl font-semibold leading-[1.02] text-[#173126]">
-            Trusted by homes where every detail matters.
+            Trusted by homeowners, designers, and project teams.
           </h2>
         </div>
         <p className="max-w-md text-sm leading-7 text-[#173126]/64">
-          Real feedback from patrons, designers, and project teams who choose Royace for finish, scale, and installation confidence.
+          Real feedback from customers who choose Royace for finish quality, scale guidance, dispatch reliability, and site support.
         </p>
       </div>
 
@@ -183,7 +176,6 @@ export function Testimonials() {
           </AnimatePresence>
         </div>
 
-        {/* Navigation */}
         <div className="mt-10 flex items-center justify-center gap-6">
           <button
             onClick={prev}

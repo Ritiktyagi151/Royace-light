@@ -23,6 +23,7 @@ export function AdminLogin() {
         setError('Access denied. Admin accounts only.');
         return;
       }
+      adminApi.defaults.headers.common.Authorization = `Bearer ${token}`;
       dispatch(setAdminAuth({ token, admin: { _id: userId, name, email: form.email, role } }));
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');

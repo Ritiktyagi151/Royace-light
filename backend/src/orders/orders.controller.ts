@@ -1,9 +1,9 @@
 import {
-  Controller, Get, Post, Patch, Body, Param, Query,
-  UseGuards, Request,
+  Controller, Get, Post, Patch, Delete, Body, Param, Query,
+  UseGuards, Request, Header,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, UpdateOrderStatusDto } from './dto/order.dto';
+import { AdminCreateOrderDto, CreateOrderDto, RequestReturnDto, ReviewReturnRequestDto, UpdateOrderStatusDto } from './dto/order.dto';
 import { JwtAuthGuard, AdminGuard } from '../auth/guards/auth.guard';
 
 @Controller('orders')
@@ -34,6 +34,13 @@ export class OrdersController {
     return { success: true, data };
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/return-request')
+  async requestReturn(@Param('id') id: string, @Request() req, @Body() dto: RequestReturnDto) {
+    const data = await this.ordersService.requestReturn(id, req.user._id, dto);
+    return { success: true, message: 'Return request submitted', data };
+  }
+
   // Track single order
   @UseGuards(JwtAuthGuard)
   @Get(':id/track')
@@ -53,20 +60,36 @@ export class OrdersController {
   // ─── Admin routes ───────────────────────────────────────
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('admin/all')
+  @Header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
   async getAllOrders(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 20,
     @Query('status') status?: string,
+    @Query('search') search?: string,
+    @Query('fromDate') fromDate?: string,
+    @Query('toDate') toDate?: string,
   ) {
-    const data = await this.ordersService.getAllOrders(+page, +limit, status);
+    const data = await this.ordersService.getAllOrders(+page, +limit, status, search, fromDate, toDate);
     return { success: true, data };
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('admin/stats')
+  @Header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
   async getStats() {
     const data = await this.ordersService.getOrderStats();
     return { success: true, data };
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('admin')
+  async createAdminOrder(@Body() dto: AdminCreateOrderDto) {
+    const data = await this.ordersService.createAdminOrder(dto);
+    return { success: true, message: 'Order created successfully', data };
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
@@ -74,5 +97,19 @@ export class OrdersController {
   async updateStatus(@Param('id') id: string, @Body() dto: UpdateOrderStatusDto) {
     const data = await this.ordersService.updateOrderStatus(id, dto);
     return { success: true, message: 'Order status updated', data };
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch('admin/:id/return-request')
+  async reviewReturn(@Param('id') id: string, @Body() dto: ReviewReturnRequestDto) {
+    const data = await this.ordersService.reviewReturnRequest(id, dto);
+    return { success: true, message: 'Return request reviewed', data };
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Delete('admin/:id')
+  async deleteOrder(@Param('id') id: string) {
+    const data = await this.ordersService.deleteOrder(id);
+    return { success: true, message: 'Order deleted successfully', data };
   }
 }

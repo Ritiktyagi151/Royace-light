@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Package, ShoppingBag, Users, Store,
   Tag,
+  Percent,
   ChevronLeft, ChevronRight, LogOut, Menu, X, Settings,
   BarChart3, Bell,
 } from 'lucide-react';
@@ -16,6 +17,7 @@ const NAV_ITEMS = [
   { href: '/admin',            icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/admin/products',   icon: Package,         label: 'Products' },
   { href: '/admin/categories', icon: Tag,             label: 'Categories' },
+  { href: '/admin/coupons',    icon: Percent,         label: 'Coupons' },
   { href: '/admin/orders',     icon: ShoppingBag,     label: 'Orders' },
   { href: '/admin/users',      icon: Users,           label: 'Users' },
   { href: '/admin/vendors',    icon: Store,           label: 'Vendors' },
@@ -23,14 +25,22 @@ const NAV_ITEMS = [
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {
-  const { token, admin } = useAdminSelector((s) => s.adminAuth);
+  const { token, admin, bootstrapped } = useAdminSelector((s) => s.adminAuth);
   const dispatch = useAdminDispatch();
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  if (!token) {
+  if (!bootstrapped) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center text-sm font-medium text-gray-500">
+        Checking admin access...
+      </div>
+    );
+  }
+
+  if (!token || !admin) {
     return <AdminLogin />;
   }
 

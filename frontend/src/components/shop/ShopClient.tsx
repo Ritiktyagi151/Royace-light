@@ -77,7 +77,7 @@ export function ShopClient({ initialData, searchParams, categories }: ShopClient
           textAlign: 'center',
         }}
       >
-        <p className="overline-text" style={{ marginBottom: '1rem' }}>Discover</p>
+        <p className="overline-text" style={{ marginBottom: '1rem' }}>Collections</p>
         <h1
           style={{
             fontFamily: "'Playfair Display', serif",
@@ -363,7 +363,7 @@ export function ShopClient({ initialData, searchParams, categories }: ShopClient
                     color: 'rgba(250,247,240,0.5)',
                   }}
                 >
-                  No pieces found
+                  No products found
                 </p>
                 <p style={{ fontSize: '0.72rem', color: 'rgba(250,247,240,0.25)', letterSpacing: '0.06em' }}>
                   Try adjusting your filters or explore our full collection

@@ -147,6 +147,9 @@ export class Product {
   remark?: string;
   // Any extra notes from catalog
 
+  @Prop({ type: [String], default: [] })
+  hiddenFields: string[];
+
   // ── Images ─────────────────────────────────────────────────────────────────
 
   @Prop({ type: [Object], default: [] })

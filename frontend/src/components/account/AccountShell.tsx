@@ -10,6 +10,8 @@ import { logout } from '@/store/slices/authSlice';
 const SIDEBAR_ITEMS = [
   { label: 'My Account', href: '/profile' },
   { label: 'My Orders', href: '/my-orders' },
+  { label: 'Payment Details', href: '/payment-details' },
+  { label: 'My Returns', href: '/my-returns' },
   { label: 'My Wish List', href: '/wishlist' },
   { label: 'Address Book', href: '/address-book' },
   { label: 'Account Information', href: '/account-information' },
@@ -53,7 +55,7 @@ export function AccountShell({
         </h1>
 
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(220px,280px)_1fr]">
-          <aside className="border border-[rgba(0,96,57,0.26)] bg-[linear-gradient(180deg,rgba(6,47,36,0.74),rgba(31,58,47,0.82))] py-1">
+          <aside className="border border-[rgba(0,96,57,0.26)] bg-[linear-gradient(180deg,rgba(6,47,36,0.74),rgba(31,58,47,0.82))] py-1 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
             <nav aria-label="Account navigation">
               {SIDEBAR_ITEMS.map((item) => {
                 const active = pathname === item.href;

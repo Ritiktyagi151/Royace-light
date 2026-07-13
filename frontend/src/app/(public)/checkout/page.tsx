@@ -6,7 +6,7 @@ import { ArrowLeft, ArrowRight, Check, CreditCard, MapPin, Package, Lock, Chevro
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchCartThunk, clearCart, selectCartTotal } from '@/store/slices/cartSlice';
 import { addToast } from '@/store/slices/uiSlice';
-import { createRazorpayOrderAPI, placeOrderAPI } from '@/lib/api';
+import { createRazorpayOrderAPI, placeOrderAPI, validateCouponAPI } from '@/lib/api';
 import { getAssetUrl } from '@/lib/urls';
 
 const STEPS = [
@@ -50,6 +50,9 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<AddressForm>>({});
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'online'>('cod');
   const [placing, setPlacing] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState<{
     orderId: string;
     paymentMethod?: string;
@@ -64,6 +67,10 @@ export default function CheckoutPage() {
     setCartReady(false);
     dispatch(fetchCartThunk(token)).finally(() => setCartReady(true));
   }, [token, dispatch]);
+
+  useEffect(() => {
+    setAppliedCoupon(null);
+  }, [subtotal]);
 
   if (!token) {
     return (
@@ -210,6 +217,9 @@ export default function CheckoutPage() {
       document.body.appendChild(script);
     });
 
+  const discountAmount = Number(appliedCoupon?.discountAmount || 0);
+  const orderTotal = Math.max(0, subtotal - discountAmount);
+
   const getOrderPayload = (paymentFields: Record<string, string> = {}) => ({
     items: items.map((item) => ({
       productId: item.productId,
@@ -221,9 +231,11 @@ export default function CheckoutPage() {
       image: item.image || '',
       itemTotal: item.price * item.quantity,
     })),
-    amount: subtotal,
-    totalAmount: subtotal,
+    amount: orderTotal,
+    totalAmount: orderTotal,
     deliveryFees: 0,
+    couponCode: appliedCoupon?.code,
+    discountAmount,
     paymentMethod,
     address: {
       fullName: address.fullName,
@@ -245,7 +257,7 @@ export default function CheckoutPage() {
     const loaded = await loadRazorpayScript();
     if (!loaded) throw new Error('Unable to load payment gateway');
 
-    const razorpayOrder = await createRazorpayOrderAPI(token!, subtotal, orderData);
+    const razorpayOrder = await createRazorpayOrderAPI(token!, orderTotal, orderData);
     return new Promise<Record<string, string>>((resolve, reject) => {
       const Razorpay = (window as any).Razorpay;
       const checkout = new Razorpay({
@@ -273,6 +285,27 @@ export default function CheckoutPage() {
 
       checkout.open();
     });
+  };
+
+  const applyCoupon = async () => {
+    if (!token || !couponCode.trim()) return;
+    setApplyingCoupon(true);
+    try {
+      const result = await validateCouponAPI(token, couponCode.trim(), subtotal);
+      setAppliedCoupon(result);
+      setCouponCode(result.code);
+      dispatch(addToast({ message: 'Coupon applied', type: 'success' }));
+    } catch (err: any) {
+      setAppliedCoupon(null);
+      dispatch(addToast({ message: err.response?.data?.message || 'Invalid coupon', type: 'error' }));
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
   };
 
   const handlePlaceOrder = async () => {
@@ -594,16 +627,53 @@ export default function CheckoutPage() {
                 <span style={{ fontSize: '0.65rem', color: 'rgba(250,247,240,0.4)', letterSpacing: '0.06em' }}>Subtotal</span>
                 <span style={{ fontSize: '0.78rem', color: 'var(--ivory)' }}>₹{subtotal.toLocaleString('en-IN')}</span>
               </div>
+              {appliedCoupon && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                  <span style={{ fontSize: '0.65rem', color: 'rgba(228,199,124,0.72)', letterSpacing: '0.06em' }}>Coupon ({appliedCoupon.code})</span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--gold-light)' }}>-₹{discountAmount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
                 <span style={{ fontSize: '0.65rem', color: 'rgba(250,247,240,0.4)', letterSpacing: '0.06em' }}>Installation</span>
                 <span style={{ fontSize: '0.78rem', color: subtotal >= 150000 ? 'var(--gold-light)' : 'rgba(250,247,240,0.6)' }}>
                   {subtotal >= 150000 ? 'Complimentary' : 'TBD'}
                 </span>
               </div>
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ ...labelStyle, marginBottom: '0.45rem' }}>Coupon Code</label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    disabled={Boolean(appliedCoupon)}
+                    placeholder="WELCOME10"
+                    className="input-luxury"
+                    style={{ minWidth: 0, height: 40, fontSize: '0.68rem' }}
+                  />
+                  {appliedCoupon ? (
+                    <button
+                      type="button"
+                      onClick={removeCoupon}
+                      style={{ height: 40, padding: '0 0.85rem', border: '1px solid rgba(250,247,240,0.12)', color: 'rgba(250,247,240,0.55)', background: 'transparent', fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase' }}
+                    >
+                      Remove
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={applyCoupon}
+                      disabled={applyingCoupon || !couponCode.trim()}
+                      style={{ height: 40, padding: '0 0.85rem', border: '1px solid rgba(228,199,124,0.32)', color: 'var(--gold-light)', background: 'rgba(0,96,57,0.16)', fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', opacity: applyingCoupon || !couponCode.trim() ? 0.5 : 1 }}
+                    >
+                      {applyingCoupon ? 'Checking' : 'Apply'}
+                    </button>
+                  )}
+                </div>
+              </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid rgba(250,247,240,0.08)' }}>
                 <span style={{ fontSize: '0.6rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(250,247,240,0.5)' }}>Total</span>
                 <span style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.4rem', color: 'var(--ivory)' }}>
-                  ₹{subtotal.toLocaleString('en-IN')}
+                  ₹{orderTotal.toLocaleString('en-IN')}
                 </span>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { IsIn, IsNumber, IsOptional, IsString, IsArray, Min, ValidateNested } from 'class-validator';
+import { IsBoolean, IsIn, IsNumber, IsOptional, IsString, IsArray, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderStatus } from '../schemas/order.schema';
 
@@ -34,6 +34,8 @@ export class CreateOrderDto {
 
   @IsOptional() @IsNumber() amount?: number;
   @IsOptional() @IsNumber() deliveryFees?: number;
+  @IsOptional() @IsString() couponCode?: string;
+  @IsOptional() @IsNumber() discountAmount?: number;
 
   @IsOptional() @IsNumber() totalAmount?: number;
 
@@ -52,5 +54,48 @@ export class CreateOrderDto {
 }
 
 export class UpdateOrderStatusDto {
+  @IsIn(Object.values(OrderStatus))
   status: OrderStatus;
+}
+
+export class AdminCreateOrderDto {
+  @IsString()
+  customerEmail: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
+  items: OrderItemDto[];
+
+  @ValidateNested()
+  @Type(() => OrderAddressDto)
+  address: OrderAddressDto;
+
+  @IsOptional() @IsNumber() deliveryFees?: number;
+  @IsOptional() @IsIn(['cod', 'online', 'razorpay'])
+  paymentMethod?: 'cod' | 'online' | 'razorpay';
+  @IsOptional() @IsBoolean() payment?: boolean;
+  @IsOptional() @IsIn(Object.values(OrderStatus))
+  status?: OrderStatus;
+  @IsOptional() @IsString() paymentId?: string;
+  @IsOptional() @IsString() razorpayOrderId?: string;
+  @IsOptional() @IsString() deliveryMethod?: string;
+}
+
+export class RequestReturnDto {
+  @IsString()
+  reason: string;
+
+  @IsOptional()
+  @IsString()
+  details?: string;
+}
+
+export class ReviewReturnRequestDto {
+  @IsIn(['approved', 'rejected'])
+  decision: 'approved' | 'rejected';
+
+  @IsOptional()
+  @IsString()
+  adminNote?: string;
 }

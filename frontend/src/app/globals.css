@@ -4,8 +4,27 @@
 
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap");
 
+@font-face {
+  font-family: "Royace Heading";
+  src: url("/fonts/Roboto_Serif/RobotoSerif-VariableFont_GRAD,opsz,wdth,wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Royace Heading";
+  src: url("/fonts/Roboto_Serif/RobotoSerif-Italic-VariableFont_GRAD,opsz,wdth,wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
 @layer base {
   :root {
+    --font-heading: "Royace Heading", "Roboto Serif", Georgia, serif;
+    --font-body: "DM Sans", sans-serif;
+
     /* Core Palette */
     --gold: #c7a45a;
     --gold-light: #e4c77c;
@@ -103,7 +122,7 @@
   .public-site {
     background-color: var(--charcoal);
     color: var(--ivory);
-    font-family: "DM Sans", sans-serif;
+    font-family: var(--font-body);
     font-weight: 300;
     letter-spacing: 0.01em;
     -webkit-font-smoothing: antialiased;
@@ -113,14 +132,18 @@
   }
 
   .public-site *,
+  .public-site .font-cormorant,
+  .public-site .cormorant {
+    font-family: var(--font-body) !important;
+    font-style: normal !important;
+  }
+
   .public-site .font-serif,
   .public-site .font-display,
-  .public-site .font-cormorant,
-  .public-site .cormorant,
   .public-site .display-xl,
   .public-site .display-serif,
   .public-site .price-display {
-    font-family: "DM Sans", sans-serif !important;
+    font-family: var(--font-heading) !important;
     font-style: normal !important;
   }
 
@@ -149,11 +172,20 @@
   .public-site h4,
   .public-site h5,
   .public-site h6 {
-    font-family: "DM Sans", sans-serif;
-    font-weight: 500;
-    font-style: normal;
+    font-family: var(--font-heading) !important;
+    font-weight: 400;
+    font-style: normal !important;
     letter-spacing: 0.01em;
     line-height: 1.1;
+  }
+
+  .public-site footer h1,
+  .public-site footer h2,
+  .public-site footer h3,
+  .public-site footer h4,
+  .public-site footer h5,
+  .public-site footer h6 {
+    font-family: "Roboto Variable", Roboto, "Helvetica Neue", Helvetica, sans-serif !important;
   }
 }
 
@@ -1874,5 +1906,49 @@
     max-width: 150px;
     font-size: 0.78rem !important;
     letter-spacing: 0.08em !important;
+  }
+}
+
+.public-site .home-page h1,
+.public-site .home-page h2,
+.public-site .home-page h3,
+.public-site .home-page h4,
+.public-site .home-page h5,
+.public-site .home-page h6,
+.public-site .home-page .font-serif,
+.public-site .home-page .font-display,
+.public-site .home-page .display-xl,
+.public-site .home-page .display-serif {
+  font-family: "Roboto Variable", Roboto, "Helvetica Neue", Helvetica, sans-serif !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+}
+
+.public-site .product-detail-page .breadcrumb-item {
+  color: rgba(23, 49, 38, 0.55) !important;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.public-site .product-detail-page .breadcrumb-item:hover {
+  color: #006039 !important;
+}
+
+.public-site .product-detail-page .breadcrumb-sep {
+  color: rgba(23, 49, 38, 0.32) !important;
+}
+
+@media (max-width: 767px) {
+  .public-site .product-detail-page .product-cta-row {
+    flex-direction: row !important;
+    align-items: stretch !important;
+  }
+
+  .public-site .product-detail-page .product-cta-row button:first-child {
+    width: auto !important;
+  }
+
+  .public-site .product-detail-page .product-cta-row button:not(:first-child) {
+    width: 48px !important;
   }
 }

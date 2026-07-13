@@ -38,15 +38,23 @@ export default function AdminUsersPage() {
   });
 
   const filtered = users?.filter((u: any) =>
-    !search || u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
+    !search ||
+    u.name?.toLowerCase().includes(search.toLowerCase()) ||
+    u.email?.toLowerCase().includes(search.toLowerCase()) ||
+    u.phone?.toLowerCase().includes(search.toLowerCase())
   );
+  const title = roleFilter === 'user' ? 'Customers' : `${roleFilter.charAt(0).toUpperCase()}${roleFilter.slice(1)}s`;
 
   return (
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Users</h2>
-          <p className="text-gray-500 text-sm">{filtered?.length || 0} users</p>
+          <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+          <p className="text-gray-500 text-sm">
+            {roleFilter === 'user'
+              ? `${total || 0} total registered customers`
+              : `${total || 0} total ${title.toLowerCase()}`}
+          </p>
         </div>
         <div className="flex gap-3">
           <div className="relative">
@@ -65,18 +73,18 @@ export default function AdminUsersPage() {
                   roleFilter === r ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {r}s
+                {r === 'user' ? 'Customers' : `${r}s`}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="admin-card overflow-hidden">
-        <table className="w-full">
+      <div className="admin-card overflow-x-auto">
+        <table className="w-full min-w-[980px]">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
-              {['User', 'Email', 'Role', 'Joined', 'Status', 'Action'].map((h) => (
+              {['Customer', 'Email', 'Phone', 'Role', 'Joined', 'Status', 'Action'].map((h) => (
                 <th key={h} className="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
               ))}
             </tr>
@@ -85,7 +93,7 @@ export default function AdminUsersPage() {
             {isLoading
               ? Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i} className="border-b border-gray-50">
-                    {Array.from({ length: 6 }).map((_, j) => (
+                    {Array.from({ length: 7 }).map((_, j) => (
                       <td key={j} className="px-5 py-4">
                         <div className="h-3 bg-gray-100 rounded animate-pulse w-24" />
                       </td>
@@ -103,6 +111,7 @@ export default function AdminUsersPage() {
                       </div>
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-500">{user.email}</td>
+                    <td className="px-5 py-4 text-sm text-gray-500">{user.phone || '-'}</td>
                     <td className="px-5 py-4">
                       <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                         user.role === 'admin' ? 'bg-purple-50 text-purple-700' :

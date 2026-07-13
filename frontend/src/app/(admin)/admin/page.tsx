@@ -1,40 +1,69 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ShoppingBag, Package, Users, IndianRupee, TrendingUp, Clock, CheckCircle, Truck } from 'lucide-react';
+import { ShoppingBag, Package, Users, IndianRupee, Clock, CheckCircle, Truck } from 'lucide-react';
 import { adminApi } from '@/lib/adminApi';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+
+const QUERY_OPTIONS = {
+  staleTime: 60_000,
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false,
+  retry: false,
+};
 
 export default function AdminDashboard() {
   const { data: statsData } = useQuery({
     queryKey: ['admin-order-stats'],
-    queryFn: async () => {
-      const res = await adminApi.get('/orders/admin/stats');
+    queryFn: async ({ signal }) => {
+      const res = await adminApi.get('/orders/admin/stats', { signal });
       return res.data.data;
     },
+    ...QUERY_OPTIONS,
   });
 
   const { data: recentOrders } = useQuery({
     queryKey: ['admin-recent-orders'],
-    queryFn: async () => {
-      const res = await adminApi.get('/orders/admin/all?limit=5');
+    queryFn: async ({ signal }) => {
+      const res = await adminApi.get('/orders/admin/all?limit=5', { signal });
       return res.data.data.orders;
     },
+    ...QUERY_OPTIONS,
   });
 
   const { data: productsData } = useQuery({
     queryKey: ['admin-products-count'],
-    queryFn: async () => {
-      const res = await adminApi.get('/products/admin/all?limit=1');
+    queryFn: async ({ signal }) => {
+      const res = await adminApi.get('/products/admin/all?limit=1', { signal });
       return res.data.data;
     },
+    ...QUERY_OPTIONS,
+  });
+
+  const { data: customersData } = useQuery({
+    queryKey: ['admin-customers-count'],
+    queryFn: async ({ signal }) => {
+      const res = await adminApi.get('/users?role=user&page=1&limit=1', { signal });
+      return res.data.data;
+    },
+    ...QUERY_OPTIONS,
+  });
+
+  const { data: lowStockData } = useQuery({
+    queryKey: ['admin-low-stock-products'],
+    queryFn: async ({ signal }) => {
+      const res = await adminApi.get('/products/admin/low-stock?threshold=10&limit=8', { signal });
+      return res.data.data;
+    },
+    ...QUERY_OPTIONS,
   });
 
   const stats = [
-    { label: 'Total Revenue', value: `Rs. ${(statsData?.revenue || 0).toLocaleString()}`, icon: IndianRupee, color: 'bg-green-50 text-green-600', change: '+12%' },
-    { label: 'Total Orders', value: statsData?.total || 0, icon: ShoppingBag, color: 'bg-blue-50 text-blue-600', change: '+8%' },
-    { label: 'Products', value: productsData?.total || 0, icon: Package, color: 'bg-purple-50 text-purple-600', change: '+3' },
-    { label: 'Delivered', value: statsData?.delivered || 0, icon: CheckCircle, color: 'bg-orange-50 text-orange-600', change: '' },
+    { label: 'Total Revenue', value: `Rs. ${(statsData?.revenue || 0).toLocaleString()}`, icon: IndianRupee, color: 'bg-green-50 text-green-600' },
+    { label: 'Total Orders', value: statsData?.total || 0, icon: ShoppingBag, color: 'bg-blue-50 text-blue-600' },
+    { label: 'Total Customers', value: customersData?.total || 0, icon: Users, color: 'bg-cyan-50 text-cyan-600' },
+    { label: 'Products', value: productsData?.total || 0, icon: Package, color: 'bg-purple-50 text-purple-600' },
+    { label: 'Delivered', value: statsData?.delivered || 0, icon: CheckCircle, color: 'bg-orange-50 text-orange-600' },
   ];
 
   const orderStatusData = statsData
@@ -65,18 +94,13 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        {stats.map(({ label, value, icon: Icon, color, change }) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5">
+        {stats.map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="stat-card">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-gray-500 mb-1">{label}</p>
                 <p className="text-2xl font-bold text-gray-900">{value}</p>
-                {change && (
-                  <p className="text-xs text-green-600 font-medium mt-1 flex items-center gap-1">
-                    <TrendingUp size={11} /> {change} this month
-                  </p>
-                )}
               </div>
               <div className={`p-3 rounded-xl ${color}`}>
                 <Icon size={20} />
@@ -128,6 +152,27 @@ export default function AdminDashboard() {
             ))}
             {!recentOrders?.length && (
               <p className="text-sm text-gray-400 text-center py-8">No orders yet</p>
+            )}
+          </div>
+        </div>
+
+        <div className="admin-card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-gray-900">Low Stock Products</h3>
+            <span className="text-xs text-gray-400">Threshold: {lowStockData?.threshold || 10}</span>
+          </div>
+          <div className="space-y-3">
+            {lowStockData?.products?.map((product: any) => (
+              <div key={product._id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{product.name}</p>
+                  <p className="text-xs text-gray-500">{product.sku || 'No SKU'}</p>
+                </div>
+                <p className="text-sm font-semibold text-gray-900">{product.totalQuantity || 0}</p>
+              </div>
+            ))}
+            {!lowStockData?.products?.length && (
+              <p className="text-sm text-gray-400 text-center py-8">All products well stocked</p>
             )}
           </div>
         </div>

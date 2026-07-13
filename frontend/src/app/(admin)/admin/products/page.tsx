@@ -16,6 +16,7 @@ const EMPTY_FORM = {
   sku: '', slug: '', series: '', finish: '', lightSource: '', remark: '',
   watt: '', inputVoltage: '', lmPerW: '', fluxLumin: '', ra: '',
   chipBrand: '', pf: '', cutSize: '', beamAngle: '', ipRate: '',
+  hiddenFields: [] as string[],
 };
 
 const LIGHTING_SPEC_FIELDS = [
@@ -170,6 +171,27 @@ export default function AdminProductsPage() {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     return `${origin}/product/${publicId}`;
   };
+
+  const toggleFieldVisibility = (fieldKey: string, show: boolean) => {
+    setForm((current) => ({
+      ...current,
+      hiddenFields: show
+        ? current.hiddenFields.filter((key) => key !== fieldKey)
+        : [...new Set([...current.hiddenFields, fieldKey])],
+    }));
+  };
+
+  const ShowOnProductPageToggle = ({ fieldKey }: { fieldKey: string }) => (
+    <label className="mt-1.5 inline-flex items-center gap-2 text-xs text-gray-500">
+      <input
+        type="checkbox"
+        checked={!form.hiddenFields.includes(fieldKey)}
+        onChange={(e) => toggleFieldVisibility(fieldKey, e.target.checked)}
+        className="h-3.5 w-3.5 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+      />
+      Show on product page
+    </label>
+  );
 
   const loadImage = (src: string) =>
     new Promise<HTMLImageElement>((resolve, reject) => {
@@ -409,6 +431,7 @@ export default function AdminProductsPage() {
       cutSize: product.cutSize || '',
       beamAngle: product.beamAngle ?? '',
       ipRate: product.ipRate || '',
+      hiddenFields: Array.isArray(product.hiddenFields) ? product.hiddenFields : [],
     });
     const nextImages = getProductImages(product).map((src: string) => ({
       id: src,
@@ -484,6 +507,8 @@ export default function AdminProductsPage() {
     Object.entries(form).forEach(([k, v]) => {
       if (k === 'colors' || k === 'tags' || k === 'material') {
         fd.append(k, JSON.stringify(String(v).split(',').map((s) => s.trim()).filter(Boolean)));
+      } else if (k === 'hiddenFields') {
+        fd.append('hiddenFields', JSON.stringify(v));
       } else if (k === 'dimension') {
         const dimension = v as typeof EMPTY_FORM.dimension;
         fd.append('dimension', JSON.stringify({
@@ -841,6 +866,7 @@ export default function AdminProductsPage() {
                     placeholder="e.g. 1200*180*H290"
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
                   />
+                  <ShowOnProductPageToggle fieldKey="dimension" />
                 </div>
 
                 <div className="col-span-2 grid grid-cols-3 gap-4">
@@ -875,6 +901,7 @@ export default function AdminProductsPage() {
                     <input type={key === 'weight' ? 'number' : 'text'} min={key === 'weight' ? '0' : undefined} value={(form as any)[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                       className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
                       placeholder={placeholder} />
+                    {(key === 'material' || key === 'weight') && <ShowOnProductPageToggle fieldKey={key} />}
                   </div>
                 ))}
 
@@ -884,6 +911,7 @@ export default function AdminProductsPage() {
                     <input required value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })}
                       placeholder="e.g. RL188093-600D"
                       className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                    <ShowOnProductPageToggle fieldKey="sku" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">Slug</label>
@@ -899,12 +927,14 @@ export default function AdminProductsPage() {
                     <input value={form.series} onChange={(e) => setForm({ ...form, series: e.target.value })}
                       placeholder="e.g. RL188093"
                       className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                    <ShowOnProductPageToggle fieldKey="series" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">Finish</label>
                     <input value={form.finish} onChange={(e) => setForm({ ...form, finish: e.target.value })}
                       placeholder="e.g. CHROME+PINK"
                       className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                    <ShowOnProductPageToggle fieldKey="finish" />
                   </div>
                 </div>
 
@@ -914,12 +944,14 @@ export default function AdminProductsPage() {
                     <input value={form.lightSource} onChange={(e) => setForm({ ...form, lightSource: e.target.value })}
                       placeholder="e.g. LED 3IN1 3K/4K/6K"
                       className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                    <ShowOnProductPageToggle fieldKey="lightSource" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">Remark</label>
                     <input value={form.remark} onChange={(e) => setForm({ ...form, remark: e.target.value })}
                       placeholder="Any remarks"
                       className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                    <ShowOnProductPageToggle fieldKey="remark" />
                   </div>
                 </div>
 
@@ -938,6 +970,7 @@ export default function AdminProductsPage() {
                           placeholder={placeholder}
                           className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
                         />
+                        <ShowOnProductPageToggle fieldKey={key} />
                       </div>
                     ))}
                   </div>

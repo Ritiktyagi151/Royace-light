@@ -13,13 +13,14 @@ export function AuthModal() {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (authModalOpen) {
-      setName(''); setEmail(''); setPassword(''); setError('');
+      setName(''); setEmail(''); setPhone(''); setPassword(''); setError('');
     }
   }, [authModalOpen, authMode]);
 
@@ -44,7 +45,7 @@ export function AuthModal() {
       if (isLogin) {
         result = await dispatch(loginThunk({ email, password }));
       } else {
-        result = await dispatch(registerThunk({ name, email, password }));
+        result = await dispatch(registerThunk({ name, email, phone, password }));
       }
       if (result.meta.requestStatus === 'fulfilled') {
         dispatch(addToast({ message: isLogin ? 'Welcome back!' : 'Account created!', type: 'success' }));
@@ -115,14 +116,24 @@ export function AuthModal() {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {!isLogin && (
-              <div>
-                <label style={labelStyle}>Full Name</label>
-                <input
-                  type="text" required value={name} onChange={(e) => setName(e.target.value)}
-                  placeholder="Your full name"
-                  className="input-luxury"
-                />
-              </div>
+              <>
+                <div>
+                  <label style={labelStyle}>Full Name</label>
+                  <input
+                    type="text" required value={name} onChange={(e) => setName(e.target.value)}
+                    placeholder="Your full name"
+                    className="input-luxury"
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>Phone Number</label>
+                  <input
+                    type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+91 98911 19199"
+                    className="input-luxury"
+                  />
+                </div>
+              </>
             )}
             <div>
               <label style={labelStyle}>Email Address</label>

@@ -70,30 +70,26 @@ export default async function ProductDetailPage({
       {/* Related products */}
       {related.length > 0 && (
         <section
-          style={{
-            padding: '6rem 1.5rem 8rem',
-            background: 'linear-gradient(180deg, rgba(6,47,36,0.78), var(--charcoal-2))',
-            borderTop: '1px solid rgba(0,96,57,0.24)',
-          }}
+          className="relative overflow-hidden border-t border-[#173126]/10 bg-[#f7f1e8] px-4 py-16 text-[#173126] sm:px-6 lg:px-8 lg:py-20"
         >
-          <div className="max-w-7xl mx-auto">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div className="pointer-events-none absolute inset-0 z-0 bg-[url('/images/green-texture.png')] bg-cover bg-center opacity-70 mix-blend-multiply" />
+          <div className="relative z-10 max-w-7xl mx-auto">
+            <div className="mb-9 flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="overline-text" style={{ marginBottom: '0.875rem' }}>You May Also Like</p>
-                <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 'clamp(1.5rem,3vw,2.5rem)', fontWeight: 300, fontStyle: 'italic', color: 'var(--ivory)' }}>
+                <p className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#006039]">You May Also Like</p>
+                <h2 className="text-3xl font-medium leading-tight text-[#173126] sm:text-4xl">
                   Related Pieces
                 </h2>
               </div>
               <Link
                 href={buildShopPath({ category: categoryRef })}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.6rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold-light)', textDecoration: 'none' }}
+                className="inline-flex items-center gap-2 border border-[#006039]/25 px-5 py-3 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#006039] transition hover:border-[#006039] hover:bg-[#006039] hover:text-white"
               >
                 View All <ArrowRight size={12} />
               </Link>
             </div>
 
-            <div style={{ gap: '1px', background: 'rgba(0,96,57,0.18)' }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {related.slice(0, 4).map((p: any) => (
                 <ProductCard key={p._id} product={p} />
               ))}

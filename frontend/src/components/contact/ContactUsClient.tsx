@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { FormEvent, useMemo, useState } from 'react';
 import {
@@ -19,7 +20,7 @@ import {
 } from 'lucide-react';
 import { SITE_CONTACT, mailTo } from '@/lib/contact';
 
-const subjectOptions = ['Order Issue', 'Return/Refund', 'General Query'];
+const subjectOptions = ['Product Enquiry', 'Custom Project', 'Order Support', 'Return or Refund', 'General Query'];
 
 const fieldClass =
   'w-full border border-[#e4c77c2e] bg-[#173126cc] px-4 py-3.5 text-[0.84rem] tracking-[0.02em] text-[var(--ivory)] outline-none transition placeholder:text-white/30 focus:border-[#e4c77c85] focus:bg-[#00603929] focus:shadow-[0_0_0_3px_rgba(199,164,90,0.08)]';
@@ -32,7 +33,7 @@ const contactCardClass =
 
 const whatsappNumber = SITE_CONTACT.phone.replace(/\D/g, '');
 const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-  'Hi Royace Lighting, I need help with my enquiry.',
+  'Hi Royace Lighting, I need help with a lighting enquiry.',
 )}`;
 
 const mapEmbedSrc =
@@ -43,7 +44,7 @@ export function ContactUsClient() {
   const [selectedSubject, setSelectedSubject] = useState('');
 
   const responseLine = useMemo(
-    () => 'We typically respond within 24 hours during business days.',
+    () => 'We usually respond within 24 working hours, Monday to Saturday.',
     [],
   );
 
@@ -56,19 +57,26 @@ export function ContactUsClient() {
 
   return (
     <main className="min-h-screen bg-[var(--obsidian)] text-[var(--ivory)]">
-      <section className="relative flex min-h-[450px] overflow-hidden border-b border-white/10 bg-[linear-gradient(135deg,rgba(6,47,36,0.94),rgba(31,58,47,0.98))] px-4 pb-10 pt-28 sm:px-6 lg:h-[450px] lg:px-10 lg:pb-12 lg:pt-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(228,199,124,0.12),transparent_32%),radial-gradient(circle_at_80%_10%,rgba(0,96,57,0.18),transparent_34%)]" />
-        <div className="relative mx-auto grid w-full max-w-7xl gap-8 self-end lg:grid-cols-[minmax(0,1fr)_390px] lg:items-end">
+      <section className="relative flex min-h-[520px] overflow-hidden border-b border-white/10 bg-[#071811] px-4 pb-10 pt-28 sm:px-6 lg:h-[560px] lg:px-10 lg:pb-12 lg:pt-28">
+        <Image
+          src="/images/conatct-us1.png"
+          alt="Royace Lighting contact us banner"
+          fill
+          priority
+          sizes="100vw"
+          className="object-fill object-center opacity-70"
+        />
+        {/* <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,12,9,0.86),rgba(6,47,36,0.66)_48%,rgba(5,12,9,0.32)),linear-gradient(180deg,rgba(5,12,9,0.22),rgba(5,12,9,0.74))]" /> */}
+        {/* <div className="relative mx-auto grid w-full max-w-7xl gap-8 self-end lg:grid-cols-[minmax(0,1fr)_390px] lg:items-end">
           <div>
             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-[var(--gold-light)]">
               Contact Us
             </p>
-            <h1 className="mt-4 max-w-4xl font-serif text-[clamp(2.35rem,5.5vw,4.8rem)] font-light italic leading-none">
-              We are here to help with every order and lighting enquiry.
+            <h1 className="mt-4 max-w-4xl font-serif text-3xl font-light italic leading-none">
+              Speak to us for product selection, custom lighting, and order support.
             </h1>
             <p className="mt-5 max-w-2xl text-sm leading-7 text-white/62">
-              Reach our customer support team for order issues, returns, refunds, shipping updates,
-              product guidance, bespoke lighting, or store directions.
+              Connect with our team for chandeliers, pendant lights, wall lights, custom project enquiries, delivery updates, returns, refunds, and store directions.
             </p>
             <p className="mt-4 inline-flex border border-[#e4c77c33] bg-white/[0.04] px-4 py-3 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[var(--gold-light)]">
               {responseLine}
@@ -83,11 +91,11 @@ export function ContactUsClient() {
               <Clock size={16} className="mt-1 shrink-0 text-[var(--gold-light)]" />
               <div>
                 <p className="text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-white/42">Working Hours</p>
-                <p className="mt-1 text-sm leading-6 text-white/78">Mon-Sat, 10AM-7PM</p>
+                <p className="mt-1 text-sm leading-6 text-white/78">Monday to Saturday, 10:30 AM - 7:00 PM</p>
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </section>
 
       <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_420px] lg:px-10 lg:py-20">
@@ -96,10 +104,10 @@ export function ContactUsClient() {
             <div className="flex items-start justify-between gap-5 border-b border-white/10 pb-5">
               <div>
                 <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-[var(--gold)]">
-                  Send a Message
+                  Send Your Enquiry
                 </p>
                 <h2 className="mt-3 font-serif text-[clamp(1.8rem,4vw,3rem)] font-light italic">
-                  Tell us how we can help.
+                  Share your requirement with our team.
                 </h2>
               </div>
               <Send size={24} className="shrink-0 text-[var(--gold-light)]" />
@@ -108,7 +116,7 @@ export function ContactUsClient() {
             {submitted && (
               <div className="mt-6 flex gap-3 border border-emerald-400/30 bg-emerald-500/10 p-4 text-sm leading-6 text-emerald-100">
                 <CheckCircle2 size={18} className="mt-1 shrink-0 text-emerald-300" />
-                <p>Thank you. Your message has been received. Our team will contact you shortly.</p>
+                <p>Thank you. Your enquiry has been received. Our team will contact you shortly.</p>
               </div>
             )}
 
@@ -147,7 +155,7 @@ export function ContactUsClient() {
                 <textarea
                   className={`${fieldClass} min-h-[150px] resize-y`}
                   name="message"
-                  placeholder="Share your order ID, product name, issue details, or project requirements."
+                  placeholder="Share your order ID, product name, room size, city, timeline, or project requirement."
                   required
                 />
               </label>
@@ -155,7 +163,7 @@ export function ContactUsClient() {
                 type="submit"
                 className="inline-flex items-center justify-center gap-2 border border-[var(--gold)] bg-[var(--gold)] px-6 py-4 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[var(--obsidian)] transition hover:bg-[var(--gold-light)] sm:col-span-2"
               >
-                Submit Message
+                Submit Enquiry
                 <ArrowRight size={15} />
               </button>
             </form>
@@ -166,9 +174,9 @@ export function ContactUsClient() {
               <MapPin size={20} className="text-[var(--gold-light)]" />
               <div>
                 <p className="text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-[var(--gold)]">
-                  Office / Store Address
+                Office and Store Address
                 </p>
-                <h2 className="mt-1 font-serif text-2xl font-light italic">Visit by Appointment</h2>
+                <h2 className="mt-1 font-serif text-2xl font-light italic">Visit by prior appointment</h2>
               </div>
             </div>
             <p className="mt-4 text-sm leading-7 text-white/68">{SITE_CONTACT.registeredAddress}</p>

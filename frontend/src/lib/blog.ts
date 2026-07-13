@@ -18,9 +18,9 @@ export type BlogPost = {
 export const blogPosts: BlogPost[] = [
   {
     slug: 'choose-right-chandelier-size-luxury-living-room',
-    title: 'How to Choose the Right Chandelier Size for a Luxury Living Room',
+    title: 'How to Choose the Right Chandelier Size for a Living Room',
     excerpt:
-      'A practical guide to scale, ceiling height, finish, and light layering for statement spaces.',
+      'A practical guide to scale, ceiling height, finish, and light layering for Indian living rooms.',
     category: 'Design Guide',
     date: 'June 18, 2026',
     readTime: '6 min read',
@@ -89,9 +89,9 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: 'bespoke-lighting-villas-installation-planning',
-    title: 'Bespoke Lighting for Villas: What to Plan Before Installation',
+    title: 'Custom Lighting for Villas: What to Plan Before Installation',
     excerpt:
-      'From slab points to ceiling reinforcement, these details keep custom lighting projects smooth.',
+      'From ceiling points to reinforcement, these details keep custom lighting projects smooth on site.',
     category: 'Bespoke',
     date: 'May 28, 2026',
     readTime: '5 min read',
@@ -217,9 +217,9 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: 'hotel-lobby-lighting-lessons-for-homes',
-    title: 'Hotel Lobby Lighting Lessons You Can Use at Home',
+    title: 'Hotel Lobby Lighting Ideas You Can Use at Home',
     excerpt:
-      'Borrow hospitality lighting principles to make home interiors feel warmer, layered, and more luxurious.',
+      'Use hospitality lighting principles to make home interiors feel warmer, layered, and more premium.',
     category: 'Luxury Design',
     date: 'April 7, 2026',
     readTime: '5 min read',

@@ -17,6 +17,8 @@ import {
   RotateCcw,
   X,
   Maximize2,
+  Headphones,
+  MessageCircle,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addToCartThunk } from '../../store/slices/cartSlice';
@@ -24,15 +26,16 @@ import { openAuthModal, openCartDrawer, addToast } from '../../store/slices/uiSl
 import { getAssetUrl } from '@/lib/urls';
 import { selectIsWishlisted, toggleWishlistItem } from '@/store/slices/wishlistSlice';
 import { buildShopPath } from '@/lib/shopUrls';
+import { SITE_CONTACT } from '@/lib/contact';
 
 interface ProductDetailClientProps {
   product: any;
 }
 
 const DELIVERY_HIGHLIGHTS = [
-  { icon: Truck, title: 'White-Glove Delivery', desc: 'Professional installation included' },
-  { icon: Shield, title: 'Lifetime Guarantee', desc: 'Craftsmanship warranty on all pieces' },
-  { icon: RotateCcw, title: '30-Day Returns', desc: 'Hassle-free return policy' },
+  { icon: Truck, title: 'Safe Delivery', desc: 'Careful packing and dispatch support' },
+  { icon: Shield, title: 'Quality Checked', desc: 'Finish and fitting reviewed before dispatch' },
+  { icon: RotateCcw, title: 'Return Support', desc: 'Returns as per product and policy terms' },
 ];
 
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
@@ -46,7 +49,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [added, setAdded] = useState(false);
   const wishlisted = useAppSelector(selectIsWishlisted(product._id));
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [openAccordion, setOpenAccordion] = useState<string | null>('details');
+  const [openAccordions, setOpenAccordions] = useState<string[]>(['details']);
 
   const productImages = useMemo(() => {
     const orderedAssets = product.imageAssets?.length
@@ -79,6 +82,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const categoryHref = typeof product.category === 'object'
     ? product.category?.slug || product.category?._id || ''
     : product.category;
+  const whatsappHref = `https://wa.me/${SITE_CONTACT.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
+    `Hi Royace Lighting, I want to enquire about ${product.name}.`,
+  )}`;
 
   const discount =
     product.retailPrice > product.sellingPrice
@@ -192,87 +198,82 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     ? dimensionParts.join(' x ')
     : product.dimension?.raw || product.size || '';
   const materials = product.material?.length ? product.material : product.materialUsed || [];
+  const hidden = Array.isArray(product.hiddenFields) ? product.hiddenFields : [];
+  const hasNonZeroNumber = (value: unknown) =>
+    value !== undefined && value !== null && value !== '' && Number(value) !== 0;
 
   const specDetails = [
-    product.sku && { label: 'SKU', value: product.sku },
-    product.series && { label: 'Series', value: product.series },
+    product.sku && !hidden.includes('sku') && { label: 'SKU', value: product.sku },
+    product.series && !hidden.includes('series') && { label: 'Series', value: product.series },
     { label: 'Category', value: categoryLabel },
-    product.finish && { label: 'Finish', value: product.finish },
-    product.lightSource && { label: 'Light Source', value: product.lightSource },
-    product.watt !== undefined && product.watt !== null && product.watt !== '' && {
+    !hidden.includes('finish') && product.finish && { label: 'Finish', value: product.finish },
+    !hidden.includes('lightSource') && product.lightSource && { label: 'Light Source', value: product.lightSource },
+    !hidden.includes('watt') && hasNonZeroNumber(product.watt) && {
       label: 'Watt',
       value: `${product.watt} W`,
     },
-    product.inputVoltage && { label: 'Input Voltage', value: product.inputVoltage },
-    product.lmPerW !== undefined && product.lmPerW !== null && product.lmPerW !== '' && {
+    !hidden.includes('inputVoltage') && product.inputVoltage && { label: 'Input Voltage', value: product.inputVoltage },
+    !hidden.includes('lmPerW') && hasNonZeroNumber(product.lmPerW) && {
       label: 'LM/W',
       value: product.lmPerW,
     },
-    product.fluxLumin !== undefined && product.fluxLumin !== null && product.fluxLumin !== '' && {
+    !hidden.includes('fluxLumin') && hasNonZeroNumber(product.fluxLumin) && {
       label: 'Flux Lumin',
       value: product.fluxLumin,
     },
-    product.ra !== undefined && product.ra !== null && product.ra !== '' && {
+    !hidden.includes('ra') && hasNonZeroNumber(product.ra) && {
       label: 'RA',
       value: product.ra,
     },
-    product.chipBrand && { label: 'Chip Brand', value: product.chipBrand },
-    product.pf !== undefined && product.pf !== null && product.pf !== '' && {
+    !hidden.includes('chipBrand') && product.chipBrand && { label: 'Chip Brand', value: product.chipBrand },
+    !hidden.includes('pf') && hasNonZeroNumber(product.pf) && {
       label: 'PF',
       value: product.pf,
     },
-    product.cutSize && { label: 'Cut Size', value: product.cutSize },
-    product.beamAngle !== undefined && product.beamAngle !== null && product.beamAngle !== '' && {
+    !hidden.includes('cutSize') && product.cutSize && { label: 'Cut Size', value: product.cutSize },
+    !hidden.includes('beamAngle') && hasNonZeroNumber(product.beamAngle) && {
       label: 'Beam Angle',
       value: `${product.beamAngle}°`,
     },
-    product.ipRate && { label: 'IP Rate', value: product.ipRate },
-    product.weight && { label: 'Weight', value: `${product.weight} g` },
-    dimensionValue && {
+    !hidden.includes('ipRate') && product.ipRate && { label: 'IP Rate', value: product.ipRate },
+    !hidden.includes('weight') && hasNonZeroNumber(product.weight) && { label: 'Weight', value: `${product.weight} g` },
+    !hidden.includes('dimension') && dimensionValue && {
       label: 'Dimensions',
       value: dimensionValue,
     },
-    materials.length > 0 && {
+    !hidden.includes('material') && materials.length > 0 && {
       label: 'Materials',
       value: materials.join(', '),
     },
-    product.remark && { label: 'Remark', value: product.remark },
+    !hidden.includes('remark') && product.remark && { label: 'Remark', value: product.remark },
   ].filter(Boolean);
 
   const accordions = [
     {
       id: 'details',
-      label: 'Product Details',
-      content: product.description,
-    },
-    {
-      id: 'specs',
-      label: 'Specifications',
-      content: specDetails,
+      label: 'Product Details & Specifications',
+      content: {
+        description: product.description,
+        specs: specDetails,
+      },
     },
     {
       id: 'delivery',
       label: 'Delivery & Installation',
-      content: 'Our white-glove delivery team will contact you to schedule a convenient installation time. Professional mounting is included with every order. Installation typically takes 2–4 hours.',
+      content: 'Delivery and installation support depends on product type, city serviceability, site readiness, and written confirmation. Our team can guide packing, dispatch, and installation coordination where applicable.',
     },
     {
       id: 'returns',
       label: 'Returns & Warranty',
-      content: 'All Royace pieces come with a lifetime craftsmanship guarantee. Returns accepted within 30 days of delivery in original condition. Bespoke commissions are non-returnable.',
+      content: 'Royace products are checked for finish and workmanship before dispatch. Returns and replacements are handled as per product condition, delivery status, and policy terms. Custom orders are made to requirement and are not returnable unless approved under policy.',
     },
   ];
 
   return (
-    <div
-      style={{
-        background:
-          'linear-gradient(180deg, var(--forest-2) 0%, var(--charcoal) 32%, var(--coffee) 100%)',
-        minHeight: '100vh',
-      }}
-    >
+    <div className="product-detail-page min-h-screen bg-[#f7f1e8] text-[#173126]">
       {/* Breadcrumb */}
-      <div style={{ padding: '1.5rem 1.5rem 0', maxWidth: '1280px', margin: '0 auto' }}>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+        <nav className="flex flex-wrap items-center gap-2">
           {[
             { label: 'Home', href: '/' },
             { label: 'Shop', href: '/shop' },
@@ -285,18 +286,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                   {crumb.label}
                 </Link>
               ) : (
-                <span
-                  style={{
-                    fontSize: '0.62rem',
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: 'rgba(250,247,240,0.55)',
-                    maxWidth: '200px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
+                <span className="max-w-[220px] overflow-hidden text-ellipsis whitespace-nowrap text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#173126]/55">
                   {crumb.label}
                 </span>
               )}
@@ -308,20 +298,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
       {/* Main product section */}
       <div
-        className="max-w-7xl mx-auto product-detail-layout grid grid-cols-1 lg:grid-cols-2"
-        style={{ padding: '2.5rem 1.5rem 5rem', gap: '5rem', alignItems: 'start' }}
+        className="product-detail-layout mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)] lg:gap-10 lg:px-8 lg:py-12"
       >
         {/* Gallery */}
-        <div>
+        <div className="space-y-3 lg:sticky lg:top-24">
           {/* Main image */}
           <div
+            className="relative aspect-square cursor-zoom-in overflow-hidden border border-[#173126]/10 bg-white shadow-[0_24px_70px_rgba(23,49,38,0.1)]"
             style={{
-                position: 'relative',
-                aspectRatio: '1/1',
-                overflow: 'hidden',
-                background: 'var(--ivory)',
-                border: '1px solid rgba(0,96,57,0.2)',
-                marginBottom: '0.75rem',
                 cursor: productImages.length > 1 ? 'grab' : 'zoom-in',
                 touchAction: 'pan-y',
                 userSelect: 'none',
@@ -337,12 +321,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 alt={product.name}
                 fill
                 draggable={false}
-                style={{ objectFit: 'cover', transition: 'transform 0.6s ease' }}
+                className="object-cover transition duration-700"
                 onMouseEnter={(e) => ((e.target as HTMLElement).style.transform = 'scale(1.04)')}
                 onMouseLeave={(e) => ((e.target as HTMLElement).style.transform = 'scale(1)')}
               />
             ) : (
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem' }}>
+              <div className="absolute inset-0 flex items-center justify-center text-6xl">
                 💡
               </div>
             )}
@@ -361,10 +345,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 position: 'absolute',
                 bottom: '1.25rem',
                 right: '1.25rem',
-                background: 'rgba(8,6,4,0.6)',
-                border: '1px solid rgba(250,247,240,0.15)',
+                background: 'rgba(255,255,255,0.88)',
+                border: '1px solid rgba(23,49,38,0.12)',
                 backdropFilter: 'blur(8px)',
-                color: 'rgba(250,247,240,0.6)',
+                color: '#173126',
                 width: 36,
                 height: 36,
                 display: 'flex',
@@ -381,7 +365,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
           {/* Thumbnails */}
           {productImages.length > 1 && (
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(productImages.length, 5)}, 1fr)`, gap: '0.5rem' }}>
+            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(productImages.length, 5)}, minmax(0, 1fr))` }}>
               {productImages.map((img: string, i: number) => (
                 <button
                   key={i}
@@ -390,10 +374,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                       position: 'relative',
                       aspectRatio: '1/1',
                       overflow: 'hidden',
-                      background: 'var(--ivory)',
-                      border: `1px solid ${selectedImage === img ? 'rgba(228,199,124,0.72)' : 'rgba(0,96,57,0.18)'}`,
+                      background: '#fff',
+                      border: `2px solid ${selectedImage === img ? '#006039' : 'rgba(23,49,38,0.12)'}`,
                       cursor: 'pointer',
-                      transition: 'border-color 0.2s ease',
+                      transition: 'border-color 0.2s ease, opacity 0.2s ease',
                       padding: 0,
                     }}
                 >
@@ -407,50 +391,66 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               ))}
             </div>
           )}
+
+          <div className="relative overflow-hidden border border-[#173126]/10 bg-white p-5 shadow-[0_18px_50px_rgba(23,49,38,0.08)]">
+            <div className="pointer-events-none absolute inset-0 z-0 bg-[url('/images/green-texture.png')] bg-cover bg-center opacity-45 mix-blend-multiply" />
+            <div className="absolute inset-0 z-0 bg-white/70" />
+            <div className="relative z-10">
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#006039]">
+                Product Snapshot
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+                {[
+                  categoryLabel && { label: 'Category', value: categoryLabel },
+                  !hidden.includes('finish') && product.finish && { label: 'Finish', value: product.finish },
+                  !hidden.includes('dimension') && dimensionValue && { label: 'Size', value: dimensionValue },
+                ]
+                  .filter(Boolean)
+                  .map((item: any) => (
+                    <div key={item.label} className="border border-[#173126]/10 bg-white/68 p-3">
+                      <span className="block text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#173126]/45">
+                        {item.label}
+                      </span>
+                      <strong className="mt-1 block text-sm font-semibold leading-5 text-[#173126]">
+                        {item.value}
+                      </strong>
+                    </div>
+                  ))}
+              </div>
+              <p className="mt-4 text-sm leading-6 text-[#173126]/62">
+                Need finish, size, or installation guidance? Share this product with our team for quick support.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Product info */}
-        <div className="product-info-panel" style={{ position: 'sticky', top: '100px' }}>
+        <div className="product-info-panel relative overflow-hidden border border-[#173126]/10 bg-white p-5 shadow-[0_24px_70px_rgba(23,49,38,0.1)] sm:p-7 lg:sticky lg:top-24 lg:p-8">
+          <div className="pointer-events-none absolute inset-0 z-0 bg-[url('/images/green-texture.png')] bg-cover bg-center opacity-55 mix-blend-multiply" />
+          <div className="absolute inset-0 z-0 bg-white/62" />
+          <div className="relative z-10">
           {/* Category */}
-          <p className="overline-text" style={{ marginBottom: '0.875rem' }}>{categoryLabel}</p>
+          <p className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#006039]">{categoryLabel}</p>
 
           {/* Name */}
           <h1
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: 'clamp(1.8rem, 3vw, 2.8rem)',
-              fontWeight: 300,
-              fontStyle: 'italic',
-              color: 'var(--ivory)',
-              lineHeight: 1.15,
-              marginBottom: '1.75rem',
-            }}
+            className="text-[clamp(2rem,4vw,3.25rem)] font-medium leading-tight text-[#173126]"
           >
             {product.name}
           </h1>
 
           {/* Price */}
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem', marginBottom: '2rem' }}>
+          <div className="mt-5 flex flex-wrap items-baseline gap-3">
             <span
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: '2rem',
-                fontWeight: 400,
-                color: 'var(--ivory)',
-              }}
+              className="text-3xl font-semibold text-[#006039]"
             >
               ₹{product.sellingPrice.toLocaleString('en-IN')}
             </span>
             {product.retailPrice > product.sellingPrice && (
               <>
-                <span className="price-crossed">₹{product.retailPrice.toLocaleString('en-IN')}</span>
+                <span className="text-sm text-[#173126]/42 line-through">₹{product.retailPrice.toLocaleString('en-IN')}</span>
                 <span
-                  style={{
-                    fontSize: '0.68rem',
-                    letterSpacing: '0.1em',
-                  color: 'var(--gold-light)',
-                    fontFamily: "'DM Sans', sans-serif",
-                  }}
+                  className="bg-[#006039]/8 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-[#006039]"
                 >
                   Save ₹{(product.retailPrice - product.sellingPrice).toLocaleString('en-IN')}
                 </span>
@@ -458,24 +458,23 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             )}
           </div>
 
-          <div style={{ width: '100%', height: 1, background: 'rgba(250,247,240,0.08)', marginBottom: '2rem' }} />
+          {product.description && (
+            <p className="mt-5 text-sm leading-7 text-[#173126]/68">
+              {product.description}
+            </p>
+          )}
+
+          <div className="my-7 h-px w-full bg-[#173126]/10" />
 
           {/* Color selector */}
           {product.colors?.length > 0 && (
-            <div style={{ marginBottom: '2rem' }}>
+            <div className="mb-6">
               <p
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '0.62rem',
-                  letterSpacing: '0.22em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(250,247,240,0.45)',
-                  marginBottom: '0.875rem',
-                }}
+                className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[#173126]/55"
               >
-                Finish: <span style={{ color: 'var(--gold-light)' }}>{selectedColor}</span>
+                Finish: <span className="text-[#006039]">{selectedColor}</span>
               </p>
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <div className="flex flex-wrap gap-2">
                 {product.colors.map((color: string) => (
                   <button
                     key={color}
@@ -483,7 +482,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                     className="color-swatch"
                     style={{
                       backgroundColor: color,
-                      borderColor: selectedColor === color ? 'var(--gold)' : 'transparent',
+                      borderColor: selectedColor === color ? '#006039' : 'rgba(23,49,38,0.18)',
                     }}
                     title={color}
                   />
@@ -493,87 +492,42 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           )}
 
           {/* Quantity */}
-          <div style={{ marginBottom: '2rem' }}>
+          <div className="mb-7">
             <p
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '0.62rem',
-                letterSpacing: '0.22em',
-                textTransform: 'uppercase',
-                color: 'rgba(250,247,240,0.45)',
-                marginBottom: '0.875rem',
-              }}
+              className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[#173126]/55"
             >
               Quantity
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
-              <button
-                className="qty-btn"
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              >
-                −
-              </button>
-              <span
-                style={{
-                  width: 52,
-                  textAlign: 'center',
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '0.85rem',
-                  color: 'var(--ivory)',
-                  background: 'rgba(250,247,240,0.03)',
-                  borderTop: '1px solid rgba(250,247,240,0.1)',
-                  borderBottom: '1px solid rgba(250,247,240,0.1)',
-                  height: 36,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {quantity}
-              </span>
-              <button
-                className="qty-btn"
-                onClick={() => setQuantity((q) => Math.min(product.totalQuantity, q + 1))}
-              >
-                +
-              </button>
-              <span style={{ marginLeft: '1rem', fontSize: '0.65rem', color: 'rgba(250,247,240,0.3)', letterSpacing: '0.08em' }}>
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="inline-flex overflow-hidden border border-[#173126]/14 bg-[#f7f1e8]">
+                <button
+                  className="flex h-11 w-11 items-center justify-center text-lg text-[#173126] transition hover:bg-[#006039] hover:text-white"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                >
+                  −
+                </button>
+                <span className="flex h-11 w-14 items-center justify-center border-x border-[#173126]/14 text-sm font-semibold text-[#173126]">
+                  {quantity}
+                </span>
+                <button
+                  className="flex h-11 w-11 items-center justify-center text-lg text-[#173126] transition hover:bg-[#006039] hover:text-white"
+                  onClick={() => setQuantity((q) => Math.min(product.totalQuantity, q + 1))}
+                >
+                  +
+                </button>
+              </div>
+              <span className="text-xs font-medium uppercase tracking-[0.12em] text-[#173126]/50">
                 {product.totalQuantity} in stock
               </span>
             </div>
           </div>
 
           {/* CTA buttons */}
-          <div className="product-cta-row" style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
+          <div className="product-cta-row mb-7 flex gap-3">
             <button
               onClick={handleAddToCart}
               disabled={adding || product.totalQuantity === 0}
-              style={{
-                flex: 1,
-                padding: '1rem',
-                background: added
-                  ? 'rgba(0,96,57,0.22)'
-                  : product.totalQuantity === 0
-                    ? 'rgba(250,247,240,0.06)'
-                    : 'linear-gradient(135deg, var(--rolex-green), var(--forest))',
-                color: added ? 'var(--gold-light)' : product.totalQuantity === 0 ? 'rgba(250,247,240,0.25)' : 'var(--ivory)',
-                border: added
-                  ? '1px solid rgba(228,199,124,0.35)'
-                  : product.totalQuantity === 0
-                    ? '1px solid rgba(250,247,240,0.1)'
-                    : '1px solid rgba(228,199,124,0.55)',
-                cursor: product.totalQuantity === 0 ? 'not-allowed' : 'pointer',
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '0.62rem',
-                fontWeight: 600,
-                letterSpacing: '0.22em',
-                textTransform: 'uppercase',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.6rem',
-                transition: 'all 0.3s ease',
-              }}
+              className="flex min-h-12 flex-1 items-center justify-center gap-2 bg-[#006039] px-5 py-4 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#0b7a4d] disabled:cursor-not-allowed disabled:bg-[#173126]/12 disabled:text-[#173126]/35"
             >
               {added ? <Check size={15} /> : <ShoppingBag size={15} strokeWidth={2} />}
               {product.totalQuantity === 0
@@ -585,11 +539,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 : 'Add to Cart'}
             </button>
             <button
-              className="btn-icon"
+              className="flex h-12 w-12 shrink-0 items-center justify-center border border-[#173126]/14 bg-[#f7f1e8] transition hover:border-[#006039]/40 hover:bg-[#006039]/8"
               onClick={handleWishlistToggle}
               style={{
-                color: wishlisted ? '#ef4444' : 'rgba(250,247,240,0.5)',
-                borderColor: wishlisted ? 'rgba(239,68,68,0.3)' : 'rgba(250,247,240,0.1)',
+                color: wishlisted ? '#ef4444' : 'rgba(23,49,38,0.62)',
+                borderColor: wishlisted ? 'rgba(239,68,68,0.45)' : 'rgba(23,49,38,0.14)',
               }}
             >
               <Heart
@@ -598,40 +552,44 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 style={{ fill: wishlisted ? '#ef4444' : 'none', transition: 'fill 0.2s ease' }}
               />
             </button>
-            <button className="btn-icon" onClick={handleShare}>
+            <button className="flex h-12 w-12 shrink-0 items-center justify-center border border-[#173126]/14 bg-[#f7f1e8] text-[#173126]/65 transition hover:border-[#006039]/40 hover:bg-[#006039]/8 hover:text-[#006039]" onClick={handleShare}>
               <Share2 size={15} strokeWidth={1.5} />
             </button>
           </div>
 
+          <div className="mb-7 grid gap-3 sm:grid-cols-2">
+            <Link
+              href={`/contact-us?product=${encodeURIComponent(product.name)}`}
+              className="inline-flex min-h-12 items-center justify-center gap-2 border border-[#006039]/25 bg-white/72 px-5 py-3 text-center text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#006039] transition hover:border-[#006039] hover:bg-[#006039] hover:text-white"
+            >
+              <MessageCircle size={15} strokeWidth={1.7} />
+              Enquiry
+            </Link>
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-12 items-center justify-center gap-2 border border-[#173126]/14 bg-[#f7f1e8]/86 px-5 py-3 text-center text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#173126] transition hover:border-[#006039]/40 hover:bg-[#006039]/8 hover:text-[#006039]"
+            >
+              <Headphones size={15} strokeWidth={1.7} />
+              Support
+            </a>
+          </div>
+
           {/* Delivery highlights */}
           <div
-            style={{
-              background: 'linear-gradient(180deg, rgba(6,47,36,0.68), var(--charcoal-2))',
-              border: '1px solid rgba(0,96,57,0.24)',
-              padding: '1.5rem',
-              marginBottom: '2.5rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-            }}
+            className="mb-7 grid gap-3 sm:grid-cols-3"
           >
             {DELIVERY_HIGHLIGHTS.map(({ icon: Icon, title, desc }) => (
-              <div key={title} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.875rem' }}>
-                <Icon size={15} style={{ color: 'var(--gold-light)', marginTop: '0.1rem', flexShrink: 0 }} strokeWidth={1.5} />
+              <div key={title} className="border border-[#173126]/10 bg-[#f7f1e8] p-4">
+                <Icon size={18} className="mb-3 text-[#006039]" strokeWidth={1.7} />
                 <div>
                   <p
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: '0.68rem',
-                      fontWeight: 500,
-                      color: 'var(--ivory)',
-                      letterSpacing: '0.08em',
-                      marginBottom: '0.15rem',
-                    }}
+                    className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#173126]"
                   >
                     {title}
                   </p>
-                  <p style={{ fontSize: '0.62rem', color: 'rgba(250,247,240,0.35)', letterSpacing: '0.04em' }}>
+                  <p className="mt-2 text-xs leading-5 text-[#173126]/58">
                     {desc}
                   </p>
                 </div>
@@ -640,12 +598,18 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           </div>
 
           {/* Accordions */}
-          <div>
+          <div className="divide-y divide-[#173126]/10 border-y border-[#173126]/10">
             {accordions.map((acc) => (
-              <div key={acc.id} className="accordion-item">
+              <div key={acc.id}>
                 <button
-                  className="accordion-trigger"
-                  onClick={() => setOpenAccordion(openAccordion === acc.id ? null : acc.id)}
+                  className="flex w-full items-center justify-between py-5 text-left text-[0.76rem] font-semibold uppercase tracking-[0.16em] text-[#173126] transition hover:text-[#006039]"
+                  onClick={() =>
+                    setOpenAccordions((open) =>
+                      open.includes(acc.id)
+                        ? open.filter((id) => id !== acc.id)
+                        : [...open, acc.id],
+                    )
+                  }
                 >
                   {acc.label}
                   <ChevronDown
@@ -653,76 +617,56 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                     strokeWidth={1.5}
                     style={{
                       transition: 'transform 0.3s ease',
-                      transform: openAccordion === acc.id ? 'rotate(180deg)' : 'rotate(0)',
-                      color: openAccordion === acc.id ? 'var(--gold-light)' : 'rgba(250,247,240,0.4)',
+                      transform: openAccordions.includes(acc.id) ? 'rotate(180deg)' : 'rotate(0)',
+                      color: openAccordions.includes(acc.id) ? '#006039' : 'rgba(23,49,38,0.45)',
                     }}
                   />
                 </button>
-                {openAccordion === acc.id && (
+                {openAccordions.includes(acc.id) && (
                   <div
                     style={{
                       paddingBottom: '1.5rem',
                       animation: 'fadeUp 0.3s ease forwards',
                     }}
                   >
-                    {acc.id === 'specs' && Array.isArray(acc.content) ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        {(acc.content as any[]).map((detail: any) => (
-                          <div
-                            key={detail.label}
-                            style={{
-                              display: 'flex',
-                              gap: '2rem',
-                              padding: '0.5rem 0',
-                              borderBottom: '1px solid rgba(250,247,240,0.04)',
-                            }}
-                          >
-                            <span
-                              style={{
-                                width: '100px',
-                                flexShrink: 0,
-                                fontSize: '0.65rem',
-                                color: 'rgba(250,247,240,0.3)',
-                                letterSpacing: '0.08em',
-                              }}
-                            >
-                              {detail.label}
-                            </span>
-                            <span
-                              style={{
-                                fontSize: '0.72rem',
-                                color: 'rgba(250,247,240,0.7)',
-                                textTransform: 'capitalize',
-                                letterSpacing: '0.04em',
-                              }}
-                            >
-                              {detail.value}
-                            </span>
-                          </div>
-                        ))}
-                        {product.tags?.length > 0 && (
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.75rem' }}>
-                            {product.tags.map((tag: string) => (
-                              <span
-                                key={tag}
-                                className="badge-dark"
-                                style={{ fontSize: '0.58rem', textTransform: 'lowercase', letterSpacing: '0.06em' }}
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
+                    {acc.id === 'details' ? (
+                      <div className="pb-5">
+                        {(acc.content as { description?: string; specs: any[] }).description && (
+                          <p className="mb-5 text-sm font-normal leading-7 text-[#173126]/66">
+                            {(acc.content as { description?: string; specs: any[] }).description}
+                          </p>
                         )}
+                        <div className="grid gap-2">
+                          {(acc.content as { description?: string; specs: any[] }).specs.map((detail: any) => (
+                            <div
+                              key={detail.label}
+                              className="grid gap-1 border-b border-[#173126]/8 py-3 sm:grid-cols-[140px_1fr]"
+                            >
+                              <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#173126]/45">
+                                {detail.label}
+                              </span>
+                              <span className="text-sm capitalize leading-6 text-[#173126]/76">
+                                {detail.value}
+                              </span>
+                            </div>
+                          ))}
+                          {product.tags?.length > 0 && (
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {product.tags.map((tag: string) => (
+                                <span
+                                  key={tag}
+                                  className="bg-[#006039]/8 px-3 py-1 text-[0.62rem] font-semibold lowercase tracking-[0.06em] text-[#006039]"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ) : (
                       <p
-                        style={{
-                          fontSize: '0.75rem',
-                          color: 'rgba(250,247,240,0.5)',
-                          lineHeight: 1.85,
-                          letterSpacing: '0.04em',
-                          fontWeight: 300,
-                        }}
+                        className="pb-5 text-sm font-normal leading-7 text-[#173126]/66"
                       >
                         {acc.content as string}
                       </p>
@@ -731,6 +675,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 )}
               </div>
             ))}
+          </div>
           </div>
         </div>
       </div>

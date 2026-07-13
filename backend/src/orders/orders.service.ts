@@ -14,7 +14,8 @@ import { Cart, CartDocument } from '../cart/schemas/cart.schema';
 import { Product, ProductDocument } from '../products/schemas/product.schema';
 import { EmailService } from '../email/email.service';
 import { DeliveryService } from '../delivery/delivery.service';
-import { CreateOrderDto, UpdateOrderStatusDto } from './dto/order.dto';
+import { AdminCreateOrderDto, CreateOrderDto, RequestReturnDto, ReviewReturnRequestDto, UpdateOrderStatusDto } from './dto/order.dto';
+import { CouponsService } from '../coupons/coupons.service';
 
 @Injectable()
 export class OrdersService {
@@ -26,6 +27,7 @@ export class OrdersService {
     private emailService: EmailService,
     private deliveryService: DeliveryService,
     private config: ConfigService,
+    private couponsService: CouponsService,
   ) {}
 
   // ─── Create Razorpay Order ────────────────────────────────
@@ -36,7 +38,7 @@ export class OrdersService {
     }
 
     if (dto?.items?.length) {
-      await this.validateOrderItems(dto as CreateOrderDto);
+      await this.validateOrderItems(dto as CreateOrderDto, true);
     }
 
     const keyId = this.config.get<string>('RAZORPAY_KEY_ID');
@@ -81,7 +83,8 @@ export class OrdersService {
     const user = await this.userModel.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
-    const { normalizedItems, amount, deliveryFees } = await this.validateOrderItems(dto);
+    const { normalizedItems, subtotal, amount, deliveryFees, discountAmount, coupon } =
+      await this.validateOrderItems(dto, false);
 
     if (paymentMethod === 'online') {
       const valid = this.verifyPayment(razorpayOrderId, razorpayPaymentId, razorpaySignature);
@@ -120,6 +123,9 @@ export class OrdersService {
       userId: new Types.ObjectId(userId),
       items: normalizedItems,
       amount,
+      subtotal,
+      discountAmount,
+      coupon,
       deliveryFees,
       address: dto.address,
       paymentId: razorpayPaymentId,
@@ -151,56 +157,134 @@ export class OrdersService {
     return order;
   }
 
+  async createAdminOrder(dto: AdminCreateOrderDto) {
+    const customerEmail = dto.customerEmail?.trim().toLowerCase();
+    if (!customerEmail) throw new BadRequestException('Customer email is required');
+
+    const user = await this.userModel.findOne({ email: customerEmail });
+    if (!user) throw new NotFoundException('Customer not found');
+
+    if (!dto.items?.length) {
+      throw new BadRequestException('Order must contain at least one item');
+    }
+
+    let subtotal = 0;
+    const normalizedItems = dto.items.map((item) => {
+      const quantity = Number(item.quantity);
+      const price = Number(item.price);
+      const name = item.name?.trim();
+      if (!name) throw new BadRequestException('Item name is required');
+      if (!Number.isInteger(quantity) || quantity < 1) throw new BadRequestException('Invalid item quantity');
+      if (!Number.isFinite(price) || price < 0) throw new BadRequestException('Invalid item price');
+
+      const itemTotal = price * quantity;
+      subtotal += itemTotal;
+      return {
+        productId: item.productId || item.product || `manual-${Date.now()}`,
+        name,
+        price,
+        quantity,
+        color: item.color || '',
+        size: item.size || '',
+        image: item.image || '',
+        itemTotal,
+      };
+    });
+
+    const deliveryFees = Number(dto.deliveryFees || 0);
+    if (!Number.isFinite(deliveryFees) || deliveryFees < 0) {
+      throw new BadRequestException('Invalid delivery fee');
+    }
+
+    const paymentMethod = dto.paymentMethod === 'online' || dto.paymentMethod === 'razorpay' ? 'online' : 'cod';
+    const amount = subtotal + deliveryFees;
+    const order = await this.orderModel.create({
+      userId: user._id,
+      items: normalizedItems,
+      amount,
+      subtotal,
+      discountAmount: 0,
+      deliveryFees,
+      address: dto.address,
+      paymentId: dto.paymentId,
+      razorpayOrderId: dto.razorpayOrderId,
+      payment: Boolean(dto.payment),
+      paymentMethod,
+      status: dto.status || OrderStatus.PLACED,
+      orderDate: new Date(),
+      deliveryMethod: dto.deliveryMethod,
+    });
+
+    return this.orderModel.findById(order._id).populate('userId', 'name email');
+  }
+
   // ─── Update Order Status (Admin) ─────────────────────────
   async updateOrderStatus(orderId: string, dto: UpdateOrderStatusDto) {
     const order = await this.orderModel.findById(orderId);
     if (!order) throw new NotFoundException('Order not found');
 
     const prevStatus = order.status;
-    order.status = dto.status;
-    await order.save();
+    if (prevStatus === dto.status) {
+      return this.orderModel.findById(orderId).populate('userId', 'name email');
+    }
+
+    const validNextStatuses = this.getValidNextStatuses(prevStatus);
+    if (!validNextStatuses.includes(dto.status)) {
+      throw new BadRequestException(`Cannot change status from ${prevStatus} directly to ${dto.status}`);
+    }
+
+    const updatedOrder = await this.orderModel.findByIdAndUpdate(
+      orderId,
+      { $set: { status: dto.status } },
+      { new: true, runValidators: true },
+    );
+    if (!updatedOrder) throw new NotFoundException('Order not found');
 
     // Fetch customer for emails
     const user = await this.userModel.findById(order.userId);
 
     // ─── Trigger Delhivery when order is Confirmed ──────────
     if (dto.status === OrderStatus.CONFIRMED && prevStatus !== OrderStatus.CONFIRMED) {
-      const productNames = order.items.map((i: any) => i.name).join(', ');
-      const totalQty = order.items.reduce((s: number, i: any) => s + i.quantity, 0);
-      const totalWeight = totalQty * 200; // assume 200g per item
+      try {
+        const productNames = order.items.map((i: any) => i.name).join(', ');
+        const totalQty = order.items.reduce((s: number, i: any) => s + i.quantity, 0);
+        const totalWeight = totalQty * 200; // assume 200g per item
 
-      const shipmentResult = await this.deliveryService.createShipment({
-        orderId: String(order._id).slice(-8).toUpperCase(),
-        orderDate: order.orderDate.toISOString(),
-        customerName: user?.name || 'Customer',
-        customerPhone: order.address.phone,
-        customerEmail: user?.email || '',
-        addressLine1: order.address.addressLineOne,
-        addressLine2: order.address.addressLineTwo,
-        city: order.address.city,
-        state: order.address.state,
-        pinCode: order.address.pinCode,
-        country: order.address.country || 'India',
-        codAmount: order.paymentMethod === 'cod' ? order.amount : 0,
-        orderValue: order.amount,
-        paymentMode: order.paymentMethod === 'cod' ? 'COD' : 'Prepaid',
-        weight: totalWeight,
-        productName: productNames,
-        quantity: totalQty,
-      });
-
-      if (shipmentResult.success) {
-        await this.orderModel.findByIdAndUpdate(orderId, {
-          delivery: {
-            waybill: shipmentResult.waybill,
-            trackingUrl: shipmentResult.trackingUrl,
-            shipmentId: shipmentResult.shipmentId,
-            courierName: 'Delhivery',
-            dispatchedAt: new Date(),
-          },
+        const shipmentResult = await this.deliveryService.createShipment({
+          orderId: String(order._id).slice(-8).toUpperCase(),
+          orderDate: order.orderDate.toISOString(),
+          customerName: user?.name || 'Customer',
+          customerPhone: order.address.phone,
+          customerEmail: user?.email || '',
+          addressLine1: order.address.addressLineOne,
+          addressLine2: order.address.addressLineTwo,
+          city: order.address.city,
+          state: order.address.state,
+          pinCode: order.address.pinCode,
+          country: order.address.country || 'India',
+          codAmount: order.paymentMethod === 'cod' ? order.amount : 0,
+          orderValue: order.amount,
+          paymentMode: order.paymentMethod === 'cod' ? 'COD' : 'Prepaid',
+          weight: totalWeight,
+          productName: productNames,
+          quantity: totalQty,
         });
-      } else {
-        console.warn(`Delhivery shipment not created for order ${orderId}: ${shipmentResult.error || 'Unknown error'}`);
+
+        if (shipmentResult.success) {
+          await this.orderModel.findByIdAndUpdate(orderId, {
+            delivery: {
+              waybill: shipmentResult.waybill,
+              trackingUrl: shipmentResult.trackingUrl,
+              shipmentId: shipmentResult.shipmentId,
+              courierName: 'Delhivery',
+              dispatchedAt: new Date(),
+            },
+          });
+        } else {
+          console.warn(`Delhivery shipment not created for order ${orderId}: ${shipmentResult.error || 'Unknown error'}`);
+        }
+      } catch (err) {
+        console.warn(`Delhivery shipment failed after status update for order ${orderId}: ${err.message}`);
       }
     }
 
@@ -219,25 +303,173 @@ export class OrdersService {
         .catch((err) => console.warn(`Order delivered email failed for ${orderId}: ${err.message}`));
     }
 
-    return this.orderModel.findById(orderId);
+    return this.orderModel.findById(orderId).populate('userId', 'name email');
+  }
+
+  async requestReturn(orderId: string, userId: string, dto: RequestReturnDto) {
+    const order = await this.orderModel.findById(orderId);
+    if (!order) throw new NotFoundException('Order not found');
+
+    if (String(order.userId) !== String(userId)) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    if (order.status !== OrderStatus.DELIVERED) {
+      throw new BadRequestException('Return can only be requested after delivery');
+    }
+
+    if (order.returnRequest?.status === 'Requested') {
+      throw new BadRequestException('Return request is already pending');
+    }
+
+    if (order.returnRequest?.status === 'Approved') {
+      throw new BadRequestException('This order has already been returned');
+    }
+
+    const reason = dto.reason?.trim();
+    if (!reason) {
+      throw new BadRequestException('Return reason is required');
+    }
+
+    const updatedOrder = await this.orderModel
+      .findByIdAndUpdate(
+        orderId,
+        {
+          $set: {
+            returnRequest: {
+              status: 'Requested',
+              reason,
+              details: dto.details?.trim(),
+              requestedAt: new Date(),
+            },
+          },
+        },
+        { new: true, runValidators: true },
+      )
+      .populate('userId', 'name email');
+
+    if (!updatedOrder) throw new NotFoundException('Order not found');
+    return updatedOrder;
+  }
+
+  async reviewReturnRequest(orderId: string, dto: ReviewReturnRequestDto) {
+    const order = await this.orderModel.findById(orderId);
+    if (!order) throw new NotFoundException('Order not found');
+
+    if (order.returnRequest?.status !== 'Requested') {
+      throw new BadRequestException('No pending return request found for this order');
+    }
+
+    const approved = dto.decision === 'approved';
+    const returnRequest = {
+      ...order.returnRequest,
+      status: approved ? 'Approved' : 'Rejected',
+      reviewedAt: new Date(),
+      adminNote: dto.adminNote?.trim(),
+    };
+
+    const updatedOrder = await this.orderModel
+      .findByIdAndUpdate(
+        orderId,
+        {
+          $set: {
+            status: approved ? OrderStatus.RETURNED : order.status,
+            returnRequest,
+          },
+        },
+        { new: true, runValidators: true },
+      )
+      .populate('userId', 'name email');
+
+    if (!updatedOrder) throw new NotFoundException('Order not found');
+    return updatedOrder;
+  }
+
+  async deleteOrder(orderId: string) {
+    const order = await this.orderModel.findByIdAndDelete(orderId).populate('userId', 'name email');
+    if (!order) throw new NotFoundException('Order not found');
+    return { id: orderId };
+  }
+
+  private getValidNextStatuses(status: OrderStatus) {
+    const transitions: Record<OrderStatus, OrderStatus[]> = {
+      [OrderStatus.PLACED]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
+      [OrderStatus.CONFIRMED]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
+      [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
+      [OrderStatus.SHIPPED]: [OrderStatus.OUT_FOR_DELIVERY],
+      [OrderStatus.OUT_FOR_DELIVERY]: [OrderStatus.DELIVERED],
+      [OrderStatus.DELIVERED]: [OrderStatus.RETURNED],
+      [OrderStatus.CANCELLED]: [],
+      [OrderStatus.RETURNED]: [],
+    };
+
+    return transitions[status] || [];
   }
 
   // ─── Get all orders (Admin) ───────────────────────────────
-  async getAllOrders(page = 1, limit = 20, status?: string) {
+  async getAllOrders(
+    page = 1,
+    limit = 20,
+    status?: string,
+    search?: string,
+    fromDate?: string,
+    toDate?: string,
+  ) {
+    const pageNum = Math.max(1, Number(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, Number(limit) || 20));
     const filter: any = {};
     if (status) filter.status = status;
+
+    if (fromDate || toDate) {
+      filter.orderDate = {};
+      if (fromDate) {
+        const start = new Date(`${fromDate}T00:00:00.000`);
+        if (!Number.isNaN(start.getTime())) filter.orderDate.$gte = start;
+      }
+      if (toDate) {
+        const end = new Date(`${toDate}T23:59:59.999`);
+        if (!Number.isNaN(end.getTime())) filter.orderDate.$lte = end;
+      }
+      if (!Object.keys(filter.orderDate).length) delete filter.orderDate;
+    }
+
+    const cleanedSearch = search?.trim();
+    if (cleanedSearch) {
+      const regex = new RegExp(this.escapeRegex(cleanedSearch), 'i');
+      const users = await this.userModel.find({
+        $or: [{ name: regex }, { email: regex }],
+      }).select('_id');
+      const searchFilters: any[] = [
+        { userId: { $in: users.map((user) => user._id) } },
+        {
+          $expr: {
+            $regexMatch: {
+              input: { $toString: '$_id' },
+              regex: this.escapeRegex(cleanedSearch),
+              options: 'i',
+            },
+          },
+        },
+      ];
+
+      if (Types.ObjectId.isValid(cleanedSearch)) {
+        searchFilters.push({ _id: new Types.ObjectId(cleanedSearch) });
+      }
+
+      filter.$or = searchFilters;
+    }
 
     const [orders, total] = await Promise.all([
       this.orderModel
         .find(filter)
         .populate('userId', 'name email')
         .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit),
+        .skip((pageNum - 1) * limitNum)
+        .limit(limitNum),
       this.orderModel.countDocuments(filter),
     ]);
 
-    return { orders, total, page, pages: Math.ceil(total / limit) };
+    return { orders, total, page: pageNum, pages: Math.ceil(total / limitNum) };
   }
 
   // ─── Get user orders ─────────────────────────────────────
@@ -274,14 +506,23 @@ export class OrdersService {
 
   // ─── Admin stats ──────────────────────────────────────────
   async getOrderStats() {
-    const [total, placed, confirmed, shipped, delivered, cancelled, revenue] =
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const [total, placed, confirmed, processing, shipped, outForDelivery, delivered, cancelled, returned, todaysOrders, revenue] =
       await Promise.all([
         this.orderModel.countDocuments(),
         this.orderModel.countDocuments({ status: OrderStatus.PLACED }),
         this.orderModel.countDocuments({ status: OrderStatus.CONFIRMED }),
+        this.orderModel.countDocuments({ status: OrderStatus.PROCESSING }),
         this.orderModel.countDocuments({ status: OrderStatus.SHIPPED }),
+        this.orderModel.countDocuments({ status: OrderStatus.OUT_FOR_DELIVERY }),
         this.orderModel.countDocuments({ status: OrderStatus.DELIVERED }),
         this.orderModel.countDocuments({ status: OrderStatus.CANCELLED }),
+        this.orderModel.countDocuments({ status: OrderStatus.RETURNED }),
+        this.orderModel.countDocuments({ orderDate: { $gte: todayStart, $lte: todayEnd } }),
         this.orderModel.aggregate([
           { $match: { payment: true } },
           { $group: { _id: null, total: { $sum: '$amount' } } },
@@ -292,11 +533,20 @@ export class OrdersService {
       total,
       placed,
       confirmed,
+      processing,
       shipped,
+      outForDelivery,
       delivered,
       cancelled,
+      returned,
+      pending: placed + confirmed + processing + shipped + outForDelivery,
+      todaysOrders,
       revenue: revenue[0]?.total || 0,
     };
+  }
+
+  private escapeRegex(value: string) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   private getProductDisplayImage(product: ProductDocument) {
@@ -310,7 +560,7 @@ export class OrdersService {
     return legacyProduct.primaryImage || legacyProduct.image || legacyProduct.images?.[0] || '';
   }
 
-  private async validateOrderItems(dto: CreateOrderDto) {
+  private async validateOrderItems(dto: CreateOrderDto, skipCouponConsumption = true) {
     if (!dto.items?.length) {
       throw new BadRequestException('Order must contain at least one item');
     }
@@ -356,12 +606,28 @@ export class OrdersService {
       throw new BadRequestException('Invalid delivery fee');
     }
 
-    const amount = subtotal + deliveryFees;
+    let discountAmount = 0;
+    let coupon;
+    if (dto.couponCode?.trim()) {
+      const appliedCoupon = skipCouponConsumption
+        ? await this.couponsService.validateCoupon(dto.couponCode, subtotal)
+        : await this.couponsService.consumeCoupon(dto.couponCode, subtotal);
+      discountAmount = appliedCoupon.discountAmount;
+      coupon = {
+        code: appliedCoupon.code,
+        name: appliedCoupon.name,
+        discountType: appliedCoupon.discountType,
+        discountValue: appliedCoupon.discountValue,
+        discountAmount: appliedCoupon.discountAmount,
+      };
+    }
+
+    const amount = subtotal + deliveryFees - discountAmount;
     const clientAmount = Number(dto.amount ?? dto.totalAmount ?? 0);
     if (!Number.isFinite(clientAmount) || Math.abs(clientAmount - amount) > 1) {
       throw new BadRequestException('Order amount does not match current product prices');
     }
 
-    return { normalizedItems, amount, deliveryFees };
+    return { normalizedItems, subtotal, amount, deliveryFees, discountAmount, coupon };
   }
 }

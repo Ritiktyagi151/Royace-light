@@ -75,8 +75,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ['DM Sans', 'sans-serif'],
-        serif: ['DM Sans', 'sans-serif'],
-        display: ['DM Sans', 'sans-serif'],
+        serif: ['Roboto Variable', 'Roboto', 'Helvetica Neue', 'Helvetica', 'sans-serif'],
+        display: ['Roboto Variable', 'Roboto', 'Helvetica Neue', 'Helvetica', 'sans-serif'],
         cormorant: ['DM Sans', 'sans-serif'],
         body: ['DM Sans', 'sans-serif'],
       },

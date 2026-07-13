@@ -2,11 +2,11 @@ import Link from "next/link";
 
 export default function ExperienceStoresSection() {
   return (
-    <div className="relative overflow-hidden bg-[#dfe8d8] bg-[url('/images/green-texture.png')] bg-cover bg-center py-16 lg:py-12">
+    <div className="relative overflow-hidden bg-[#dfe8d8] bg-[url('/images/green-texture.png')] bg-cover bg-center py-16 lg:min-h-[560px] lg:py-12 2xl:min-h-[640px]">
       {/* Left Content */}
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12">
         <div className="max-w-xl py-10 lg:py-16">
-          <h2 className="text-[clamp(2.35rem,11vw,5.4rem)] font-semibold leading-none text-[#3a2a1d]">
+          <h2 className="text-5xl font-semibold leading-none text-[#3a2a1d]">
             Experience Stores
           </h2>
 

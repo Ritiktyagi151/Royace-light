@@ -53,6 +53,16 @@ export class ProductsController {
     return { success: true, data };
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('admin/low-stock')
+  async getLowStockProducts(
+    @Query('threshold') threshold = 10,
+    @Query('limit') limit = 8,
+  ) {
+    const data = await this.productsService.getLowStockProducts(+threshold, +limit);
+    return { success: true, data };
+  }
+
   // ─── Admin + Vendor: add product ─────────────────────────
   @UseGuards(JwtAuthGuard, VendorGuard)
   @Post()

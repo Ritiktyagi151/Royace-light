@@ -211,7 +211,7 @@ export function Navbar() {
               <span aria-hidden="true" className="text-[var(--gold-light)]">·</span>
               <span>Orders Above ₹1,50,000</span>
               <span aria-hidden="true" className="text-[var(--gold-light)]">·</span>
-              <span>Luxury Chandeliers And Bespoke Lighting</span>
+              <span>Decorative Lighting For Homes And Projects</span>
               <span aria-hidden="true" className="text-[var(--gold-light)]">·</span>
             </div>
           ))}

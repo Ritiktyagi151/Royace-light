@@ -47,7 +47,7 @@ export default function CartPage() {
       <EmptyState
         icon={<ShoppingBag size={40} strokeWidth={1} style={{ color: 'rgba(0,96,57,0.4)' }} />}
         title="Your cart is empty"
-        desc="Discover our handcrafted lighting collections."
+        desc="Explore decorative lighting collections for your home or project."
         action={
           <Link href="/shop" className="btn-primary" style={{ fontSize: '0.6rem' }}>
             Explore Collections <ArrowRight size={14} />
@@ -104,7 +104,7 @@ export default function CartPage() {
           >
             {freeInstall ? (
                 <p style={{ fontSize: '0.65rem', letterSpacing: '0.18em', color: 'var(--gold-light)', textTransform: 'uppercase' }}>
-                ✦ White-glove installation included with your order
+                Site support and installation guidance available on request
               </p>
             ) : (
               <div>

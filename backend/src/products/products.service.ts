@@ -168,6 +168,26 @@ export class ProductsService {
     return { products, total, page, pages: Math.ceil(total / limit) };
   }
 
+  async getLowStockProducts(threshold = 10, limit = 8) {
+    const normalizedThreshold = Math.max(0, Number(threshold) || 10);
+    const normalizedLimit = Math.min(50, Math.max(1, Number(limit) || 8));
+    const filter = {
+      isActive: true,
+      totalQuantity: { $lte: normalizedThreshold },
+    };
+
+    const [products, total] = await Promise.all([
+      this.productModel
+        .find(filter)
+        .select('name sku totalQuantity')
+        .sort({ totalQuantity: 1, name: 1 })
+        .limit(normalizedLimit),
+      this.productModel.countDocuments(filter),
+    ]);
+
+    return { products, total, threshold: normalizedThreshold };
+  }
+
   async findVendorProducts(vendorId: string, query: ProductQueryDto) {
     const filter: any = { vendorId: new Types.ObjectId(vendorId) };
     if (query.category) filter.category = await this.resolveCategoryFilter(query.category);
@@ -239,6 +259,10 @@ export class ProductsService {
       payload.tags = this.normalizeStringArray(payload.tags) || [];
     }
 
+    if (Object.prototype.hasOwnProperty.call(payload, 'hiddenFields')) {
+      payload.hiddenFields = this.normalizeStringArray(payload.hiddenFields) || [];
+    }
+
     if (
       Object.prototype.hasOwnProperty.call(payload, 'size') ||
       Object.prototype.hasOwnProperty.call(payload, 'dimension')
@@ -258,6 +282,14 @@ export class ProductsService {
       return value.map((item) => String(item).trim()).filter(Boolean);
     }
     if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) {
+          return parsed.map((item) => String(item).trim()).filter(Boolean);
+        }
+      } catch {
+        // Fall back to comma-separated form values.
+      }
       return value.split(',').map((item) => item.trim()).filter(Boolean);
     }
     return undefined;

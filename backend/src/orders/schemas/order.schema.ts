@@ -49,6 +49,26 @@ class DeliveryInfo {
   @Prop() dispatchedAt?: Date;
 }
 
+@Schema({ _id: false })
+class CouponSnapshot {
+  @Prop({ trim: true }) code: string;
+  @Prop({ trim: true }) name?: string;
+  @Prop() discountType?: string;
+  @Prop() discountValue?: number;
+  @Prop({ default: 0 }) discountAmount: number;
+}
+
+@Schema({ _id: false })
+class ReturnRequest {
+  @Prop({ enum: ['Requested', 'Approved', 'Rejected'] })
+  status: 'Requested' | 'Approved' | 'Rejected';
+  @Prop({ trim: true }) reason: string;
+  @Prop({ trim: true }) details?: string;
+  @Prop() requestedAt?: Date;
+  @Prop() reviewedAt?: Date;
+  @Prop({ trim: true }) adminNote?: string;
+}
+
 @Schema({ timestamps: true })
 export class Order {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
@@ -59,6 +79,15 @@ export class Order {
 
   @Prop({ required: true })
   amount: number;
+
+  @Prop({ default: 0 })
+  subtotal: number;
+
+  @Prop({ default: 0 })
+  discountAmount: number;
+
+  @Prop({ type: Object })
+  coupon?: CouponSnapshot;
 
   @Prop({ required: true })
   deliveryFees: number;
@@ -83,6 +112,9 @@ export class Order {
 
   @Prop({ type: Object })
   delivery?: DeliveryInfo;
+
+  @Prop({ type: Object })
+  returnRequest?: ReturnRequest;
 
   @Prop({ type: Date, default: Date.now })
   orderDate: Date;

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
@@ -10,9 +10,8 @@ import {
   Sparkles,
   HeartHandshake,
 } from 'lucide-react';
-import { SectionReveal, cardReveal, cardRevealRight, staggerContainer } from './SectionReveal';
+import { cardReveal, cardRevealRight, staggerContainer } from './SectionReveal';
 
-// ---- Data (inline — move back to home-data.ts if you prefer) ----
 type Reason = {
   icon: LucideIcon;
   title: string;
@@ -24,55 +23,51 @@ type Reason = {
 const reasons: Reason[] = [
   {
     icon: ShieldCheck,
-    title: 'Quality, verified.',
-    desc: 'Har batch multiple quality checkpoints se guzarta hai — finish, weight, aur consistency, sab kuch ship hone se pehle test hota hai.',
+    title: 'Checked quality',
+    desc: 'Every order is reviewed for finish, fitting, wiring readiness, and packing before dispatch from our facility.',
     stat: '100%',
-    statLabel: 'batch inspected',
+    statLabel: 'checked orders',
   },
   {
     icon: Factory,
-    title: 'Scale that delivers.',
-    desc: 'In-house production capacity itni strong hai ki bade residential aur commercial projects bhi bina delay ke fulfil ho jaate hain.',
-    stat: '50K+',
-    statLabel: 'units / month',
+    title: 'Project capability',
+    desc: 'We support single-home requirements as well as larger residential, hospitality, and commercial lighting projects.',
+    stat: '50+',
+    statLabel: 'cities served',
   },
   {
     icon: Ruler,
-    title: 'Precision by design.',
-    desc: 'Design se lekar installation tak, har piece exact specifications ke mutabik banaya jaata hai — koi guesswork nahi.',
-    stat: '±0.2mm',
-    statLabel: 'tolerance',
+    title: 'Correct sizing',
+    desc: 'Our team helps match fixture size, drop height, and placement with the room layout and ceiling conditions.',
+    stat: 'Site',
+    statLabel: 'based planning',
   },
   {
     icon: Truck,
-    title: 'On-time, every time.',
-    desc: 'Logistics network pan-India delivery ko predictable banata hai, chahe project ka scale kuch bhi ho.',
+    title: 'Reliable dispatch',
+    desc: 'Packing and dispatch are planned carefully so delicate lighting reaches the site in a safe and organised manner.',
     stat: '98%',
-    statLabel: 'on-time dispatch',
+    statLabel: 'planned dispatch',
   },
   {
     icon: Sparkles,
-    title: 'Finish that lasts.',
-    desc: 'Premium materials aur curated finishes jo sirf achhe dikhte nahi — time ke saath apni chamak bhi bacha kar rakhte hain.',
-    stat: '10 Yr',
-    statLabel: 'finish warranty',
+    title: 'Finish guidance',
+    desc: 'We help coordinate brass, gold, black, bronze, crystal, and glass finishes with the interior palette.',
+    stat: 'Many',
+    statLabel: 'finish options',
   },
   {
     icon: HeartHandshake,
-    title: 'Support that stays.',
-    desc: 'Sale ke baad bhi hum saath hain — installation guidance se lekar after-sales query tak, dedicated support team available.',
-    stat: '24/7',
-    statLabel: 'client support',
+    title: 'Support after order',
+    desc: 'From product queries to installation guidance and after-sales support, our team remains reachable.',
+    stat: 'After',
+    statLabel: 'sales support',
   },
 ];
 
 export function WhyChooseUs() {
   return (
-    <div
-      
-      className="relative overflow-hidden bg-[#dfe8d8] px-4 py-16 text-[#1c3324] sm:px-6 lg:px-10 lg:py-24"
-    >
-      {/* soft decorative glows */}
+    <div className="relative overflow-hidden bg-[#dfe8d8] px-4 py-16 text-[#1c3324] sm:px-6 lg:px-10 lg:py-24">
       <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-[#a9cf9a]/40 blur-3xl" />
       <div className="pointer-events-none absolute -right-24 bottom-0 h-80 w-80 rounded-full bg-[#c9e3bd]/50 blur-3xl" />
 
@@ -80,14 +75,14 @@ export function WhyChooseUs() {
         <div className="max-w-3xl">
           <span className="inline-flex items-center gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-[#006039]">
             <span className="h-px w-9 bg-[#006039]" />
-            Why Royace
+            Why Choose Royace
           </span>
-          <h2 className="mt-5 max-w-4xl font-serif text-4xl font-light italic leading-[0.98] text-[#1c3324]">
-            A quieter, more exacting way to buy luxury lighting.
+          <h2 className="mt-5 max-w-4xl font-serif text-3xl font-light italic leading-[0.98] text-[#1c3324]">
+            A simpler, more dependable way to buy premium decorative lighting.
           </h2>
         </div>
         <p className="max-w-md text-sm leading-7 text-[#1c3324]/65">
-          Har fixture ke peeche ek disciplined process hai — design, material, aur delivery, sab kuch is liye banaya gaya hai ki aapko sirf result dikhe, complexity nahi.
+          Every fixture is backed by a clear process: selection, finish guidance, quality check, packing, dispatch, and practical installation support.
         </p>
       </div>
 
@@ -101,7 +96,6 @@ export function WhyChooseUs() {
         {reasons.map(({ icon: Icon, title, desc, stat, statLabel }, index) => (
           <motion.div key={title} variants={index % 2 === 0 ? cardReveal : cardRevealRight}>
             <div className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-sm border border-[#006039]/12 bg-white p-7 shadow-[0_22px_60px_rgba(28,51,36,0.08)] transition duration-300 hover:-translate-y-1 hover:border-[#006039]/40 hover:shadow-[0_28px_70px_rgba(28,51,36,0.14)]">
-              {/* index tag */}
               <span className="absolute right-6 top-6 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#006039]/30">
                 {String(index + 1).padStart(2, '0')}
               </span>
@@ -110,7 +104,7 @@ export function WhyChooseUs() {
                 <Icon size={20} strokeWidth={1.6} />
               </span>
 
-              <h3 className="mt-7 font-serif text-2xl font-light italic leading-tight text-[#1c3324] lg:text-3xl">
+              <h3 className="mt-7 font-serif text-xl font-light italic leading-tight text-[#1c3324] lg:text-3xl">
                 {title}
               </h3>
               <p className="mt-4 text-sm leading-7 text-[#1c3324]/60">{desc}</p>

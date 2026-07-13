@@ -18,7 +18,7 @@ import ExperienceStoresSection from '@/components/home/BannerVideoSection';
 export const metadata: Metadata = {
   title: 'Royace Lighting - Luxury Chandeliers & Handcrafted Lighting',
   description:
-    'Bespoke chandeliers and luxury lighting for extraordinary interiors. Crafted by master artisans for discerning homes.',
+    'Premium decorative lighting for Indian homes, villas, hotels, offices, and commercial projects. Explore chandeliers, pendants, wall lights, and custom lighting.',
 };
 
 export default async function HomePage() {
@@ -27,10 +27,10 @@ export default async function HomePage() {
   return (
     <div className="home-page">
       <HeroSection />
-      <HomePromoMosaic />
+      <HomePromoMosaic categories={collections} />
+      <BrandStoryRedesign />
       <ServiceHighlights />
       <ExperienceStoresSection />
-      <BrandStoryRedesign />
       {/* <FeaturedCategories /> */}
       <FeaturedProducts collections={collections} />
       <CollectionShowcase />

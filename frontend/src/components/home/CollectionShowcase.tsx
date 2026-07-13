@@ -27,16 +27,16 @@ export function CollectionShowcase() {
         <div className="max-w-xl">
           <span className="inline-flex items-center gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-[#006039]">
             <span className="h-px w-9 bg-[#006039]" />
-            Design Language
+            Design Approach
           </span>
           <h2 className="mt-5 font-serif text-4xl font-light leading-[0.98]">
-            Dark lacquer, warm metal, disciplined proportion.
+            Warm finishes, balanced scale, and practical installation planning.
           </h2>
           <p className="mt-6 text-sm leading-7 text-[#173126]/62">
-            Ivory rooms, forest-green accents, and warm metal finishes create premium spaces that feel composed, not loud.
+            We help choose lighting that suits Indian room sizes, ceiling heights, interior finishes, and the way the space is used every day.
           </p>
           <Link href="/bespoke" className="mt-8 inline-flex items-center gap-2 bg-[#006039] px-6 py-3 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-[#0b7a4d]">
-            Commission a piece <ArrowRight size={14} />
+            Start a Custom Enquiry <ArrowRight size={14} />
           </Link>
         </div>
 

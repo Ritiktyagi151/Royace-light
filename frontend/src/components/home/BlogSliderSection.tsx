@@ -41,10 +41,10 @@ export function BlogSliderSection() {
           <div className="max-w-3xl">
             <p className="inline-flex items-center gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-[#006039]">
               <span className="h-px w-9 bg-[#006039]" />
-              Royace Journal
+              Lighting Journal
             </p>
-            <h2 className="mt-4 text-4xl font-semibold leading-tight">
-              Lighting ideas, guides, and care notes.
+            <h2 className="mt-4 text-3xl font-semibold leading-tight">
+              Practical ideas for selecting, installing, and maintaining decorative lighting.
             </h2>
           </div>
 

@@ -14,6 +14,7 @@ import {
   LoginDto,
   ChangePasswordDto,
   RegisterVendorDto,
+  UpdateProfileDto,
 } from './dto/auth.dto';
 
 @Injectable()
@@ -35,12 +36,13 @@ export class AuthService {
     const user = await this.userModel.create({
       name: dto.name,
       email: dto.email,
+      phone: dto.phone,
       password: hashed,
       role: UserRole.USER,
     });
 
     const token = this.createToken(String(user._id));
-    return { token, userId: user._id, role: user.role, name: user.name };
+    return { token, userId: user._id, role: user.role, name: user.name, email: user.email, phone: user.phone };
   }
 
   async login(dto: LoginDto) {
@@ -53,7 +55,7 @@ export class AuthService {
     if (!user.isActive) throw new UnauthorizedException('Account is deactivated');
 
     const token = this.createToken(String(user._id));
-    return { token, userId: user._id, role: user.role, name: user.name };
+    return { token, userId: user._id, role: user.role, name: user.name, email: user.email, phone: user.phone };
   }
 
   async registerVendor(dto: RegisterVendorDto) {
@@ -73,7 +75,7 @@ export class AuthService {
     });
 
     const token = this.createToken(String(user._id));
-    return { token, userId: user._id, role: user.role, name: user.name, shopName: user.shopName };
+    return { token, userId: user._id, role: user.role, name: user.name, email: user.email, phone: user.phone, shopName: user.shopName };
   }
 
   async changePassword(userId: string, dto: ChangePasswordDto) {
@@ -95,5 +97,22 @@ export class AuthService {
     const user = await this.userModel.findById(userId).select('-password');
     if (!user) throw new NotFoundException('User not found');
     return user;
+  }
+
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    const user = await this.userModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    if (dto.email && dto.email !== user.email) {
+      const existing = await this.userModel.findOne({ email: dto.email, _id: { $ne: user._id } });
+      if (existing) throw new BadRequestException('Email already in use');
+      user.email = dto.email;
+    }
+    if (dto.name !== undefined) user.name = dto.name;
+    if (dto.phone !== undefined) user.phone = dto.phone;
+
+    await user.save();
+    const updated = await this.userModel.findById(userId).select('-password');
+    return updated;
   }
 }

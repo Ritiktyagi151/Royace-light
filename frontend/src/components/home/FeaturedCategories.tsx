@@ -24,15 +24,15 @@ export function FeaturedCategories() {
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-[#006039]">
               <span className="h-px w-9 bg-[#006039]" />
-              Curated Categories
+              Shop By Category
             </span>
             <h2 className="mt-5 font-serif text-[clamp(2.1rem,5vw,4.7rem)] font-light italic leading-[0.98] text-[#173126]">
-              Choose light by mood, scale, and room.
+              Choose lighting by room, mood, and scale.
             </h2>
           </div>
 
           <p className="max-w-md text-sm leading-7 text-[#173126]/62">
-            Explore edited collections shaped around proportion, finish, and the way each glow settles into a luxury interior.
+            Browse practical collections for homes, villas, hotels, offices, and commercial interiors across India.
           </p>
         </div>
       </div>
@@ -82,7 +82,7 @@ export function FeaturedCategories() {
                   {category.description}
                 </p>
                 <strong className="mt-6 inline-flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-white transition group-hover:text-[#e4c77c]">
-                  Discover
+                  Explore
                   <ArrowRight size={14} strokeWidth={1.6} className="transition group-hover:translate-x-1" />
                 </strong>
               </div>
