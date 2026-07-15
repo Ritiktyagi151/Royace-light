@@ -23,6 +23,7 @@ export default function CustomerLoginPage() {
   const [registerPhone, setRegisterPhone] = useState('');
   const [registerOtp, setRegisterOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  const [devOtp, setDevOtp] = useState('');
   const [sendingOtp, setSendingOtp] = useState(false);
   const [registerPassword, setRegisterPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
@@ -64,10 +65,6 @@ export default function CustomerLoginPage() {
   const handleRegister = async (event: FormEvent) => {
     event.preventDefault();
     setError('');
-    if (!otpSent) {
-      setError('Please send and enter phone OTP first.');
-      return;
-    }
     const result = await dispatch(registerThunk({
       name: registerName,
       email: registerEmail,
@@ -88,8 +85,9 @@ export default function CustomerLoginPage() {
     try {
       const result = await sendRegisterOtpAPI(registerPhone);
       setOtpSent(true);
+      setDevOtp(result?.devOtp || '');
       dispatch(addToast({
-        message: result?.devOtp ? `OTP sent. Dev OTP: ${result.devOtp}` : 'OTP sent to phone number',
+        message: result?.smsSent ? 'OTP sent to phone number' : 'OTP ready for local testing',
         type: 'success',
       }));
     } catch (err: any) {
@@ -207,19 +205,21 @@ export default function CustomerLoginPage() {
                   required
                   type="tel"
                   value={registerPhone}
-                  onChange={(event) => { setRegisterPhone(event.target.value); setOtpSent(false); }}
+                  onChange={(event) => { setRegisterPhone(event.target.value); setOtpSent(false); setDevOtp(''); }}
                   placeholder="Mobile number"
                 />
+                {otpSent && !devOtp && (
+                  <p style={helperTextStyle}>OTP sent to this mobile number.</p>
+                )}
               </div>
               <div>
                 <label style={labelStyle}>Phone OTP</label>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <input
                     className="input-luxury"
-                    required
                     value={registerOtp}
                     onChange={(event) => setRegisterOtp(event.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="6-digit OTP"
+                    placeholder="6-digit OTP (optional)"
                     style={{ minWidth: 0 }}
                   />
                   <button
@@ -232,6 +232,9 @@ export default function CustomerLoginPage() {
                     {sendingOtp ? 'Sending' : otpSent ? 'Resend' : 'Send OTP'}
                   </button>
                 </div>
+                {devOtp && (
+                  <p style={devOtpStyle}>Local OTP: <strong>{devOtp}</strong></p>
+                )}
               </div>
               <div>
                 <label style={labelStyle}>Password</label>
@@ -342,4 +345,20 @@ const linkButtonStyle: React.CSSProperties = {
   fontSize: '0.65rem',
   letterSpacing: '0.06em',
   alignSelf: 'flex-start',
+};
+
+const helperTextStyle: React.CSSProperties = {
+  marginTop: '0.45rem',
+  fontSize: '0.64rem',
+  color: 'rgba(250,247,240,0.5)',
+};
+
+const devOtpStyle: React.CSSProperties = {
+  marginTop: '0.5rem',
+  padding: '0.55rem 0.7rem',
+  border: '1px solid rgba(217,181,107,0.35)',
+  background: 'rgba(217,181,107,0.12)',
+  color: 'var(--gold-light)',
+  fontSize: '0.68rem',
+  letterSpacing: '0.04em',
 };

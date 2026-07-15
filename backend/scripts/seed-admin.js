@@ -11,8 +11,8 @@ if (!mongoUri) {
   process.exit(1);
 }
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'thesonukumar357@gmail.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'thesonukumar357';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'royaceadmin@gmail.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'royace@R123';
 const ADMIN_NAME = process.env.ADMIN_NAME || 'Admin';
 
 const userSchema = new mongoose.Schema({

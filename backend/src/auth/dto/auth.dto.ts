@@ -16,7 +16,8 @@ export class RegisterDto {
   phone: string;
 
   @IsString()
-  otp: string;
+  @IsOptional()
+  otp?: string;
 
   @IsString()
   @MinLength(6)

@@ -3,6 +3,7 @@ import {
   BadRequestException,
   UnauthorizedException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -21,6 +22,8 @@ import {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(AuthOtp.name) private otpModel: Model<AuthOtpDocument>,
@@ -51,13 +54,16 @@ export class AuthService {
     const response: any = { phone, expiresInMinutes: 10, smsSent };
     if (!smsSent && this.config.get<string>('NODE_ENV') !== 'production') {
       response.devOtp = code;
+      this.logger.warn(`SMS OTP not sent. Development OTP for ${phone}: ${code}`);
     }
     return response;
   }
 
   async register(dto: RegisterDto) {
     const phone = this.normalizePhone(dto.phone);
-    await this.verifyRegisterOtp(phone, dto.otp);
+    if (dto.otp?.trim()) {
+      await this.verifyRegisterOtp(phone, dto.otp);
+    }
 
     const existing = await this.userModel.findOne({ email: dto.email });
     if (existing) throw new BadRequestException('User already exists');
@@ -100,7 +106,10 @@ export class AuthService {
     const authKey = this.config.get<string>('MSG91_AUTH_KEY');
     const templateId = this.config.get<string>('MSG91_OTP_TEMPLATE_ID');
     const senderId = this.config.get<string>('MSG91_SENDER_ID') || 'ROYACE';
-    if (!authKey || !templateId) return false;
+    if (!authKey || !templateId) {
+      this.logger.warn('MSG91_AUTH_KEY or MSG91_OTP_TEMPLATE_ID is missing. SMS OTP is disabled.');
+      return false;
+    }
 
     try {
       const response = await fetch('https://control.msg91.com/api/v5/flow/', {
@@ -118,8 +127,12 @@ export class AuthService {
           otp: code,
         }),
       });
+      if (!response.ok) {
+        this.logger.warn(`MSG91 OTP request failed with status ${response.status}`);
+      }
       return response.ok;
-    } catch {
+    } catch (error) {
+      this.logger.warn(`MSG91 OTP request failed: ${(error as Error).message}`);
       return false;
     }
   }

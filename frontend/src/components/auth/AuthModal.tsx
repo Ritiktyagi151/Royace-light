@@ -17,6 +17,7 @@ export function AuthModal() {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  const [devOtp, setDevOtp] = useState('');
   const [sendingOtp, setSendingOtp] = useState(false);
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -24,7 +25,7 @@ export function AuthModal() {
 
   useEffect(() => {
     if (authModalOpen) {
-      setName(''); setEmail(''); setPhone(''); setOtp(''); setOtpSent(false); setPassword(''); setError('');
+      setName(''); setEmail(''); setPhone(''); setOtp(''); setOtpSent(false); setDevOtp(''); setPassword(''); setError('');
     }
   }, [authModalOpen, authMode]);
 
@@ -49,10 +50,6 @@ export function AuthModal() {
       if (isLogin) {
         result = await dispatch(loginThunk({ email, password }));
       } else {
-        if (!otpSent) {
-          setError('Please send and enter phone OTP first.');
-          return;
-        }
         result = await dispatch(registerThunk({ name, email, phone, password, otp }));
       }
       if (result.meta.requestStatus === 'fulfilled') {
@@ -72,8 +69,9 @@ export function AuthModal() {
     try {
       const result = await sendRegisterOtpAPI(phone);
       setOtpSent(true);
+      setDevOtp(result?.devOtp || '');
       dispatch(addToast({
-        message: result?.devOtp ? `OTP sent. Dev OTP: ${result.devOtp}` : 'OTP sent to phone number',
+        message: result?.smsSent ? 'OTP sent to phone number' : 'OTP ready for local testing',
         type: 'success',
       }));
     } catch (err: any) {
@@ -154,7 +152,7 @@ export function AuthModal() {
                   <label style={labelStyle}>Phone Number</label>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <input
-                      type="tel" required value={phone} onChange={(e) => { setPhone(e.target.value); setOtpSent(false); }}
+                      type="tel" required value={phone} onChange={(e) => { setPhone(e.target.value); setOtpSent(false); setDevOtp(''); }}
                       placeholder="10-digit mobile number"
                       className="input-luxury"
                       style={{ minWidth: 0 }}
@@ -169,14 +167,20 @@ export function AuthModal() {
                       {sendingOtp ? 'Sending' : otpSent ? 'Resend' : 'Send OTP'}
                     </button>
                   </div>
+                  {otpSent && !devOtp && (
+                    <p style={helperTextStyle}>OTP sent to this mobile number.</p>
+                  )}
                 </div>
                 <div>
                   <label style={labelStyle}>Phone OTP</label>
                   <input
-                    type="text" required value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="6-digit OTP"
+                    type="text" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="6-digit OTP (optional)"
                     className="input-luxury"
                   />
+                  {devOtp && (
+                    <p style={devOtpStyle}>Local OTP: <strong>{devOtp}</strong></p>
+                  )}
                 </div>
               </>
             )}
@@ -244,4 +248,20 @@ const labelStyle: React.CSSProperties = {
   textTransform: 'uppercase',
   color: 'rgba(250,247,240,0.4)',
   marginBottom: '0.5rem',
+};
+
+const helperTextStyle: React.CSSProperties = {
+  marginTop: '0.45rem',
+  fontSize: '0.64rem',
+  color: 'rgba(250,247,240,0.5)',
+};
+
+const devOtpStyle: React.CSSProperties = {
+  marginTop: '0.5rem',
+  padding: '0.55rem 0.7rem',
+  border: '1px solid rgba(217,181,107,0.35)',
+  background: 'rgba(217,181,107,0.12)',
+  color: 'var(--gold-light)',
+  fontSize: '0.68rem',
+  letterSpacing: '0.04em',
 };
