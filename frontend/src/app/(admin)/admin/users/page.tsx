@@ -61,12 +61,12 @@ export default function AdminUsersPage() {
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               value={search} onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search users..."
+              placeholder="Search customers..."
               className="pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 w-52"
             />
           </div>
           <div className="flex bg-gray-100 rounded-lg p-1">
-            {['user', 'vendor', 'admin'].map((r) => (
+            {['user', 'admin'].map((r) => (
               <button
                 key={r} onClick={() => setRoleFilter(r)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize ${
@@ -115,10 +115,9 @@ export default function AdminUsersPage() {
                     <td className="px-5 py-4">
                       <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                         user.role === 'admin' ? 'bg-purple-50 text-purple-700' :
-                        user.role === 'vendor' ? 'bg-amber-50 text-amber-700' :
                         'bg-blue-50 text-blue-700'
                       }`}>
-                        {user.role}
+                        {user.role === 'user' ? 'customer' : user.role}
                       </span>
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-500">
@@ -152,7 +151,7 @@ export default function AdminUsersPage() {
         {!isLoading && !filtered?.length && (
           <div className="text-center py-16">
             <Users size={40} className="mx-auto text-gray-200 mb-3" />
-            <p className="text-gray-400 text-sm">No users found</p>
+            <p className="text-gray-400 text-sm">No customers found</p>
           </div>
         )}
         {!isLoading && !Array.isArray(data) && data?.pages > 1 && (
@@ -161,7 +160,7 @@ export default function AdminUsersPage() {
             pages={data.pages}
             total={total}
             pageSize={limit}
-            itemLabel="users"
+            itemLabel="customers"
             onPageChange={setPage}
             onPageSizeChange={(nextLimit) => {
               setLimit(nextLimit);

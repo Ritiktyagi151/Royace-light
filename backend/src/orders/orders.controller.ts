@@ -3,7 +3,7 @@ import {
   UseGuards, Request, Header,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { AdminCreateOrderDto, CreateOrderDto, RequestReturnDto, ReviewReturnRequestDto, UpdateOrderStatusDto } from './dto/order.dto';
+import { AdminCreateOrderDto, BulkOrderActionDto, BulkOrderStatusDto, CreateOrderDto, RequestReturnDto, ReviewReturnRequestDto, UpdateOrderStatusDto } from './dto/order.dto';
 import { JwtAuthGuard, AdminGuard } from '../auth/guards/auth.guard';
 
 @Controller('orders')
@@ -50,13 +50,6 @@ export class OrdersController {
   }
 
   // Get single order
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  async getOrder(@Param('id') id: string, @Request() req) {
-    const data = await this.ordersService.getOrder(id, req.user._id, req.user.role);
-    return { success: true, data };
-  }
-
   // ─── Admin routes ───────────────────────────────────────
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('admin/all')
@@ -70,8 +63,19 @@ export class OrdersController {
     @Query('search') search?: string,
     @Query('fromDate') fromDate?: string,
     @Query('toDate') toDate?: string,
+    @Query('deleted') deleted?: string,
+    @Query('returnRequested') returnRequested?: string,
   ) {
-    const data = await this.ordersService.getAllOrders(+page, +limit, status, search, fromDate, toDate);
+    const data = await this.ordersService.getAllOrders(
+      +page,
+      +limit,
+      status,
+      search,
+      fromDate,
+      toDate,
+      deleted === 'true',
+      returnRequested === 'true',
+    );
     return { success: true, data };
   }
 
@@ -86,10 +90,35 @@ export class OrdersController {
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('admin/revenue-trend')
+  async getRevenueTrend(
+    @Query('period') period: 'daily' | 'weekly' | 'monthly' = 'daily',
+    @Query('fromDate') fromDate?: string,
+    @Query('toDate') toDate?: string,
+  ) {
+    const data = await this.ordersService.getRevenueTrend(period, fromDate, toDate);
+    return { success: true, data };
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('admin')
   async createAdminOrder(@Body() dto: AdminCreateOrderDto) {
     const data = await this.ordersService.createAdminOrder(dto);
     return { success: true, message: 'Order created successfully', data };
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch('admin/bulk/status')
+  async bulkUpdateStatus(@Body() dto: BulkOrderStatusDto) {
+    const data = await this.ordersService.bulkUpdateStatus(dto.orderIds, dto.status);
+    return { success: true, message: 'Orders updated', data };
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch('admin/bulk/delete')
+  async bulkDelete(@Body() dto: BulkOrderActionDto) {
+    const data = await this.ordersService.bulkDelete(dto.orderIds);
+    return { success: true, message: 'Orders deleted', data };
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
@@ -111,5 +140,26 @@ export class OrdersController {
   async deleteOrder(@Param('id') id: string) {
     const data = await this.ordersService.deleteOrder(id);
     return { success: true, message: 'Order deleted successfully', data };
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch('admin/:id/restore')
+  async restoreOrder(@Param('id') id: string) {
+    const data = await this.ordersService.restoreOrder(id);
+    return { success: true, message: 'Order restored successfully', data };
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Delete('admin/:id/permanent')
+  async permanentlyDeleteOrder(@Param('id') id: string) {
+    const data = await this.ordersService.permanentlyDeleteOrder(id);
+    return { success: true, message: 'Order permanently deleted', data };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getOrder(@Param('id') id: string, @Request() req) {
+    const data = await this.ordersService.getOrder(id, req.user._id, req.user.role);
+    return { success: true, data };
   }
 }

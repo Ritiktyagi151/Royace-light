@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsArray,
   IsDateString,
   IsIn,
   IsNumber,
@@ -8,7 +9,31 @@ import {
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CouponDiscountType } from '../schemas/coupon.schema';
+import { CouponDiscountType, CouponScope } from '../schemas/coupon.schema';
+
+class CouponItemDto {
+  @IsOptional()
+  @IsString()
+  productId?: string;
+
+  @IsOptional()
+  @IsString()
+  sku?: string;
+
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  price?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  quantity?: number;
+}
 
 export class CreateCouponDto {
   @IsString()
@@ -54,6 +79,30 @@ export class CreateCouponDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @IsIn(Object.values(CouponScope))
+  scope?: CouponScope;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  categoryIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  categorySlugs?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  productIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  skus?: string[];
 }
 
 export class UpdateCouponDto {
@@ -104,6 +153,30 @@ export class UpdateCouponDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @IsIn(Object.values(CouponScope))
+  scope?: CouponScope;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  categoryIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  categorySlugs?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  productIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  skus?: string[];
 }
 
 export class ValidateCouponDto {
@@ -114,4 +187,9 @@ export class ValidateCouponDto {
   @IsNumber()
   @Min(0)
   subtotal: number;
+
+  @IsOptional()
+  @IsArray()
+  @Type(() => CouponItemDto)
+  items?: CouponItemDto[];
 }

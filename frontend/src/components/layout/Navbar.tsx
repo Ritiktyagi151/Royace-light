@@ -45,6 +45,18 @@ type SearchOrder = {
   items?: { name?: string; productId?: string; sku?: string; quantity?: number }[];
 };
 
+type AnnouncementItem = {
+  _id?: string;
+  text: string;
+  link?: string;
+};
+
+const FALLBACK_ANNOUNCEMENTS: AnnouncementItem[] = [
+  { text: 'Complimentary White-Glove Installation' },
+  { text: 'Orders Above Rs. 1,50,000' },
+  { text: 'Decorative Lighting For Homes And Projects' },
+];
+
 const NAV_LINKS = [
   { label: 'About', href: '/about' },
   { label: 'Collections', href: '#', hasMega: true },
@@ -89,6 +101,7 @@ export function Navbar() {
   const [searchProducts, setSearchProducts] = useState<SearchProduct[]>([]);
   const [searchOrders, setSearchOrders] = useState<SearchOrder[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [announcements, setAnnouncements] = useState<AnnouncementItem[]>(FALLBACK_ANNOUNCEMENTS);
   const searchRef = useRef<HTMLInputElement>(null);
   const { data: fetchedCategories } = usePublicCategories();
 
@@ -154,6 +167,24 @@ export function Navbar() {
   }, [searchOpen]);
 
   useEffect(() => {
+    let cancelled = false;
+
+    api.get('/announcements')
+      .then((response) => {
+        if (cancelled) return;
+        const items = response.data?.data || [];
+        if (Array.isArray(items) && items.length) {
+          setAnnouncements(items.filter((item) => item?.text));
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     const query = searchQ.trim();
 
     if (!searchOpen || query.length < 2) {
@@ -207,12 +238,18 @@ export function Navbar() {
         <div className="flex w-max animate-[marquee_30s_linear_infinite] items-center gap-10 whitespace-nowrap text-[var(--ivory)] leading-[1.4] hover:[animation-play-state:paused]">
           {Array.from({ length: 2 }).map((_, groupIndex) => (
             <div key={groupIndex} className="flex items-center gap-10 px-5">
-              <span>Complimentary White-Glove Installation</span>
-              <span aria-hidden="true" className="text-[var(--gold-light)]">·</span>
-              <span>Orders Above ₹1,50,000</span>
-              <span aria-hidden="true" className="text-[var(--gold-light)]">·</span>
-              <span>Decorative Lighting For Homes And Projects</span>
-              <span aria-hidden="true" className="text-[var(--gold-light)]">·</span>
+              {announcements.map((item, index) => (
+                <span key={`${item._id || item.text}-${index}`} className="contents">
+                  {item.link ? (
+                    <Link href={item.link} className="text-[var(--ivory)] no-underline hover:text-[var(--gold-light)]">
+                      {item.text}
+                    </Link>
+                  ) : (
+                    <span>{item.text}</span>
+                  )}
+                  <span aria-hidden="true" className="text-[var(--gold-light)]">/</span>
+                </span>
+              ))}
             </div>
           ))}
         </div>
@@ -552,7 +589,7 @@ export function Navbar() {
                                   )}
                                   {typeof product.sellingPrice === 'number' && (
                                     <p className="mt-1 text-xs text-[#faf7f080]">
-                                      ₹{product.sellingPrice.toLocaleString('en-IN')}
+                                      â‚¹{product.sellingPrice.toLocaleString('en-IN')}
                                     </p>
                                   )}
                                 </div>
@@ -612,7 +649,7 @@ export function Navbar() {
                                   {(order.items || []).map((item) => item.name).filter(Boolean).join(', ') || order.paymentId || order.delivery?.waybill}
                                 </p>
                                 <div className="mt-2 flex flex-wrap gap-3 text-[0.56rem] uppercase tracking-[0.13em] text-[#faf7f045]">
-                                  {orderTotal ? <span>₹{orderTotal.toLocaleString('en-IN')}</span> : null}
+                                  {orderTotal ? <span>â‚¹{orderTotal.toLocaleString('en-IN')}</span> : null}
                                   {orderDate ? <span>{new Date(orderDate).toLocaleDateString('en-IN')}</span> : null}
                                 </div>
                               </Link>
@@ -651,3 +688,4 @@ export function Navbar() {
     </div>
   );
 }
+

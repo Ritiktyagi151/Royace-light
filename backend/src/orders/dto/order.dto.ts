@@ -58,6 +58,21 @@ export class UpdateOrderStatusDto {
   status: OrderStatus;
 }
 
+export class BulkOrderStatusDto {
+  @IsArray()
+  @IsString({ each: true })
+  orderIds: string[];
+
+  @IsIn([OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.RETURNED])
+  status: OrderStatus;
+}
+
+export class BulkOrderActionDto {
+  @IsArray()
+  @IsString({ each: true })
+  orderIds: string[];
+}
+
 export class AdminCreateOrderDto {
   @IsString()
   customerEmail: string;

@@ -1,5 +1,10 @@
 import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
 
+export class SendRegisterOtpDto {
+  @IsString()
+  phone: string;
+}
+
 export class RegisterDto {
   @IsString()
   name: string;
@@ -9,6 +14,9 @@ export class RegisterDto {
 
   @IsString()
   phone: string;
+
+  @IsString()
+  otp: string;
 
   @IsString()
   @MinLength(6)
@@ -44,26 +52,4 @@ export class UpdateProfileDto {
   @IsString()
   @IsOptional()
   phone?: string;
-}
-
-export class RegisterVendorDto {
-  @IsString()
-  name: string;
-
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  @MinLength(6)
-  password: string;
-
-  @IsString()
-  shopName: string;
-
-  @IsString()
-  @IsOptional()
-  shopDescription?: string;
-
-  @IsString()
-  phone: string;
 }

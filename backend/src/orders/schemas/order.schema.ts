@@ -126,6 +126,12 @@ export class Order {
   @Prop({ default: false }) emailSentPlaced: boolean;
   @Prop({ default: false }) emailSentShipped: boolean;
   @Prop({ default: false }) emailSentDelivered: boolean;
+
+  @Prop({ default: false })
+  isDeleted: boolean;
+
+  @Prop()
+  deletedAt?: Date;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

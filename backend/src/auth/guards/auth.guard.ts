@@ -51,14 +51,3 @@ export class AdminGuard implements CanActivate {
   }
 }
 
-// ─── Vendor Guard ─────────────────────────────────────────────
-@Injectable()
-export class VendorGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
-    const { user } = context.switchToHttp().getRequest();
-    if (user?.role !== UserRole.VENDOR && user?.role !== UserRole.ADMIN) {
-      throw new ForbiddenException('Vendor or Admin access required');
-    }
-    return true;
-  }
-}

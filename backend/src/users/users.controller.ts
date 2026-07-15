@@ -8,15 +8,19 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
-  async findAll(@Query('role') role?: string, @Query('page') page?: string, @Query('limit') limit?: string) {
+  async findAll(
+    @Query('role') role?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+  ) {
     // If page/limit provided, usersService will return paginated object, otherwise array
-    const data = await this.usersService.findAll(role, page ? Number(page) : undefined, limit ? Number(limit) : undefined);
-    return { success: true, data };
-  }
-
-  @Get('vendors')
-  async getVendors() {
-    const data = await this.usersService.getVendors();
+    const data = await this.usersService.findAll(
+      role,
+      page ? Number(page) : undefined,
+      limit ? Number(limit) : undefined,
+      search,
+    );
     return { success: true, data };
   }
 

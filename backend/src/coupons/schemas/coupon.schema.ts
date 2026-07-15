@@ -8,6 +8,13 @@ export enum CouponDiscountType {
   FIXED = 'fixed',
 }
 
+export enum CouponScope {
+  ALL = 'all',
+  CATEGORIES = 'categories',
+  PRODUCTS = 'products',
+  SKUS = 'skus',
+}
+
 @Schema({ timestamps: true })
 export class Coupon {
   @Prop({ required: true, unique: true, uppercase: true, trim: true })
@@ -30,6 +37,21 @@ export class Coupon {
 
   @Prop({ min: 0 })
   usageLimit?: number;
+
+  @Prop({ type: String, enum: CouponScope, default: CouponScope.ALL })
+  scope: CouponScope;
+
+  @Prop({ type: [String], default: [] })
+  categoryIds: string[];
+
+  @Prop({ type: [String], default: [] })
+  categorySlugs: string[];
+
+  @Prop({ type: [String], default: [] })
+  productIds: string[];
+
+  @Prop({ type: [String], default: [] })
+  skus: string[];
 
   @Prop({ default: 0, min: 0 })
   usedCount: number;

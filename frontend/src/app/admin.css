@@ -27,3 +27,65 @@
     @apply border-b border-gray-50 hover:bg-gray-50/60 transition-colors;
   }
 }
+
+.dark .admin-panel {
+  color-scheme: dark;
+}
+
+.dark .admin-panel .admin-card,
+.dark .admin-panel .stat-card,
+.dark .admin-panel :where(.bg-white) {
+  background-color: #111827;
+  border-color: #1f2937;
+  color: #f9fafb;
+}
+
+.dark .admin-panel :where(.bg-gray-50) {
+  background-color: #0f172a;
+}
+
+.dark .admin-panel :where(.bg-gray-100) {
+  background-color: #1f2937;
+}
+
+.dark .admin-panel :where(.border-gray-50),
+.dark .admin-panel :where(.border-gray-100),
+.dark .admin-panel :where(.border-gray-200) {
+  border-color: #1f2937;
+}
+
+.dark .admin-panel :where(.text-gray-900),
+.dark .admin-panel :where(.text-gray-800),
+.dark .admin-panel :where(.text-gray-700) {
+  color: #f9fafb;
+}
+
+.dark .admin-panel :where(.text-gray-600),
+.dark .admin-panel :where(.text-gray-500),
+.dark .admin-panel :where(.text-gray-400) {
+  color: #9ca3af;
+}
+
+.dark .admin-panel .admin-input,
+.dark .admin-panel input,
+.dark .admin-panel select,
+.dark .admin-panel textarea {
+  background-color: #0f172a;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+.dark .admin-panel input::placeholder,
+.dark .admin-panel textarea::placeholder {
+  color: #6b7280;
+}
+
+.dark .admin-panel .table-row {
+  border-color: #1f2937;
+}
+
+.dark .admin-panel .table-row:hover,
+.dark .admin-panel :where(.hover\:bg-gray-50):hover,
+.dark .admin-panel :where(.hover\:bg-gray-100):hover {
+  background-color: rgba(31, 41, 55, 0.75);
+}

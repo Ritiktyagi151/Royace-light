@@ -43,7 +43,7 @@ export function BlogSliderSection() {
               <span className="h-px w-9 bg-[#006039]" />
               Lighting Journal
             </p>
-            <h2 className="mt-4 text-3xl font-semibold leading-tight">
+            <h2 className="mt-4 text-3xl  leading-tight">
               Practical ideas for selecting, installing, and maintaining decorative lighting.
             </h2>
           </div>
@@ -98,10 +98,10 @@ export function BlogSliderSection() {
                   <p className="mb-3 text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-[#006039]">
                     {post.category}
                   </p>
-                  <h3 className="text-xl font-semibold leading-snug text-[#173126]">
+                  <h3 className="text-xl  leading-snug text-[#173126]">
                     {post.title}
                   </h3>
-                  <p className="mt-3 line-clamp-3 text-[0.8rem] leading-6 text-[#173126]/64">
+                  <p className="mt-3 line-clamp-3 text-[0.8rem]  text-[#173126]/64">
                     {post.excerpt}
                   </p>
                   <div className="mt-auto flex flex-wrap gap-3 pt-6 text-[0.58rem] uppercase tracking-[0.12em] text-[#173126]/48">

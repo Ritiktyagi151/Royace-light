@@ -160,10 +160,6 @@ export class Product {
 
   // ── Relations ──────────────────────────────────────────────────────────────
 
-  @Prop({ type: Types.ObjectId, ref: 'User', default: null })
-  vendorId?: Types.ObjectId;
-  // null = admin-owned product
-
   // ── Status ─────────────────────────────────────────────────────────────────
 
   @Prop({ default: true })

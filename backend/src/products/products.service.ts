@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,7 +8,6 @@ import { Model, Types } from 'mongoose';
 import { Product, ProductDocument, ProductImageAsset } from './schemas/product.schema';
 import { Category, CategoryDocument } from '../categories/category.schema';
 import { CreateProductDto, UpdateProductDto, ProductQueryDto } from './dto/product.dto';
-import { UserRole } from '../users/schemas/user.schema';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sharp from 'sharp';
@@ -42,12 +40,11 @@ export class ProductsService {
     return assets;
   }
 
-  async create(dto: CreateProductDto, uploadedAssets: ProductImageAsset[] = [], vendorId?: string) {
+  async create(dto: CreateProductDto, uploadedAssets: ProductImageAsset[] = []) {
     const payload = await this.buildProductPayload(dto, true);
 
     const orderedAssets = this.resolveImageAssets([], uploadedAssets, dto);
     payload.imageAssets = orderedAssets;
-    payload.vendorId = vendorId ? new Types.ObjectId(vendorId) : null;
 
     return this.productModel.create(payload);
   }
@@ -101,15 +98,9 @@ export class ProductsService {
     id: string,
     dto: UpdateProductDto,
     uploadedAssets: ProductImageAsset[] = [],
-    userId?: string,
-    role?: string,
   ) {
     const product = await this.productModel.findById(id);
     if (!product) throw new NotFoundException('Product not found');
-
-    if (role === UserRole.VENDOR && String(product.vendorId) !== userId) {
-      throw new ForbiddenException('You can only edit your own products');
-    }
 
     const updateData = await this.buildProductPayload(dto, false);
     const shouldUpdateImages =
@@ -131,13 +122,9 @@ export class ProductsService {
     return this.productModel.findByIdAndUpdate(id, updateData, { new: true });
   }
 
-  async remove(id: string, userId?: string, role?: string) {
+  async remove(id: string) {
     const product = await this.productModel.findById(id);
     if (!product) throw new NotFoundException('Product not found');
-
-    if (role === UserRole.VENDOR && String(product.vendorId) !== userId) {
-      throw new ForbiddenException('You can only delete your own products');
-    }
 
     this.removeImageFiles(
       this.getStoredImageAssets(product).flatMap((asset) => [asset.url, asset.webpUrl].filter(Boolean) as string[]),
@@ -146,18 +133,16 @@ export class ProductsService {
     return { message: 'Product deleted successfully' };
   }
 
-  async findAllAdmin(query: ProductQueryDto & { vendorId?: string }) {
+  async findAllAdmin(query: ProductQueryDto) {
     const filter: any = {};
     if (query.category) filter.category = await this.resolveCategoryFilter(query.category);
     if (query.search) Object.assign(filter, this.buildProductSearchFilter(query.search));
-    if (query.vendorId) filter.vendorId = new Types.ObjectId(query.vendorId);
     const page = +query.page || 1;
     const limit = +query.limit || 20;
 
     const [products, total] = await Promise.all([
       this.productModel
         .find(filter)
-        .populate('vendorId', 'name shopName email')
         .populate('category', 'name slug')
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
@@ -188,15 +173,26 @@ export class ProductsService {
     return { products, total, threshold: normalizedThreshold };
   }
 
-  async findVendorProducts(vendorId: string, query: ProductQueryDto) {
-    const filter: any = { vendorId: new Types.ObjectId(vendorId) };
-    if (query.category) filter.category = await this.resolveCategoryFilter(query.category);
+  async getTopSellingProducts(limit = 5) {
+    const normalizedLimit = Math.min(50, Math.max(1, Number(limit) || 5));
+    const products = await this.productModel
+      .find({ isActive: true })
+      .select('name sku salesCount totalQuantity sellingPrice image imageAssets')
+      .sort({ salesCount: -1, createdAt: -1 })
+      .limit(normalizedLimit);
 
-    return this.productModel
-      .find(filter)
-      .sort({ createdAt: -1 })
-      .skip(((+query.page || 1) - 1) * (+query.limit || 20))
-      .limit(+query.limit || 20);
+    return {
+      products: products.map((product: any) => ({
+        _id: product._id,
+        name: product.name,
+        sku: product.sku,
+        totalQuantity: product.totalQuantity,
+        sellingPrice: product.sellingPrice,
+        soldQuantity: Number(product.salesCount || 0),
+        revenue: Number(product.salesCount || 0) * Number(product.sellingPrice || 0),
+      })),
+      limit: normalizedLimit,
+    };
   }
 
   async getFeatured(limit = 8) {

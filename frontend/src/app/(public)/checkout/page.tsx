@@ -291,7 +291,12 @@ export default function CheckoutPage() {
     if (!token || !couponCode.trim()) return;
     setApplyingCoupon(true);
     try {
-      const result = await validateCouponAPI(token, couponCode.trim(), subtotal);
+      const couponItems = items.map((item) => ({
+        productId: item.productId,
+        price: item.price,
+        quantity: item.quantity,
+      }));
+      const result = await validateCouponAPI(token, couponCode.trim(), subtotal, couponItems);
       setAppliedCoupon(result);
       setCouponCode(result.code);
       dispatch(addToast({ message: 'Coupon applied', type: 'success' }));

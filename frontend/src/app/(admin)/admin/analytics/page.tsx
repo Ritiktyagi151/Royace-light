@@ -1,11 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
+  Line,
+  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -13,12 +16,16 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { IndianRupee, Package, ShoppingBag, Store, Users } from 'lucide-react';
+import { IndianRupee, Package, ShoppingBag, Users } from 'lucide-react';
 import { adminApi } from '@/lib/adminApi';
 
 const COLORS = ['#2563eb', '#4f46e5', '#f59e0b', '#8b5cf6', '#16a34a', '#dc2626'];
 
 export default function AdminAnalyticsPage() {
+  const [trendPeriod, setTrendPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [trendFrom, setTrendFrom] = useState('');
+  const [trendTo, setTrendTo] = useState('');
+
   const { data: statsData, isLoading: statsLoading } = useQuery({
     queryKey: ['admin-analytics-order-stats'],
     queryFn: async () => {
@@ -43,10 +50,13 @@ export default function AdminAnalyticsPage() {
     },
   });
 
-  const { data: vendorsData, isLoading: vendorsLoading } = useQuery({
-    queryKey: ['admin-analytics-vendors'],
+  const { data: revenueTrendData, isLoading: revenueTrendLoading } = useQuery({
+    queryKey: ['admin-revenue-trend', trendPeriod, trendFrom, trendTo],
     queryFn: async () => {
-      const res = await adminApi.get('/users?role=vendor&page=1&limit=1');
+      const params = new URLSearchParams({ period: trendPeriod });
+      if (trendFrom) params.set('fromDate', trendFrom);
+      if (trendTo) params.set('toDate', trendTo);
+      const res = await adminApi.get(`/orders/admin/revenue-trend?${params}`);
       return res.data.data;
     },
   });
@@ -84,24 +94,18 @@ export default function AdminAnalyticsPage() {
       Icon: Users,
       color: 'bg-sky-50 text-sky-700',
     },
-    {
-      label: 'Vendors',
-      value: vendorsData?.total || 0,
-      Icon: Store,
-      color: 'bg-amber-50 text-amber-700',
-    },
   ];
 
-  const loading = statsLoading || productsLoading || usersLoading || vendorsLoading;
+  const loading = statsLoading || productsLoading || usersLoading;
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold text-gray-900">Analytics</h2>
-        <p className="mt-0.5 text-sm text-gray-500">Track orders, revenue, products, users, and vendors.</p>
+        <p className="mt-0.5 text-sm text-gray-500">Track orders, revenue, products, and customers.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {overview.map(({ label, value, Icon, color }) => (
           <div key={label} className="stat-card">
             <div className="flex items-start justify-between gap-4">
@@ -115,6 +119,56 @@ export default function AdminAnalyticsPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="admin-card p-6">
+        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h3 className="font-semibold text-gray-900">Revenue Trend</h3>
+            <p className="mt-0.5 text-sm text-gray-500">Paid order revenue by selected period.</p>
+          </div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:flex">
+            <select
+              value={trendPeriod}
+              onChange={(e) => setTrendPeriod(e.target.value as 'daily' | 'weekly' | 'monthly')}
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+            >
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+            <input
+              type="date"
+              value={trendFrom}
+              onChange={(e) => setTrendFrom(e.target.value)}
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-900"
+              aria-label="Revenue trend start date"
+            />
+            <input
+              type="date"
+              value={trendTo}
+              onChange={(e) => setTrendTo(e.target.value)}
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-900"
+              aria-label="Revenue trend end date"
+            />
+          </div>
+        </div>
+        <ResponsiveContainer width="100%" height={320}>
+          <LineChart data={revenueTrendData?.data || []}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+            <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+            <YAxis tick={{ fontSize: 12 }} />
+            <Tooltip
+              formatter={(value: number, name: string) => [
+                name === 'revenue' ? `Rs. ${Number(value || 0).toLocaleString('en-IN')}` : value,
+                name === 'revenue' ? 'Revenue' : 'Orders',
+              ]}
+            />
+            <Line type="monotone" dataKey="revenue" stroke="#16a34a" strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+            <Line type="monotone" dataKey="orders" stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} />
+          </LineChart>
+        </ResponsiveContainer>
+        {revenueTrendLoading && <p className="mt-2 text-sm text-gray-400">Loading trend...</p>}
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">

@@ -153,7 +153,10 @@ export function BrandStoryRedesign() {
               </Link>
             </div>
 
-            <h2 className="mt-2 max-w-2xl text-[clamp(1.45rem,6.4vw,2rem)] font-semibold leading-[1.03] text-[#173126] sm:mt-3 md:text-[clamp(1.55rem,2.2vw,2.25rem)] xl:text-[2.35rem]">
+            <h2
+              className="mt-4 max-w-2xl text-2xl font- text-[#173126] sm:mt-3 md:text-3xl xl:text-4xl"
+             
+            >
               Decorative lighting planned for Indian homes and projects.
             </h2>
 

@@ -10,7 +10,7 @@ export class CouponsController {
   @UseGuards(JwtAuthGuard)
   @Post('validate')
   async validate(@Body() dto: ValidateCouponDto) {
-    const data = await this.couponsService.validateCoupon(dto.code, dto.subtotal);
+    const data = await this.couponsService.validateCoupon(dto.code, dto.subtotal, dto.items || []);
     return { success: true, data };
   }
 

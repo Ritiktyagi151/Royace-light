@@ -1,12 +1,12 @@
 import {
   Controller, Get, Post, Put, Delete, Body, Param, Query,
-  UseGuards, Request, UseInterceptors, UploadedFiles,
+  UseGuards, UseInterceptors, UploadedFiles,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto, ProductQueryDto } from './dto/product.dto';
-import { JwtAuthGuard, AdminGuard, VendorGuard } from '../auth/guards/auth.guard';
+import { JwtAuthGuard, AdminGuard } from '../auth/guards/auth.guard';
 
 const multerOptions = {
   storage: memoryStorage(),
@@ -63,8 +63,15 @@ export class ProductsController {
     return { success: true, data };
   }
 
-  // ─── Admin + Vendor: add product ─────────────────────────
-  @UseGuards(JwtAuthGuard, VendorGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('admin/top-selling')
+  async getTopSellingProducts(@Query('limit') limit = 5) {
+    const data = await this.productsService.getTopSellingProducts(+limit);
+    return { success: true, data };
+  }
+
+  // Admin: add product
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
   @UseInterceptors(FileFieldsInterceptor([
     { name: 'image', maxCount: 1 },
@@ -73,19 +80,17 @@ export class ProductsController {
   async create(
     @Body() dto: CreateProductDto,
     @UploadedFiles() files: { image?: Express.Multer.File[]; images?: Express.Multer.File[] },
-    @Request() req,
   ) {
     const uploadedFiles = [...(files?.images || []), ...(files?.image || [])];
     const uploadedAssets = await this.productsService.optimizeUploadedImages(
       uploadedFiles,
       dto.enableCompression !== false,
     );
-    const vendorId = req.user.role === 'vendor' ? req.user._id : undefined;
-    const data = await this.productsService.create(dto, uploadedAssets, vendorId);
+    const data = await this.productsService.create(dto, uploadedAssets);
     return { success: true, message: 'Product created', data };
   }
 
-  @UseGuards(JwtAuthGuard, VendorGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Put(':id')
   @UseInterceptors(FileFieldsInterceptor([
     { name: 'image', maxCount: 1 },
@@ -95,32 +100,21 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() dto: UpdateProductDto,
     @UploadedFiles() files: { image?: Express.Multer.File[]; images?: Express.Multer.File[] },
-    @Request() req,
   ) {
     const uploadedFiles = [...(files?.images || []), ...(files?.image || [])];
     const uploadedAssets = await this.productsService.optimizeUploadedImages(
       uploadedFiles,
       dto.enableCompression !== false,
     );
-    const data = await this.productsService.update(
-      id, dto, uploadedAssets, req.user._id, req.user.role,
-    );
+    const data = await this.productsService.update(id, dto, uploadedAssets);
     return { success: true, message: 'Product updated', data };
   }
 
-  @UseGuards(JwtAuthGuard, VendorGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string, @Request() req) {
-    const data = await this.productsService.remove(id, req.user._id, req.user.role);
+  async remove(@Param('id') id: string) {
+    const data = await this.productsService.remove(id);
     return { success: true, ...data };
-  }
-
-  // ─── Vendor: own products ────────────────────────────────
-  @UseGuards(JwtAuthGuard, VendorGuard)
-  @Get('vendor/my-products')
-  async vendorProducts(@Request() req, @Query() query: ProductQueryDto) {
-    const data = await this.productsService.findVendorProducts(req.user._id, query);
-    return { success: true, data };
   }
 
   @Get(':idOrSlug')

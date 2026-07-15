@@ -89,7 +89,7 @@ export const privacyPolicy: LegalPolicy = {
             'To register enquiries, create customer accounts, confirm orders, and provide order updates.',
             'To process payments, verify transaction status, generate invoices, and manage refunds or chargeback responses.',
             'To procure, manufacture, customise, inspect, pack, dispatch, deliver, repair, replace, or service lighting products.',
-            'To coordinate with logistics providers, installers, vendors, artisans, suppliers, warehouses, customer support teams, and payment gateway partners.',
+            'To coordinate with logistics providers, installers, artisans, suppliers, warehouses, customer support teams, and payment gateway partners.',
             'To respond to complaints, warranty claims, damaged-product reports, return requests, and post-delivery support requests.',
             'To comply with GST, accounting, audit, tax, consumer protection, payment gateway, fraud-prevention, and other legal obligations in India.',
             'To send important transactional communications by email, SMS, WhatsApp, phone, or courier, including order confirmations, payment reminders, delivery notifications, and service updates.',
@@ -128,8 +128,8 @@ export const privacyPolicy: LegalPolicy = {
           type: 'list',
           items: [
             'Payment gateways, banks, UPI providers, fraud-prevention partners, and refund processors for payment verification and settlement.',
-            'Courier companies, surface cargo carriers, warehouse teams, packaging vendors, installation partners, and service technicians for order fulfilment.',
-            'Manufacturers, artisans, finish vendors, component suppliers, and quality-control teams for made-to-order or custom lighting products.',
+            'Courier companies, surface cargo carriers, warehouse teams, packaging partners, installation partners, and service technicians for order fulfilment.',
+            'Manufacturers, artisans, finish partners, component suppliers, and quality-control teams for made-to-order or custom lighting products.',
             'Technology, analytics, hosting, CRM, email, SMS, WhatsApp, and customer support providers who help us operate the website and customer communications.',
             'Professional advisers, auditors, accountants, insurers, dispute-resolution forums, regulators, courts, law-enforcement agencies, or government authorities where required.',
           ],
@@ -271,14 +271,14 @@ export const termsPolicy: LegalPolicy = {
       blocks: [
         {
           type: 'paragraph',
-          text: 'Royace Lighting sells decorative lighting products including chandeliers, pendant lights, wall lights, table lamps, ceiling lights, bespoke lighting, and related accessories. Products may be ready-stock, pre-order, made-to-order, customised, imported, vendor-supplied, or project-specific depending on the listing and written confirmation.',
+          text: 'Royace Lighting sells decorative lighting products including chandeliers, pendant lights, wall lights, table lamps, ceiling lights, bespoke lighting, and related accessories. Products may be ready-stock, pre-order, made-to-order, customised, imported, sourced, or project-specific depending on the listing and written confirmation.',
         },
         {
           type: 'list',
           items: [
             'Product images are for representation and may vary due to screen settings, photography lighting, natural material differences, hand finishing, glass shade variations, crystal arrangement, or production batches.',
             'Dimensions, weight, wattage, colour temperature, finish, cord length, chain length, canopy details, and installation recommendations are provided in good faith and may have reasonable tolerances.',
-            'Stock availability may change due to showroom sale, vendor availability, quality inspection failure, production constraints, or payment verification delay.',
+            'Stock availability may change due to showroom sale, supplier availability, quality inspection failure, production constraints, or payment verification delay.',
             'We may correct product information, pricing, availability, or typographical errors before accepting an order.',
           ],
         },
@@ -417,7 +417,7 @@ export const termsPolicy: LegalPolicy = {
       blocks: [
         {
           type: 'paragraph',
-          text: 'To the maximum extent permitted by law, Royace Lighting and its owners, directors, employees, vendors, suppliers, logistics partners, and service providers will not be liable for indirect, incidental, special, punitive, or consequential losses, including loss of profit, project delay, business interruption, interior work delay, or loss of goodwill.',
+          text: 'To the maximum extent permitted by law, Royace Lighting and its owners, directors, employees, suppliers, logistics partners, and service providers will not be liable for indirect, incidental, special, punitive, or consequential losses, including loss of profit, project delay, business interruption, interior work delay, or loss of goodwill.',
         },
         {
           type: 'paragraph',
@@ -485,7 +485,7 @@ export const refundPolicy: LegalPolicy = {
           rows: [
             [
               'Ready-stock products',
-              'Products available for quality check and dispatch from our inventory or confirmed vendor inventory.',
+              'Products available for quality check and dispatch from our inventory or confirmed supplier inventory.',
               'Cancellation may be accepted before dispatch. Returns may be considered as stated in this policy.',
             ],
             [
@@ -537,7 +537,7 @@ export const refundPolicy: LegalPolicy = {
           blocks: [
             {
               type: 'paragraph',
-              text: 'Made-to-order and custom products may be cancelled only if the request is received before design approval, material procurement, production scheduling, finishing, import booking, vendor confirmation, or any other committed cost. Once work has started, cancellation may be declined or eligible refund may be reduced by committed costs, design charges, labour, material, payment gateway charges, logistics charges, and taxes where applicable.',
+              text: 'Made-to-order and custom products may be cancelled only if the request is received before design approval, material procurement, production scheduling, finishing, import booking, supplier confirmation, or any other committed cost. Once work has started, cancellation may be declined or eligible refund may be reduced by committed costs, design charges, labour, material, payment gateway charges, logistics charges, and taxes where applicable.',
             },
             {
               type: 'note',
@@ -693,7 +693,7 @@ export const shippingPolicy: LegalPolicy = {
       blocks: [
         {
           type: 'paragraph',
-          text: `This Shipping & Delivery Policy applies to orders placed with ${LEGAL_CONTACT.brandName} through our website, payment link, written quotation, or authorised sales channel. We currently deliver to serviceable PIN codes in India through courier, surface cargo, specialist freight, vendor dispatch, or local delivery partners. International shipping, if offered, is subject to written quotation, export documentation, customs duties, and destination-country rules.`,
+          text: `This Shipping & Delivery Policy applies to orders placed with ${LEGAL_CONTACT.brandName} through our website, payment link, written quotation, or authorised sales channel. We currently deliver to serviceable PIN codes in India through courier, surface cargo, specialist freight, supplier dispatch, or local delivery partners. International shipping, if offered, is subject to written quotation, export documentation, customs duties, and destination-country rules.`,
         },
       ],
     },

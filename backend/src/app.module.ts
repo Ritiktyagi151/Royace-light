@@ -9,13 +9,14 @@ import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
 import { CartModule } from './cart/cart.module';
 import { OrdersModule } from './orders/orders.module';
-import { VendorModule } from './vendor/vendor.module';
 import { EmailModule } from './email/email.module';
 import { DeliveryModule } from './delivery/delivery.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 import { NewsletterModule } from './newsletter/newsletter.module';
+import { EnquiriesModule } from './enquiries/enquiries.module';
+import { AnnouncementsModule } from './announcements/announcements.module';
 
 @Module({
   imports: [
@@ -60,13 +61,14 @@ import { NewsletterModule } from './newsletter/newsletter.module';
     ProductsModule,
     CartModule,
     OrdersModule,
-    VendorModule,
     EmailModule,
     DeliveryModule,
     CategoriesModule,
     ActivityLogsModule,
     CouponsModule,
     NewsletterModule,
+    EnquiriesModule,
+    AnnouncementsModule,
   ],
 })
 export class AppModule {}

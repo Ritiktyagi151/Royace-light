@@ -19,6 +19,7 @@ export default function AdminCategoriesPage() {
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState('');
+  const [formError, setFormError] = useState('');
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
@@ -45,20 +46,32 @@ export default function AdminCategoriesPage() {
       return adminApi.post('/categories', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin-categories'] }); closeModal(); },
+    onError: (error: any) => {
+      setFormError(error?.response?.data?.message || 'Unable to save category image. Please try a smaller image.');
+    },
   });
 
   const deleteCategory = useMutation({ mutationFn: (id: string) => adminApi.delete(`/categories/${id}`), onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-categories'] }) });
 
   const toggleActive = useMutation({ mutationFn: (id: string) => adminApi.patch(`/categories/${id}/toggle`), onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-categories'] }) });
 
-  const openAdd = () => { setEditing(null); setForm({ ...EMPTY_FORM }); setImageFile(null); setImagePreview(''); setModalOpen(true); };
+  const openAdd = () => { setEditing(null); setForm({ ...EMPTY_FORM }); setImageFile(null); setImagePreview(''); setFormError(''); setModalOpen(true); };
 
-  const openEdit = (c: any) => { setEditing(c); setForm({ name: c.name, slug: c.slug, description: c.description || '', emoji: c.emoji || '', sortOrder: c.sortOrder || 0, isActive: c.isActive }); setImagePreview(getAssetUrl(c.image) || ''); setImageFile(null); setModalOpen(true); };
+  const openEdit = (c: any) => { setEditing(c); setForm({ name: c.name, slug: c.slug, description: c.description || '', emoji: c.emoji || '', sortOrder: c.sortOrder || 0, isActive: c.isActive }); setImagePreview(getAssetUrl(c.image) || ''); setImageFile(null); setFormError(''); setModalOpen(true); };
 
-  const closeModal = () => { setModalOpen(false); setEditing(null); };
+  const closeModal = () => { setModalOpen(false); setEditing(null); setFormError(''); };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0]; if (f) { setImageFile(f); setImagePreview(URL.createObjectURL(f)); }
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 10 * 1024 * 1024) {
+      setFormError('Category image must be 10 MB or smaller.');
+      e.target.value = '';
+      return;
+    }
+    setFormError('');
+    setImageFile(f);
+    setImagePreview(URL.createObjectURL(f));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -138,6 +151,11 @@ export default function AdminCategoriesPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              {formError && (
+                <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {formError}
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Image</label>
                 <div onClick={() => fileRef.current?.click()} className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-gray-400 transition-colors">

@@ -20,6 +20,11 @@ const emptyForm = {
   minOrderAmount: '',
   maxDiscountAmount: '',
   usageLimit: '',
+  scope: 'all',
+  categoryIds: '',
+  categorySlugs: '',
+  productIds: '',
+  skus: '',
   startsAt: '',
   expiresAt: '',
   isActive: true,
@@ -81,6 +86,11 @@ export default function AdminCouponsPage() {
       minOrderAmount: String(coupon.minOrderAmount ?? ''),
       maxDiscountAmount: String(coupon.maxDiscountAmount ?? ''),
       usageLimit: String(coupon.usageLimit ?? ''),
+      scope: coupon.scope || 'all',
+      categoryIds: (coupon.categoryIds || []).join(', '),
+      categorySlugs: (coupon.categorySlugs || []).join(', '),
+      productIds: (coupon.productIds || []).join(', '),
+      skus: (coupon.skus || []).join(', '),
       startsAt: toInputDate(coupon.startsAt),
       expiresAt: toInputDate(coupon.expiresAt),
       isActive: Boolean(coupon.isActive),
@@ -148,6 +158,34 @@ export default function AdminCouponsPage() {
             <Field label="Usage Limit">
               <input type="number" min="0" value={form.usageLimit} onChange={(e) => setForm({ ...form, usageLimit: e.target.value })} className="admin-input" />
             </Field>
+            <Field label="Applies To">
+              <select value={form.scope} onChange={(e) => setForm({ ...form, scope: e.target.value })} className="admin-input">
+                <option value="all">All products</option>
+                <option value="categories">Specific categories</option>
+                <option value="products">Specific products</option>
+                <option value="skus">SKU / SKU prefix</option>
+              </select>
+            </Field>
+            {form.scope === 'categories' && (
+              <div className="grid grid-cols-1 gap-3">
+                <Field label="Category IDs">
+                  <textarea value={form.categoryIds} onChange={(e) => setForm({ ...form, categoryIds: e.target.value })} className="admin-input min-h-20" placeholder="Paste category IDs, comma or line separated" />
+                </Field>
+                <Field label="Category Slugs">
+                  <textarea value={form.categorySlugs} onChange={(e) => setForm({ ...form, categorySlugs: e.target.value })} className="admin-input min-h-20" placeholder="chandeliers, wall-lights" />
+                </Field>
+              </div>
+            )}
+            {form.scope === 'products' && (
+              <Field label="Product IDs">
+                <textarea value={form.productIds} onChange={(e) => setForm({ ...form, productIds: e.target.value })} className="admin-input min-h-24" placeholder="Paste product IDs, comma or line separated" />
+              </Field>
+            )}
+            {form.scope === 'skus' && (
+              <Field label="SKUs / SKU Prefix">
+                <textarea value={form.skus} onChange={(e) => setForm({ ...form, skus: e.target.value.toUpperCase() })} className="admin-input min-h-24" placeholder="RL188093, RL188093-600D" />
+              </Field>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <Field label="Starts">
                 <input type="date" value={form.startsAt} onChange={(e) => setForm({ ...form, startsAt: e.target.value })} className="admin-input" />
@@ -173,7 +211,7 @@ export default function AdminCouponsPage() {
             <table className="w-full">
               <thead className="border-b border-gray-100 bg-gray-50">
                 <tr>
-                  {['Code', 'Discount', 'Min Order', 'Usage', 'Validity', 'Status', 'Action'].map((heading) => (
+                  {['Code', 'Discount', 'Applies To', 'Min Order', 'Usage', 'Validity', 'Status', 'Action'].map((heading) => (
                     <th key={heading} className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{heading}</th>
                   ))}
                 </tr>
@@ -182,7 +220,7 @@ export default function AdminCouponsPage() {
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, index) => (
                     <tr key={index} className="border-b border-gray-50">
-                      {Array.from({ length: 7 }).map((__, cell) => (
+                      {Array.from({ length: 8 }).map((__, cell) => (
                         <td key={cell} className="px-5 py-4"><div className="h-3 w-20 animate-pulse rounded bg-gray-100" /></td>
                       ))}
                     </tr>
@@ -197,6 +235,10 @@ export default function AdminCouponsPage() {
                       <td className="px-5 py-4 text-sm text-gray-600">
                         {coupon.discountType === 'percentage' ? `${coupon.discountValue}%` : `Rs. ${Number(coupon.discountValue || 0).toLocaleString('en-IN')}`}
                         {coupon.maxDiscountAmount ? <p className="text-xs text-gray-400">Max Rs. {coupon.maxDiscountAmount}</p> : null}
+                      </td>
+                      <td className="px-5 py-4 text-sm text-gray-600">
+                        <p className="font-medium capitalize text-gray-800">{getScopeLabel(coupon)}</p>
+                        <p className="max-w-[220px] truncate text-xs text-gray-400">{getScopePreview(coupon)}</p>
                       </td>
                       <td className="px-5 py-4 text-sm text-gray-600">Rs. {Number(coupon.minOrderAmount || 0).toLocaleString('en-IN')}</td>
                       <td className="px-5 py-4 text-sm text-gray-600">{coupon.usedCount || 0}{coupon.usageLimit ? ` / ${coupon.usageLimit}` : ''}</td>
@@ -220,7 +262,7 @@ export default function AdminCouponsPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="px-5 py-14 text-center">
+                    <td colSpan={8} className="px-5 py-14 text-center">
                       <div className="mx-auto flex max-w-sm flex-col items-center">
                         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 text-gray-400">
                           <Percent size={20} />
@@ -258,10 +300,41 @@ function buildPayload(form: typeof emptyForm) {
     minOrderAmount: Number(form.minOrderAmount || 0),
     maxDiscountAmount: form.maxDiscountAmount ? Number(form.maxDiscountAmount) : undefined,
     usageLimit: form.usageLimit ? Number(form.usageLimit) : undefined,
+    scope: form.scope,
+    categoryIds: parseList(form.categoryIds),
+    categorySlugs: parseList(form.categorySlugs),
+    productIds: parseList(form.productIds),
+    skus: parseList(form.skus).map((sku) => sku.toUpperCase()),
     startsAt: form.startsAt || undefined,
     expiresAt: form.expiresAt || undefined,
     isActive: form.isActive,
   };
+}
+
+function parseList(value: string) {
+  return value
+    .split(/[\n,]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function getScopeLabel(coupon: any) {
+  if (!coupon.scope || coupon.scope === 'all') return 'All products';
+  if (coupon.scope === 'categories') return 'Categories';
+  if (coupon.scope === 'products') return 'Products';
+  if (coupon.scope === 'skus') return 'SKU / prefix';
+  return coupon.scope;
+}
+
+function getScopePreview(coupon: any) {
+  if (!coupon.scope || coupon.scope === 'all') return 'Every product';
+  const values = [
+    ...(coupon.categorySlugs || []),
+    ...(coupon.categoryIds || []),
+    ...(coupon.productIds || []),
+    ...(coupon.skus || []),
+  ];
+  return values.length ? values.join(', ') : 'Not configured';
 }
 
 function toInputDate(value?: string) {

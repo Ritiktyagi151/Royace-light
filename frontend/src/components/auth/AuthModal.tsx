@@ -5,6 +5,7 @@ import { X, Eye, EyeOff } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { closeAuthModal, openAuthModal, addToast } from '../../store/slices/uiSlice';
 import { loginThunk, registerThunk } from '../../store/slices/authSlice';
+import { sendRegisterOtpAPI } from '@/lib/api';
 
 export function AuthModal() {
   const dispatch = useAppDispatch();
@@ -14,13 +15,16 @@ export function AuthModal() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false);
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (authModalOpen) {
-      setName(''); setEmail(''); setPhone(''); setPassword(''); setError('');
+      setName(''); setEmail(''); setPhone(''); setOtp(''); setOtpSent(false); setPassword(''); setError('');
     }
   }, [authModalOpen, authMode]);
 
@@ -45,7 +49,11 @@ export function AuthModal() {
       if (isLogin) {
         result = await dispatch(loginThunk({ email, password }));
       } else {
-        result = await dispatch(registerThunk({ name, email, phone, password }));
+        if (!otpSent) {
+          setError('Please send and enter phone OTP first.');
+          return;
+        }
+        result = await dispatch(registerThunk({ name, email, phone, password, otp }));
       }
       if (result.meta.requestStatus === 'fulfilled') {
         dispatch(addToast({ message: isLogin ? 'Welcome back!' : 'Account created!', type: 'success' }));
@@ -55,6 +63,23 @@ export function AuthModal() {
       }
     } catch {
       setError('Something went wrong. Please try again.');
+    }
+  };
+
+  const sendOtp = async () => {
+    setError('');
+    setSendingOtp(true);
+    try {
+      const result = await sendRegisterOtpAPI(phone);
+      setOtpSent(true);
+      dispatch(addToast({
+        message: result?.devOtp ? `OTP sent. Dev OTP: ${result.devOtp}` : 'OTP sent to phone number',
+        type: 'success',
+      }));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Unable to send OTP');
+    } finally {
+      setSendingOtp(false);
     }
   };
 
@@ -127,9 +152,29 @@ export function AuthModal() {
                 </div>
                 <div>
                   <label style={labelStyle}>Phone Number</label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      type="tel" required value={phone} onChange={(e) => { setPhone(e.target.value); setOtpSent(false); }}
+                      placeholder="10-digit mobile number"
+                      className="input-luxury"
+                      style={{ minWidth: 0 }}
+                    />
+                    <button
+                      type="button"
+                      onClick={sendOtp}
+                      disabled={sendingOtp || !phone.trim()}
+                      className="btn-outline"
+                      style={{ whiteSpace: 'nowrap', fontSize: '0.55rem', opacity: sendingOtp || !phone.trim() ? 0.6 : 1 }}
+                    >
+                      {sendingOtp ? 'Sending' : otpSent ? 'Resend' : 'Send OTP'}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label style={labelStyle}>Phone OTP</label>
                   <input
-                    type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 98911 19199"
+                    type="text" required value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="6-digit OTP"
                     className="input-luxury"
                   />
                 </div>

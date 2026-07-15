@@ -70,14 +70,15 @@ export default function HomePromoMosaic({ categories = FALLBACK_CATEGORIES }: Ho
                 </div>
               )}
 
-              <div className="absolute bottom-5 left-5 z-10 sm:bottom-7 sm:left-7">
-                <p className="max-w-md overflow-hidden text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e4dac3]  [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
-                  {getKicker(tile)}
-                </p>
+              <div className="absolute bottom-4 left-5 z-10 sm:bottom-7 sm:left-7">
+                
 
-                <h3 className="mt-2 font- text-2xl font-semibold  leading-none text-white">
+                <h3 className="mt-2  text-2xl   leading-none text-white">
                   {tile.name}
                 </h3>
+                <p className="max-w-md overflow-hidden text-[8px] font-semibold uppercase tracking-[0.28em] text-[#e4dac3]  [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+                  {getKicker(tile)}
+                </p>
               </div>
             </Link>
           </motion.div>

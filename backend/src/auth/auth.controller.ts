@@ -2,12 +2,18 @@ import {
   Controller, Post, Get, Body, UseGuards, Request, Patch,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, ChangePasswordDto, RegisterVendorDto, UpdateProfileDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, ChangePasswordDto, UpdateProfileDto, SendRegisterOtpDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Post('register/send-otp')
+  async sendRegisterOtp(@Body() dto: SendRegisterOtpDto) {
+    const data = await this.authService.sendRegisterOtp(dto);
+    return { success: true, message: 'OTP sent successfully', data };
+  }
 
   @Post('register')
   async register(@Body() dto: RegisterDto) {
@@ -19,12 +25,6 @@ export class AuthController {
   async login(@Body() dto: LoginDto) {
     const data = await this.authService.login(dto);
     return { success: true, message: 'Login successful', data };
-  }
-
-  @Post('vendor/register')
-  async registerVendor(@Body() dto: RegisterVendorDto) {
-    const data = await this.authService.registerVendor(dto);
-    return { success: true, message: 'Vendor registered successfully', data };
   }
 
   @UseGuards(JwtAuthGuard)

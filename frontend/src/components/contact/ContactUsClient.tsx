@@ -18,6 +18,7 @@ import {
   Undo2,
   Youtube,
 } from 'lucide-react';
+import { api } from '@/lib/api';
 import { SITE_CONTACT, mailTo } from '@/lib/contact';
 
 const subjectOptions = ['Product Enquiry', 'Custom Project', 'Order Support', 'Return or Refund', 'General Query'];
@@ -42,17 +43,41 @@ const mapEmbedSrc =
 export function ContactUsClient() {
   const [submitted, setSubmitted] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const responseLine = useMemo(
     () => 'We usually respond within 24 working hours, Monday to Saturday.',
     [],
   );
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
-    event.currentTarget.reset();
-    setSelectedSubject('');
+    setSubmitError('');
+    setSubmitted(false);
+    setIsSubmitting(true);
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      await api.post('/enquiries', {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        subject: formData.get('subject'),
+        message: formData.get('message'),
+        source: 'contact-us',
+        product: new URLSearchParams(window.location.search).get('product') || undefined,
+      });
+      setSubmitted(true);
+      form.reset();
+      setSelectedSubject('');
+    } catch (error: any) {
+      setSubmitError(error?.response?.data?.message || 'Unable to submit enquiry. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -119,6 +144,11 @@ export function ContactUsClient() {
                 <p>Thank you. Your enquiry has been received. Our team will contact you shortly.</p>
               </div>
             )}
+            {submitError && (
+              <div className="mt-6 border border-red-400/30 bg-red-500/10 p-4 text-sm leading-6 text-red-100">
+                {submitError}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-2">
               <label className={labelClass}>
@@ -161,9 +191,10 @@ export function ContactUsClient() {
               </label>
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="inline-flex items-center justify-center gap-2 border border-[var(--gold)] bg-[var(--gold)] px-6 py-4 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[var(--obsidian)] transition hover:bg-[var(--gold-light)] sm:col-span-2"
               >
-                Submit Enquiry
+                {isSubmitting ? 'Submitting...' : 'Submit Enquiry'}
                 <ArrowRight size={15} />
               </button>
             </form>

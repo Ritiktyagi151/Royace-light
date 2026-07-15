@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginThunk, registerThunk } from '@/store/slices/authSlice';
 import { addToast } from '@/store/slices/uiSlice';
 import { addWishlistItem, WishlistItem } from '@/store/slices/wishlistSlice';
+import { sendRegisterOtpAPI } from '@/lib/api';
 
 export default function CustomerLoginPage() {
   const router = useRouter();
@@ -20,6 +21,9 @@ export default function CustomerLoginPage() {
   const [registerName, setRegisterName] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPhone, setRegisterPhone] = useState('');
+  const [registerOtp, setRegisterOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false);
   const [registerPassword, setRegisterPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
@@ -60,16 +64,38 @@ export default function CustomerLoginPage() {
   const handleRegister = async (event: FormEvent) => {
     event.preventDefault();
     setError('');
+    if (!otpSent) {
+      setError('Please send and enter phone OTP first.');
+      return;
+    }
     const result = await dispatch(registerThunk({
       name: registerName,
       email: registerEmail,
       phone: registerPhone,
+      otp: registerOtp,
       password: registerPassword,
     }));
     if (result.meta.requestStatus === 'fulfilled') {
       completeAuthFlow();
     } else {
       setError(getAuthErrorMessage((result as any).payload, 'Registration failed. Please try again.'));
+    }
+  };
+
+  const sendRegisterOtp = async () => {
+    setError('');
+    setSendingOtp(true);
+    try {
+      const result = await sendRegisterOtpAPI(registerPhone);
+      setOtpSent(true);
+      dispatch(addToast({
+        message: result?.devOtp ? `OTP sent. Dev OTP: ${result.devOtp}` : 'OTP sent to phone number',
+        type: 'success',
+      }));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Unable to send OTP');
+    } finally {
+      setSendingOtp(false);
     }
   };
 
@@ -181,9 +207,31 @@ export default function CustomerLoginPage() {
                   required
                   type="tel"
                   value={registerPhone}
-                  onChange={(event) => setRegisterPhone(event.target.value)}
+                  onChange={(event) => { setRegisterPhone(event.target.value); setOtpSent(false); }}
                   placeholder="Mobile number"
                 />
+              </div>
+              <div>
+                <label style={labelStyle}>Phone OTP</label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    className="input-luxury"
+                    required
+                    value={registerOtp}
+                    onChange={(event) => setRegisterOtp(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="6-digit OTP"
+                    style={{ minWidth: 0 }}
+                  />
+                  <button
+                    type="button"
+                    className="btn-outline"
+                    disabled={sendingOtp || !registerPhone.trim()}
+                    onClick={sendRegisterOtp}
+                    style={{ whiteSpace: 'nowrap', fontSize: '0.55rem', opacity: sendingOtp || !registerPhone.trim() ? 0.6 : 1 }}
+                  >
+                    {sendingOtp ? 'Sending' : otpSent ? 'Resend' : 'Send OTP'}
+                  </button>
+                </div>
               </div>
               <div>
                 <label style={labelStyle}>Password</label>

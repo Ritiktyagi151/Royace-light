@@ -386,9 +386,65 @@ export class OrdersService {
   }
 
   async deleteOrder(orderId: string) {
-    const order = await this.orderModel.findByIdAndDelete(orderId).populate('userId', 'name email');
+    const order = await this.orderModel
+      .findByIdAndUpdate(
+        orderId,
+        { $set: { isDeleted: true, deletedAt: new Date() } },
+        { new: true },
+      )
+      .populate('userId', 'name email');
+    if (!order) throw new NotFoundException('Order not found');
+    return order;
+  }
+
+  async restoreOrder(orderId: string) {
+    const order = await this.orderModel
+      .findByIdAndUpdate(
+        orderId,
+        { $set: { isDeleted: false }, $unset: { deletedAt: 1 } },
+        { new: true },
+      )
+      .populate('userId', 'name email');
+    if (!order) throw new NotFoundException('Order not found');
+    return order;
+  }
+
+  async permanentlyDeleteOrder(orderId: string) {
+    const order = await this.orderModel.findByIdAndDelete(orderId);
     if (!order) throw new NotFoundException('Order not found');
     return { id: orderId };
+  }
+
+  async bulkUpdateStatus(orderIds: string[], status: OrderStatus) {
+    const ids = this.normalizeOrderIds(orderIds);
+    if (!ids.length) throw new BadRequestException('Select at least one order');
+
+    const result = await this.orderModel.updateMany(
+      { _id: { $in: ids }, isDeleted: { $ne: true } },
+      { $set: { status } },
+      { runValidators: true },
+    );
+
+    return {
+      matched: result.matchedCount,
+      modified: result.modifiedCount,
+      status,
+    };
+  }
+
+  async bulkDelete(orderIds: string[]) {
+    const ids = this.normalizeOrderIds(orderIds);
+    if (!ids.length) throw new BadRequestException('Select at least one order');
+
+    const result = await this.orderModel.updateMany(
+      { _id: { $in: ids } },
+      { $set: { isDeleted: true, deletedAt: new Date() } },
+    );
+
+    return {
+      matched: result.matchedCount,
+      modified: result.modifiedCount,
+    };
   }
 
   private getValidNextStatuses(status: OrderStatus) {
@@ -414,11 +470,14 @@ export class OrdersService {
     search?: string,
     fromDate?: string,
     toDate?: string,
+    deleted = false,
+    returnRequested = false,
   ) {
     const pageNum = Math.max(1, Number(page) || 1);
     const limitNum = Math.min(100, Math.max(1, Number(limit) || 20));
-    const filter: any = {};
+    const filter: any = deleted ? { isDeleted: true } : { isDeleted: { $ne: true } };
     if (status) filter.status = status;
+    if (returnRequested) filter['returnRequest.status'] = 'Requested';
 
     if (fromDate || toDate) {
       filter.orderDate = {};
@@ -475,7 +534,7 @@ export class OrdersService {
   // ─── Get user orders ─────────────────────────────────────
   async getUserOrders(userId: string) {
     return this.orderModel
-      .find({ userId: new Types.ObjectId(userId) })
+      .find({ userId: new Types.ObjectId(userId), isDeleted: { $ne: true } })
       .sort({ createdAt: -1 });
   }
 
@@ -511,26 +570,77 @@ export class OrdersService {
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
 
-    const [total, placed, confirmed, processing, shipped, outForDelivery, delivered, cancelled, returned, todaysOrders, revenue] =
+    const activeFilter = { isDeleted: { $ne: true } };
+    const billableFilter = {
+      ...activeFilter,
+      status: { $nin: [OrderStatus.CANCELLED, OrderStatus.RETURNED] },
+    };
+    const [total, deleted, placed, confirmed, processing, shipped, outForDelivery, delivered, cancelled, returned, todaysOrders, paymentStats] =
       await Promise.all([
-        this.orderModel.countDocuments(),
-        this.orderModel.countDocuments({ status: OrderStatus.PLACED }),
-        this.orderModel.countDocuments({ status: OrderStatus.CONFIRMED }),
-        this.orderModel.countDocuments({ status: OrderStatus.PROCESSING }),
-        this.orderModel.countDocuments({ status: OrderStatus.SHIPPED }),
-        this.orderModel.countDocuments({ status: OrderStatus.OUT_FOR_DELIVERY }),
-        this.orderModel.countDocuments({ status: OrderStatus.DELIVERED }),
-        this.orderModel.countDocuments({ status: OrderStatus.CANCELLED }),
-        this.orderModel.countDocuments({ status: OrderStatus.RETURNED }),
-        this.orderModel.countDocuments({ orderDate: { $gte: todayStart, $lte: todayEnd } }),
+        this.orderModel.countDocuments(activeFilter),
+        this.orderModel.countDocuments({ isDeleted: true }),
+        this.orderModel.countDocuments({ ...activeFilter, status: OrderStatus.PLACED }),
+        this.orderModel.countDocuments({ ...activeFilter, status: OrderStatus.CONFIRMED }),
+        this.orderModel.countDocuments({ ...activeFilter, status: OrderStatus.PROCESSING }),
+        this.orderModel.countDocuments({ ...activeFilter, status: OrderStatus.SHIPPED }),
+        this.orderModel.countDocuments({ ...activeFilter, status: OrderStatus.OUT_FOR_DELIVERY }),
+        this.orderModel.countDocuments({ ...activeFilter, status: OrderStatus.DELIVERED }),
+        this.orderModel.countDocuments({ ...activeFilter, status: OrderStatus.CANCELLED }),
+        this.orderModel.countDocuments({ ...activeFilter, status: OrderStatus.RETURNED }),
+        this.orderModel.countDocuments({ ...activeFilter, orderDate: { $gte: todayStart, $lte: todayEnd } }),
         this.orderModel.aggregate([
-          { $match: { payment: true } },
-          { $group: { _id: null, total: { $sum: '$amount' } } },
+          { $match: billableFilter },
+          {
+            $addFields: {
+              amountValue: {
+                $convert: {
+                  input: '$amount',
+                  to: 'double',
+                  onError: 0,
+                  onNull: 0,
+                },
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalAmount: { $sum: '$amountValue' },
+              paidAmount: {
+                $sum: { $cond: [{ $eq: ['$payment', true] }, '$amountValue', 0] },
+              },
+              dueAmount: {
+                $sum: { $cond: [{ $eq: ['$payment', true] }, 0, '$amountValue'] },
+              },
+              onlinePaidAmount: {
+                $sum: {
+                  $cond: [
+                    { $and: [{ $eq: ['$payment', true] }, { $in: ['$paymentMethod', ['online', 'razorpay']] }] },
+                    '$amountValue',
+                    0,
+                  ],
+                },
+              },
+              codDueAmount: {
+                $sum: {
+                  $cond: [
+                    { $and: [{ $eq: ['$payment', false] }, { $eq: ['$paymentMethod', 'cod'] }] },
+                    '$amountValue',
+                    0,
+                  ],
+                },
+              },
+              paidOrders: { $sum: { $cond: [{ $eq: ['$payment', true] }, 1, 0] } },
+              dueOrders: { $sum: { $cond: [{ $eq: ['$payment', false] }, 1, 0] } },
+            },
+          },
         ]),
       ]);
+    const payments = paymentStats[0] || {};
 
     return {
       total,
+      deleted,
       placed,
       confirmed,
       processing,
@@ -541,8 +651,91 @@ export class OrdersService {
       returned,
       pending: placed + confirmed + processing + shipped + outForDelivery,
       todaysOrders,
-      revenue: revenue[0]?.total || 0,
+      revenue: payments.paidAmount || 0,
+      payment: {
+        totalAmount: payments.totalAmount || 0,
+        paidAmount: payments.paidAmount || 0,
+        dueAmount: payments.dueAmount || 0,
+        onlinePaidAmount: payments.onlinePaidAmount || 0,
+        codDueAmount: payments.codDueAmount || 0,
+        paidOrders: payments.paidOrders || 0,
+        dueOrders: payments.dueOrders || 0,
+      },
     };
+  }
+
+  async getRevenueTrend(period: 'daily' | 'weekly' | 'monthly' = 'daily', fromDate?: string, toDate?: string) {
+    const dateRange = this.resolveTrendDateRange(period, fromDate, toDate);
+    const dateFormat = period === 'monthly'
+      ? '%Y-%m'
+      : period === 'weekly'
+      ? '%G-W%V'
+      : '%Y-%m-%d';
+
+    const data = await this.orderModel.aggregate([
+      {
+        $match: {
+          isDeleted: { $ne: true },
+          payment: true,
+          status: { $nin: [OrderStatus.CANCELLED, OrderStatus.RETURNED] },
+          orderDate: { $gte: dateRange.start, $lte: dateRange.end },
+        },
+      },
+      {
+        $addFields: {
+          amountValue: {
+            $convert: {
+              input: '$amount',
+              to: 'double',
+              onError: 0,
+              onNull: 0,
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: dateFormat, date: '$orderDate' } },
+          revenue: { $sum: '$amountValue' },
+          orders: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    return {
+      period,
+      fromDate: dateRange.start,
+      toDate: dateRange.end,
+      data: data.map((item) => ({
+        label: item._id,
+        revenue: item.revenue || 0,
+        orders: item.orders || 0,
+      })),
+    };
+  }
+
+  private normalizeOrderIds(orderIds: string[] = []) {
+    return [...new Set(orderIds)]
+      .filter((id) => Types.ObjectId.isValid(id))
+      .map((id) => new Types.ObjectId(id));
+  }
+
+  private resolveTrendDateRange(period: 'daily' | 'weekly' | 'monthly', fromDate?: string, toDate?: string) {
+    const end = toDate ? new Date(`${toDate}T23:59:59.999`) : new Date();
+    if (Number.isNaN(end.getTime())) end.setTime(Date.now());
+
+    const start = fromDate ? new Date(`${fromDate}T00:00:00.000`) : new Date(end);
+    if (Number.isNaN(start.getTime())) start.setTime(end.getTime());
+
+    if (!fromDate) {
+      if (period === 'monthly') start.setMonth(start.getMonth() - 11);
+      else if (period === 'weekly') start.setDate(start.getDate() - 84);
+      else start.setDate(start.getDate() - 30);
+      start.setHours(0, 0, 0, 0);
+    }
+
+    return { start, end };
   }
 
   private escapeRegex(value: string) {
@@ -610,8 +803,8 @@ export class OrdersService {
     let coupon;
     if (dto.couponCode?.trim()) {
       const appliedCoupon = skipCouponConsumption
-        ? await this.couponsService.validateCoupon(dto.couponCode, subtotal)
-        : await this.couponsService.consumeCoupon(dto.couponCode, subtotal);
+        ? await this.couponsService.validateCoupon(dto.couponCode, subtotal, normalizedItems)
+        : await this.couponsService.consumeCoupon(dto.couponCode, subtotal, normalizedItems);
       discountAmount = appliedCoupon.discountAmount;
       coupon = {
         code: appliedCoupon.code,

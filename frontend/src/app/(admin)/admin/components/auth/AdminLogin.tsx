@@ -24,6 +24,7 @@ export function AdminLogin() {
         return;
       }
       adminApi.defaults.headers.common.Authorization = `Bearer ${token}`;
+      localStorage.setItem('royace_admin_last_login_at', new Date().toISOString());
       dispatch(setAdminAuth({ token, admin: { _id: userId, name, email: form.email, role } }));
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');

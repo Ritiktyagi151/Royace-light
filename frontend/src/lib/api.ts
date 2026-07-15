@@ -40,10 +40,15 @@ export async function createRazorpayOrderAPI(token: string, amount: number, orde
   return res.data.data || res.data;
 }
 
-export async function validateCouponAPI(token: string, code: string, subtotal: number) {
-  const res = await api.post('/coupons/validate', { code, subtotal }, {
+export async function validateCouponAPI(token: string, code: string, subtotal: number, items?: any[]) {
+  const res = await api.post('/coupons/validate', { code, subtotal, items }, {
     headers: { Authorization: `Bearer ${token}` },
   });
+  return res.data.data || res.data;
+}
+
+export async function sendRegisterOtpAPI(phone: string) {
+  const res = await api.post('/auth/register/send-otp', { phone });
   return res.data.data || res.data;
 }
 

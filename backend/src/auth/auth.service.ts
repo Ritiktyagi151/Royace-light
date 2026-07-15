@@ -7,42 +7,121 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
 import { User, UserDocument, UserRole } from '../users/schemas/user.schema';
+import { AuthOtp, AuthOtpDocument } from './schemas/auth-otp.schema';
 import {
   RegisterDto,
   LoginDto,
   ChangePasswordDto,
-  RegisterVendorDto,
   UpdateProfileDto,
+  SendRegisterOtpDto,
 } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(AuthOtp.name) private otpModel: Model<AuthOtpDocument>,
     private jwtService: JwtService,
+    private config: ConfigService,
   ) {}
 
   private createToken(userId: string): string {
     return this.jwtService.sign({ id: userId });
   }
 
+  async sendRegisterOtp(dto: SendRegisterOtpDto) {
+    const phone = this.normalizePhone(dto.phone);
+    const existingPhone = await this.userModel.findOne({ phone });
+    if (existingPhone) throw new BadRequestException('Phone number already registered');
+
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const codeHash = await bcrypt.hash(code, 10);
+    await this.otpModel.updateMany({ phone, purpose: 'register', used: false }, { used: true });
+    await this.otpModel.create({
+      phone,
+      codeHash,
+      purpose: 'register',
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    });
+
+    const smsSent = await this.sendSmsOtp(phone, code);
+    const response: any = { phone, expiresInMinutes: 10, smsSent };
+    if (!smsSent && this.config.get<string>('NODE_ENV') !== 'production') {
+      response.devOtp = code;
+    }
+    return response;
+  }
+
   async register(dto: RegisterDto) {
+    const phone = this.normalizePhone(dto.phone);
+    await this.verifyRegisterOtp(phone, dto.otp);
+
     const existing = await this.userModel.findOne({ email: dto.email });
     if (existing) throw new BadRequestException('User already exists');
+    const existingPhone = await this.userModel.findOne({ phone });
+    if (existingPhone) throw new BadRequestException('Phone number already registered');
 
     const hashed = await bcrypt.hash(dto.password, 10);
     const user = await this.userModel.create({
       name: dto.name,
       email: dto.email,
-      phone: dto.phone,
+      phone,
       password: hashed,
       role: UserRole.USER,
     });
 
     const token = this.createToken(String(user._id));
     return { token, userId: user._id, role: user.role, name: user.name, email: user.email, phone: user.phone };
+  }
+
+  private async verifyRegisterOtp(phone: string, otp: string) {
+    const entry = await this.otpModel
+      .findOne({ phone, purpose: 'register', used: false, expiresAt: { $gt: new Date() } })
+      .sort({ createdAt: -1 });
+    if (!entry) throw new BadRequestException('OTP expired or not found');
+
+    const match = await bcrypt.compare(String(otp || ''), entry.codeHash);
+    if (!match) throw new BadRequestException('Invalid OTP');
+    entry.used = true;
+    await entry.save();
+  }
+
+  private normalizePhone(phone?: string) {
+    const digits = String(phone || '').replace(/\D/g, '');
+    if (digits.length === 10) return digits;
+    if (digits.length === 12 && digits.startsWith('91')) return digits.slice(2);
+    throw new BadRequestException('Enter a valid 10-digit phone number');
+  }
+
+  private async sendSmsOtp(phone: string, code: string) {
+    const authKey = this.config.get<string>('MSG91_AUTH_KEY');
+    const templateId = this.config.get<string>('MSG91_OTP_TEMPLATE_ID');
+    const senderId = this.config.get<string>('MSG91_SENDER_ID') || 'ROYACE';
+    if (!authKey || !templateId) return false;
+
+    try {
+      const response = await fetch('https://control.msg91.com/api/v5/flow/', {
+        method: 'POST',
+        headers: {
+          authkey: authKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          template_id: templateId,
+          sender: senderId,
+          short_url: '0',
+          mobiles: `91${phone}`,
+          OTP: code,
+          otp: code,
+        }),
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
   }
 
   async login(dto: LoginDto) {
@@ -56,26 +135,6 @@ export class AuthService {
 
     const token = this.createToken(String(user._id));
     return { token, userId: user._id, role: user.role, name: user.name, email: user.email, phone: user.phone };
-  }
-
-  async registerVendor(dto: RegisterVendorDto) {
-    const existing = await this.userModel.findOne({ email: dto.email });
-    if (existing) throw new BadRequestException('Email already in use');
-
-    const hashed = await bcrypt.hash(dto.password, 10);
-    const user = await this.userModel.create({
-      name: dto.name,
-      email: dto.email,
-      password: hashed,
-      role: UserRole.VENDOR,
-      shopName: dto.shopName,
-      shopDescription: dto.shopDescription,
-      phone: dto.phone,
-      isActive: true,
-    });
-
-    const token = this.createToken(String(user._id));
-    return { token, userId: user._id, role: user.role, name: user.name, email: user.email, phone: user.phone, shopName: user.shopName };
   }
 
   async changePassword(userId: string, dto: ChangePasswordDto) {

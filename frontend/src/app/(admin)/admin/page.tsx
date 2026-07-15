@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ShoppingBag, Package, Users, IndianRupee, Clock, CheckCircle, Truck } from 'lucide-react';
+import { ShoppingBag, Package, Users, IndianRupee, Clock, CheckCircle, Truck, TrendingUp } from 'lucide-react';
 import { adminApi } from '@/lib/adminApi';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
@@ -52,7 +52,16 @@ export default function AdminDashboard() {
   const { data: lowStockData } = useQuery({
     queryKey: ['admin-low-stock-products'],
     queryFn: async ({ signal }) => {
-      const res = await adminApi.get('/products/admin/low-stock?threshold=10&limit=8', { signal });
+      const res = await adminApi.get('/products/admin/low-stock?threshold=4&limit=5', { signal });
+      return res.data.data;
+    },
+    ...QUERY_OPTIONS,
+  });
+
+  const { data: topSellingData } = useQuery({
+    queryKey: ['admin-top-selling-products'],
+    queryFn: async ({ signal }) => {
+      const res = await adminApi.get('/products/admin/top-selling?limit=5', { signal });
       return res.data.data;
     },
     ...QUERY_OPTIONS,
@@ -159,7 +168,7 @@ export default function AdminDashboard() {
         <div className="admin-card p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-gray-900">Low Stock Products</h3>
-            <span className="text-xs text-gray-400">Threshold: {lowStockData?.threshold || 10}</span>
+            <span className="text-xs text-gray-400">Quantity below 5</span>
           </div>
           <div className="space-y-3">
             {lowStockData?.products?.map((product: any) => (
@@ -173,6 +182,35 @@ export default function AdminDashboard() {
             ))}
             {!lowStockData?.products?.length && (
               <p className="text-sm text-gray-400 text-center py-8">All products well stocked</p>
+            )}
+          </div>
+        </div>
+
+        <div className="admin-card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-gray-900">Top 5 Selling Products</h3>
+            <TrendingUp size={18} className="text-green-600" />
+          </div>
+          <div className="space-y-3">
+            {topSellingData?.products?.map((product: any, index: number) => (
+              <div key={product._id || index} className="flex items-center justify-between gap-3 py-2 border-b border-gray-50 last:border-0">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-700">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-gray-900">{product.name}</p>
+                    <p className="text-xs text-gray-500">{product.sku || 'No SKU'}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-gray-900">{product.soldQuantity || 0} sold</p>
+                  <p className="text-xs text-gray-500">Rs. {Number(product.revenue || 0).toLocaleString('en-IN')}</p>
+                </div>
+              </div>
+            ))}
+            {!topSellingData?.products?.length && (
+              <p className="text-sm text-gray-400 text-center py-8">No sales data yet</p>
             )}
           </div>
         </div>

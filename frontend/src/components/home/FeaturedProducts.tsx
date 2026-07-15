@@ -43,7 +43,7 @@ export function FeaturedProducts({ collections }: FeaturedProductsProps) {
               Featured Collections
             </span>
             <h2
-              className="mt-5 text-4xl font-bold  leading-[1.04]"
+              className="mt-5 text-3xl  leading-[1.04]"
             
             >
               Decorative lighting collections for homes, villas, hotels, and commercial projects.
@@ -90,7 +90,7 @@ export function FeaturedProducts({ collections }: FeaturedProductsProps) {
                 <span className="mb-3 block text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-[#006039]">
                   Collection
                 </span>
-                <h3 className="text-2xl font-semibold leading-tight text-[#173126]">
+                <h3 className="text-2xl leading-tight text-[#173126]">
                   {collection.name}
                 </h3>
                 <p className="mt-4 overflow-hidden text-sm leading-6 text-[#173126]/68 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">

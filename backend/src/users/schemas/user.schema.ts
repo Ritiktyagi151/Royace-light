@@ -6,7 +6,6 @@ export type UserDocument = User & Document;
 export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',
-  VENDOR = 'vendor',
 }
 
 @Schema({ timestamps: true })
@@ -25,13 +24,6 @@ export class User {
 
   @Prop({ default: true })
   isActive: boolean;
-
-  // Vendor-specific fields
-  @Prop({ trim: true })
-  shopName?: string;
-
-  @Prop({ trim: true })
-  shopDescription?: string;
 
   @Prop({ trim: true })
   phone?: string;

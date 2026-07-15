@@ -573,7 +573,7 @@ export default function AdminProductsPage() {
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
-              {['Product', 'Category', 'Price', 'Stock', 'Status', 'Vendor', 'Actions'].map((h) => (
+              {['Product', 'Category', 'Price', 'Stock', 'Status', 'Actions'].map((h) => (
                 <th key={h} className="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
               ))}
             </tr>
@@ -582,7 +582,7 @@ export default function AdminProductsPage() {
             {isLoading
               ? Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i} className="border-b border-gray-50">
-                    {Array.from({ length: 7 }).map((_, j) => (
+                    {Array.from({ length: 6 }).map((_, j) => (
                       <td key={j} className="px-5 py-4"><div className="h-3 bg-gray-100 rounded animate-pulse w-20" /></td>
                     ))}
                   </tr>
@@ -627,9 +627,6 @@ export default function AdminProductsPage() {
                         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${p.isActive ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                           {p.isActive ? 'Active' : 'Inactive'}
                         </span>
-                      </td>
-                      <td className="px-5 py-4 text-sm text-gray-500">
-                        {p.vendorId ? p.vendorId.shopName || p.vendorId.name : 'Admin'}
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-2">
