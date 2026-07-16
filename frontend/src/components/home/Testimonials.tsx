@@ -115,7 +115,7 @@ export function Testimonials() {
             <span className="h-px w-9 bg-[#006039]" />
             Customer Feedback
           </span>
-          <h2 className="mt-5 text-3xl leading-[1.02] text-[#173126]">
+          <h2 className="mt-5 font-serif italic text-3xl leading-[1.02] text-[#173126]">
             Trusted by homeowners, designers, and project teams.
           </h2>
         </div>

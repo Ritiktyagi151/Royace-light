@@ -29,7 +29,7 @@ export function CollectionShowcase() {
             <span className="h-px w-9 bg-[#006039]" />
             Design Approach
           </span>
-          <h2 className="mt-5 font-serif text-4xl font-light leading-[0.98]">
+          <h2 className="mt-5 font-serif text-4xl font-light italic leading-[0.98]">
             Warm finishes, balanced scale, and practical installation planning.
           </h2>
           <p className="mt-6 text-sm leading-7 text-[#173126]/62">

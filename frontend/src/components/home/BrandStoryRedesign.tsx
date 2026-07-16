@@ -154,7 +154,7 @@ export function BrandStoryRedesign() {
             </div>
 
             <h2
-              className="mt-4 max-w-2xl text-2xl font- text-[#173126] sm:mt-3 md:text-3xl xl:text-4xl"
+              className="mt-4 max-w-2xl text-2xl italic font-serif text-[#173126] sm:mt-3 md:text-3xl xl:text-4xl"
              
             >
               Decorative lighting planned for Indian homes and projects.

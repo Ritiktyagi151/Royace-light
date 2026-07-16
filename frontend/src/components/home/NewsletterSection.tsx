@@ -41,8 +41,8 @@ export function NewsletterSection() {
               <span className="h-px w-9 bg-[#006039]" />
               Design Updates
             </span>
-            <h2 className="mt-5 max-w-3xl text-4xl font-medium ">
-              Get new collection updates and project ideas.
+            <h2 className="mt-5 max-w-3xl text-4xl italic font-medium ">
+              Get new collection  updates and project ideas.
             </h2>
             <p className="mt-5 max-w-xl text-sm leading-7 text-[#241913]/60">
               Receive useful updates on new arrivals, room-wise lighting ideas, care tips, and project-ready decorative lighting.

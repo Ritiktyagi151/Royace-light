@@ -43,7 +43,7 @@ export function BlogSliderSection() {
               <span className="h-px w-9 bg-[#006039]" />
               Lighting Journal
             </p>
-            <h2 className="mt-4 text-3xl  leading-tight">
+            <h2 className="mt-4 font-serif italic text-3xl  leading-tight">
               Practical ideas for selecting, installing, and maintaining decorative lighting.
             </h2>
           </div>
