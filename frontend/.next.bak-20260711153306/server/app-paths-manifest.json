@@ -1,7 +1,0 @@
-{
-  "/(public)/profile/page": "app/(public)/profile/page.js",
-  "/(public)/checkout/page": "app/(public)/checkout/page.js",
-  "/(public)/social-accounts/page": "app/(public)/social-accounts/page.js",
-  "/(public)/page": "app/(public)/page.js",
-  "/(public)/my-orders/page": "app/(public)/my-orders/page.js"
-}

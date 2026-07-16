@@ -1,7 +1,0 @@
-{
-  "/(public)/profile/page": "/profile",
-  "/(public)/checkout/page": "/checkout",
-  "/(public)/social-accounts/page": "/social-accounts",
-  "/(public)/page": "/",
-  "/(public)/my-orders/page": "/my-orders"
-}
