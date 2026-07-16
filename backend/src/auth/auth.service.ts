@@ -35,6 +35,19 @@ export class AuthService {
     return this.jwtService.sign({ id: userId });
   }
 
+  private createEnvAdminToken(): string {
+    return this.jwtService.sign({ id: 'env-admin', source: 'env-admin' });
+  }
+
+  private getEnvAdmin() {
+    const email = this.config.get<string>('ADMIN_EMAIL')?.trim().toLowerCase();
+    const password = this.config.get<string>('ADMIN_PASSWORD');
+    const name = this.config.get<string>('ADMIN_NAME')?.trim() || 'Admin';
+
+    if (!email || !password) return null;
+    return { email, password, name };
+  }
+
   async sendRegisterOtp(dto: SendRegisterOtpDto) {
     const phone = this.normalizePhone(dto.phone);
     const existingPhone = await this.userModel.findOne({ phone });
@@ -148,6 +161,25 @@ export class AuthService {
 
     const token = this.createToken(String(user._id));
     return { token, userId: user._id, role: user.role, name: user.name, email: user.email, phone: user.phone };
+  }
+
+  async adminLogin(dto: LoginDto) {
+    const envAdmin = this.getEnvAdmin();
+    if (!envAdmin) throw new UnauthorizedException('Admin credentials are not configured');
+
+    const email = dto.email.trim().toLowerCase();
+    if (email !== envAdmin.email || dto.password !== envAdmin.password) {
+      throw new UnauthorizedException('Invalid admin credentials');
+    }
+
+    const token = this.createEnvAdminToken();
+    return {
+      token,
+      userId: 'env-admin',
+      role: UserRole.ADMIN,
+      name: envAdmin.name,
+      email: envAdmin.email,
+    };
   }
 
   async changePassword(userId: string, dto: ChangePasswordDto) {

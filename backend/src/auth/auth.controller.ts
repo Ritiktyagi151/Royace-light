@@ -27,6 +27,12 @@ export class AuthController {
     return { success: true, message: 'Login successful', data };
   }
 
+  @Post('admin/login')
+  async adminLogin(@Body() dto: LoginDto) {
+    const data = await this.authService.adminLogin(dto);
+    return { success: true, message: 'Admin login successful', data };
+  }
+
   @UseGuards(JwtAuthGuard)
   @Patch('change-password')
   async changePassword(@Request() req, @Body() dto: ChangePasswordDto) {

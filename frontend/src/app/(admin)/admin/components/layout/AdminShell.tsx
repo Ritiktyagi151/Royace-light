@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import type { LucideIcon } from 'lucide-react';
@@ -315,8 +316,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
     <>
       {/* Logo */}
       <div className={`flex items-center gap-2.5 px-4 py-5 border-b border-gray-100 ${collapsed ? 'justify-center' : ''}`}>
-        <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center shrink-0">
-          <span className="text-white text-xs font-bold">NC</span>
+        <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm">
+          <Image
+            src="/royace-logo.png"
+            alt="Royace Lighting"
+            fill
+            sizes="36px"
+            className="object-contain p-1"
+            priority
+          />
         </div>
         {!collapsed && (
           <div>

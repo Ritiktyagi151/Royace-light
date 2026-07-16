@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { adminApi } from '@/lib/adminApi';
 import { useAdminDispatch, setAdminAuth } from '@/store/admin/store';
@@ -17,7 +18,7 @@ export function AdminLogin() {
     setLoading(true);
     setError('');
     try {
-      const res = await adminApi.post('/auth/login', form);
+      const res = await adminApi.post('/auth/admin/login', form);
       const { token, role, name, userId } = res.data.data;
       if (role !== 'admin') {
         setError('Access denied. Admin accounts only.');
@@ -37,8 +38,15 @@ export function AdminLogin() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white text-xl font-bold">NC</span>
+          <div className="relative mx-auto mb-4 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+            <Image
+              src="/royace-logo.png"
+              alt="Royace Lighting"
+              fill
+              sizes="64px"
+              className="object-contain p-2"
+              priority
+            />
           </div>
           <h2 className="text-2xl font-bold text-gray-900">Admin Access</h2>
           <p className="text-gray-500 text-sm mt-1">Royace Lighting Admin Panel</p>
@@ -51,7 +59,7 @@ export function AdminLogin() {
               type="email" required value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
-              placeholder="admin@Royace Lighting.com"
+              placeholder="admin@royace.in"
             />
           </div>
           <div>
