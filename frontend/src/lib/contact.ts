@@ -2,13 +2,13 @@ export const SITE_CONTACT = {
   brandName: 'Royace Lighting',
   companyName: 'Royace Lighting',
   gstNumber: 'Available on GST invoice',
-  email: 'info@royacelighting.com',
-  phone: '+91 98911 19199',
-  phoneHref: 'tel:+919891119199',
-  registeredAddress: 'Mehrauli Road, Qutub Area, New Delhi, 110030',
+  email: 'inquiry@royace.in',
+  phone: '+91 98916 19199',
+  phoneHref: 'tel:+919891619199',
+  registeredAddress: 'Royace Lighting, 2/25 Main Road, Kirti Nagar, Near Police Station, New Delhi',
   supportTimings: 'Monday to Saturday, 10:00 AM to 7:00 PM IST',
   mapUrl:
-    'https://www.google.com/maps/search/?api=1&query=Mehrauli%20Road%2C%20Qutub%20Area%2C%20New%20Delhi%20110030',
+    'https://www.google.com/maps/search/?api=1&query=Royace%20Lighting%202%2F25%20Main%20Road%20Kirti%20Nagar%20Near%20Police%20Station%20New%20Delhi',
 };
 
 export const mailTo = (subject: string) =>

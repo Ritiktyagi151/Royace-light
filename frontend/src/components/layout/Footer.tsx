@@ -222,7 +222,7 @@ export function Footer() {
                 rel="noreferrer"
                 className={`${footerLinkClass} leading-7`}
               >
-                Mehrauli Road, Qutub Area<br />New Delhi, 110030
+                Royace Lighting, 2/25 Main Road<br />Kirti Nagar, Near Police Station, New Delhi
               </Link>
             </li>
           </ul>

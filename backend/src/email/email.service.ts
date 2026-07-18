@@ -16,8 +16,8 @@ export class EmailService {
     } else {
       this.logger.warn('RESEND_API_KEY not set — email sending disabled');
     }
-    this.fromEmail = config.get<string>('RESEND_FROM_EMAIL') || 'noreply@Royace Lighting.com';
-    this.adminEmail = config.get<string>('ADMIN_EMAIL') || 'admin@Royace Lighting.com';
+    this.fromEmail = config.get<string>('RESEND_FROM_EMAIL') || 'inquiry@royace.in';
+    this.adminEmail = config.get<string>('ADMIN_EMAIL') || 'inquiry@royace.in';
   }
 
   private baseTemplate(content: string, preheader = '') {
@@ -178,7 +178,7 @@ export class EmailService {
         <p style="margin:0;font-size:16px;color:#713f12;">Loved your purchase? Share it with friends! ✨</p>
       </div>
 
-      <p style="color:#6b7280;font-size:13px;margin-top:24px;">If you have any issues with your order, please contact us at support@Royace Lighting.com</p>`;
+      <p style="color:#6b7280;font-size:13px;margin-top:24px;">If you have any issues with your order, please contact us at inquiry@royace.in</p>`;
 
     if (!this.resend) {
       this.logger.warn(`Skipping delivered email to ${to}: Resend not configured`);

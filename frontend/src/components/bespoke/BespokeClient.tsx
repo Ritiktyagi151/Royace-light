@@ -253,7 +253,7 @@ export function BespokeClient() {
 
             <FormSection title="Client Details">
               <Input label="Name" name="name" value={form.name} onChange={updateField} required placeholder="Full name" />
-              <Input label="Phone" name="phone" type="tel" value={form.phone} onChange={updateField} required placeholder="+91 98911 19199" />
+              <Input label="Phone" name="phone" type="tel" value={form.phone} onChange={updateField} required placeholder="+91 98916 19199" />
               <Input label="Email" name="email" type="email" value={form.email} onChange={updateField} placeholder="you@example.com" />
               <Select label="You are" name="role" value={form.role} onChange={updateField} options={['Homeowner', 'Interior Designer', 'Architect', 'Builder', 'Hotel / Hospitality', 'Retail / Commercial']} />
               <Input label="City / Site Location" name="city" value={form.city} onChange={updateField} required placeholder="Delhi, Mumbai, Jaipur..." />

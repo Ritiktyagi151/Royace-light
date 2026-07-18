@@ -38,7 +38,7 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
 )}`;
 
 const mapEmbedSrc =
-  'https://www.google.com/maps?q=Mehrauli%20Road%2C%20Qutub%20Area%2C%20New%20Delhi%20110030&output=embed';
+  'https://www.google.com/maps?q=Royace%20Lighting%202%2F25%20Main%20Road%20Kirti%20Nagar%20Near%20Police%20Station%20New%20Delhi&output=embed';
 
 export function ContactUsClient() {
   const [submitted, setSubmitted] = useState(false);
@@ -161,7 +161,7 @@ export function ContactUsClient() {
               </label>
               <label className={labelClass}>
                 Phone Number
-                <input className={fieldClass} name="phone" type="tel" placeholder="+91 98911 19199" required />
+                <input className={fieldClass} name="phone" type="tel" placeholder="+91 98916 19199" required />
               </label>
               <label className={labelClass}>
                 Subject
