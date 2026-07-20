@@ -113,13 +113,15 @@ export function Footer() {
           {/* Socials */}
           <div className="flex gap-2">
             {[
-              { Icon: Instagram, href: '' },
+              { Icon: Instagram, href: SITE_CONTACT.instagramUrl },
               { Icon: Facebook, href: '#' },
               { Icon: Twitter, href: '#' },
             ].map(({ Icon, href }, i) => (
               <a
                 key={i}
                 href={href}
+                target={href.startsWith('http') ? '_blank' : undefined}
+                rel={href.startsWith('http') ? 'noreferrer' : undefined}
                 className={iconLinkClass}
                 aria-label="Royace social profile"
               >
@@ -146,19 +148,21 @@ export function Footer() {
         </div>
 
         {/* Info */}
-        <div>
-          <h4 className={footerHeadingClass}>
-            Information
-          </h4>
-          <ul className="m-0 flex list-none flex-col gap-3.5 p-0">
-            {INFO_LINKS.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className={footerLinkClass}>
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div className="grid grid-cols-2 gap-6 lg:block">
+          <div>
+            <h4 className={footerHeadingClass}>
+              Information
+            </h4>
+            <ul className="m-0 flex list-none flex-col gap-3.5 p-0">
+              {INFO_LINKS.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={footerLinkClass}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* <div className="mt-7 border border-white/10 bg-white/[0.03] p-4">
             <p className="mb-3 text-[0.58rem] font-semibold uppercase tracking-[0.24em] text-[var(--gold-light)]">
@@ -175,18 +179,20 @@ export function Footer() {
             </Link>
           </div> */}
 
-          <h4 className={`${footerHeadingClass} mt-10`}>
-            Services
-          </h4>
-          <ul className="m-0 flex list-none flex-col gap-3.5 p-0">
-            {SERVICE_LINKS.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className={footerLinkClass}>
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div>
+            <h4 className={`${footerHeadingClass} lg:mt-10`}>
+              Services
+            </h4>
+            <ul className="m-0 flex list-none flex-col gap-3.5 p-0">
+              {SERVICE_LINKS.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={footerLinkClass}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
         </div>
 

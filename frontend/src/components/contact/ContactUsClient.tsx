@@ -14,6 +14,8 @@ import {
   MessageCircle,
   Phone,
   Send,
+  ShieldCheck,
+  Sparkles,
   Truck,
   Undo2,
   Youtube,
@@ -31,6 +33,46 @@ const labelClass =
 
 const contactCardClass =
   'border border-white/10 bg-white/[0.035] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.18)]';
+
+const helpTopics = [
+  {
+    title: 'Product Selection',
+    text: 'Share the room type, ceiling height, room size, preferred finish, and reference images so we can suggest the right chandelier, pendant, wall light, or lamp.',
+    Icon: Sparkles,
+  },
+  {
+    title: 'Order Support',
+    text: 'For order status, payment, invoice, dispatch, or delivery help, include your order ID, registered phone number, and payment reference if available.',
+    Icon: Truck,
+  },
+  {
+    title: 'After-Sales Help',
+    text: 'For damaged, wrong, or missing products, contact us within 48 hours with photos, packaging images, invoice copy, and an unboxing video where possible.',
+    Icon: ShieldCheck,
+  },
+];
+
+const enquiryChecklist = [
+  'Product name, SKU, or collection link if you have selected an item',
+  'Installation city, delivery pin code, and preferred delivery timeline',
+  'Room size, ceiling height, false-ceiling status, and site photos for custom lighting',
+  'Order ID, invoice, payment screenshot, or tracking details for support requests',
+];
+
+const contactFaqs = [
+  {
+    question: 'How fast will the team respond?',
+    answer: 'Most enquiries are reviewed within 24 working hours from Monday to Saturday. Order, payment, and damage reports are prioritised when complete details are shared.',
+  },
+  {
+    question: 'Can I ask for a custom size or finish?',
+    answer: 'Yes. Share dimensions, finish preference, colour temperature, reference images, budget range, and timeline. The team will confirm feasibility and pricing.',
+  },
+  {
+    question: 'Should I visit directly?',
+    answer: 'Please call or message first. Appointments help us make sure the right team member and product references are available for your visit.',
+  },
+];
 
 const whatsappNumber = SITE_CONTACT.phone.replace(/\D/g, '');
 const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
@@ -242,16 +284,29 @@ export function ContactUsClient() {
           </div>
 
           <div className={contactCardClass}>
+            <h2 className="font-serif text-2xl font-light italic">Support Hours</h2>
+            <div className="mt-5 flex items-start gap-3">
+              <Clock size={17} className="mt-1 shrink-0 text-[var(--gold-light)]" strokeWidth={1.5} />
+              <div>
+                <p className="text-sm leading-6 text-white/82">{SITE_CONTACT.supportTimings}</p>
+                <p className="mt-3 text-sm leading-7 text-white/58">{responseLine} For urgent delivery or damage concerns, WhatsApp is usually the fastest option.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className={contactCardClass}>
             <h2 className="font-serif text-2xl font-light italic">Follow Us</h2>
             <div className="mt-5 flex gap-3">
               {[
-                { Icon: Instagram, href: '#', label: 'Instagram' },
+                { Icon: Instagram, href: SITE_CONTACT.instagramUrl, label: 'Instagram' },
                 { Icon: Facebook, href: '#', label: 'Facebook' },
                 { Icon: Youtube, href: '#', label: 'YouTube' },
               ].map(({ Icon, href, label }) => (
                 <a
                   key={label}
                   href={href}
+                  target={href.startsWith('http') ? '_blank' : undefined}
+                  rel={href.startsWith('http') ? 'noreferrer' : undefined}
                   aria-label={label}
                   className="flex h-11 w-11 items-center justify-center border border-white/10 bg-white/[0.04] text-white/65 transition hover:border-[var(--gold)] hover:text-[var(--gold-light)]"
                 >
@@ -270,6 +325,73 @@ export function ContactUsClient() {
             </div>
           </div>
         </aside>
+      </section>
+
+      <section className="border-y border-white/10 bg-[#10241b] px-4 py-14 sm:px-6 lg:px-10 lg:py-18">
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-3xl">
+            <p className="text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-[var(--gold)]">
+              Help Us Help You Faster
+            </p>
+            <h2 className="mt-3 font-serif text-[clamp(1.8rem,4vw,3rem)] font-light italic">
+              Add these details in your message.
+            </h2>
+          </div>
+          <div className="mt-8 grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+              {helpTopics.map(({ title, text, Icon }) => (
+                <article key={title} className={contactCardClass}>
+                  <Icon size={19} className="text-[var(--gold-light)]" strokeWidth={1.5} />
+                  <h3 className="mt-4 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-white/92">{title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-white/62">{text}</p>
+                </article>
+              ))}
+            </div>
+            <div className={`${contactCardClass} flex flex-col justify-between`}>
+              <div>
+                <h3 className="font-serif text-2xl font-light italic">Before submitting</h3>
+                <ul className="mt-5 grid list-none gap-4 p-0">
+                  {enquiryChecklist.map((item) => (
+                    <li key={item} className="flex gap-3 text-sm leading-7 text-white/70">
+                      <CheckCircle2 size={17} className="mt-1 shrink-0 text-[var(--gold-light)]" strokeWidth={1.5} />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="mt-7 border border-[rgba(228,199,124,0.18)] bg-[rgba(0,96,57,0.12)] p-5">
+                <p className="text-[0.58rem] font-bold uppercase tracking-[0.22em] text-[var(--gold-light)]">Damage or missing item?</p>
+                <p className="mt-3 text-sm leading-7 text-white/65">
+                  Keep all packaging safely, avoid installation, and send photos plus video evidence within 48 hours of delivery so the team can review the case properly.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
+        <div className="grid gap-8 lg:grid-cols-[360px_1fr] lg:items-start">
+          <div>
+            <p className="text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-[var(--gold)]">
+              Quick Answers
+            </p>
+            <h2 className="mt-3 font-serif text-[clamp(1.8rem,4vw,3rem)] font-light italic">
+              Common contact questions.
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-white/62">
+              These answers cover the details customers most often need before speaking with the Royace team.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {contactFaqs.map((faq) => (
+              <article key={faq.question} className={contactCardClass}>
+                <h3 className="text-[0.72rem] font-bold uppercase leading-6 tracking-[0.18em] text-white/90">{faq.question}</h3>
+                <p className="mt-3 text-sm leading-7 text-white/62">{faq.answer}</p>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
     </main>
   );

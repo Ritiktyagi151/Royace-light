@@ -28,11 +28,11 @@ export default function HomePromoMosaic({ categories = FALLBACK_CATEGORIES }: Ho
   return (
     <div className="bg-[#f5efe6] p-3 md:p-4">
       <motion.div
-        className="grid auto-rows-[320px] gap-3 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] lg:grid-rows-[270px_270px]"
+        className="grid auto-rows-[260px] gap-3 sm:auto-rows-[320px] md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] lg:grid-rows-[270px_270px]"
         variants={staggerContainer}
-        initial="hidden"
+        initial="show"
         whileInView="show"
-        viewport={{ once: false, amount: 0.18 }}
+        viewport={{ once: true, amount: 0.05 }}
       >
         {promoTiles.map((tile, index) => (
           <motion.div

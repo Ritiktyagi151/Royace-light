@@ -7,6 +7,7 @@ export const SITE_CONTACT = {
   phoneHref: 'tel:+919891619199',
   registeredAddress: 'Royace Lighting, 2/25 Main Road, Kirti Nagar, Near Police Station, New Delhi',
   supportTimings: 'Monday to Saturday, 10:00 AM to 7:00 PM IST',
+  instagramUrl: 'https://www.instagram.com/royace.lighting?igsh=MTBjZXhtcHZta3dpNw==',
   mapUrl:
     'https://www.google.com/maps/search/?api=1&query=Royace%20Lighting%202%2F25%20Main%20Road%20Kirti%20Nagar%20Near%20Police%20Station%20New%20Delhi',
 };

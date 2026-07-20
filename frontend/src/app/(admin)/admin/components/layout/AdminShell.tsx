@@ -315,27 +315,37 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const SidebarContent = () => (
     <>
       {/* Logo */}
-      <div className={`flex items-center gap-2.5 px-4 py-5 border-b border-gray-100 ${collapsed ? 'justify-center' : ''}`}>
-        <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm">
-          <Image
-            src="/royace-logo.png"
-            alt="Royace Lighting"
-            fill
-            sizes="36px"
-            className="object-contain p-1"
-            priority
-          />
-        </div>
-        {!collapsed && (
-          <div>
-            <p className="font-bold text-gray-900 text-sm">Royace Lighting</p>
-            <p className="text-xs text-gray-400">Admin Panel</p>
-          </div>
-        )}
+      <div className={`flex items-center border-b border-gray-100 px-4 py-5 ${collapsed ? 'justify-center' : ''}`}>
+        <Link
+          href="/admin"
+          className={`flex min-w-0 items-center gap-3 rounded-lg transition-colors hover:bg-emerald-50 ${collapsed ? 'p-1.5' : 'w-full p-2'}`}
+          aria-label="Royace Lighting admin dashboard"
+        >
+          <span className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-emerald-900/10 bg-[#f8faf6] shadow-sm">
+            <Image
+              src="/royace-logo.png"
+              alt="Royace Lighting"
+              fill
+              sizes="40px"
+              className="object-contain p-1.5"
+              priority
+            />
+          </span>
+          {!collapsed && (
+            <span className="min-w-0">
+              <span className="block truncate text-sm font-bold tracking-wide text-emerald-950">
+                ROYACE
+              </span>
+              <span className="mt-0.5 block text-[11px] font-medium uppercase tracking-[0.18em] text-emerald-700/70">
+                Admin Panel
+              </span>
+            </span>
+          )}
+        </Link>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
+      <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
         {NAV_SECTIONS.map((section) => (
           <div key={section.label} className="space-y-1">
             {!collapsed && (
@@ -351,10 +361,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
                   key={href}
                   href={href}
                   onClick={() => setMobileOpen(false)}
-                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                     active
-                      ? 'bg-gray-900 text-white'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-emerald-800 text-white shadow-sm'
+                      : 'text-gray-600 hover:bg-emerald-50 hover:text-emerald-900'
                   } ${collapsed ? 'justify-center' : ''}`}
                   title={collapsed ? label : undefined}
                 >
@@ -373,8 +383,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
       </nav>
 
       {/* Footer */}
-      <div className={`px-3 py-4 border-t border-gray-100 space-y-1`}>
-        <Link href="/admin/settings" className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors ${collapsed ? 'justify-center' : ''}`}>
+      <div className="space-y-1 border-t border-gray-100 px-3 py-4">
+        <Link href="/admin/settings" className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-emerald-50 hover:text-emerald-900 transition-colors ${collapsed ? 'justify-center' : ''}`}>
           <Settings size={18} />
           {!collapsed && 'Settings'}
         </Link>
@@ -390,14 +400,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
   );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-950">
+    <div className="flex h-screen overflow-hidden bg-[#f4f7f2] dark:bg-gray-950">
       {/* Desktop Sidebar */}
-      <aside className={`hidden md:flex flex-col border-r border-gray-100 bg-white transition-all duration-200 ${collapsed ? 'w-16' : 'w-60'}`}>
+      <aside className={`relative hidden flex-col border-r border-emerald-900/10 bg-white shadow-[8px_0_24px_rgba(6,47,36,0.05)] transition-all duration-200 md:flex ${collapsed ? 'w-16' : 'w-64'}`}>
         <SidebarContent />
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 translate-x-full bg-white border border-gray-200 rounded-r-lg p-1 shadow-sm hover:bg-gray-50 transition-colors"
-          style={{ left: collapsed ? 56 : 224 }}
+          className="absolute right-0 top-1/2 z-10 -translate-y-1/2 translate-x-1/2 rounded-full border border-emerald-900/10 bg-white p-1.5 text-emerald-700 shadow-sm transition-colors hover:bg-emerald-50 hover:text-emerald-900"
         >
           {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
         </button>
@@ -407,7 +416,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
           <div className="absolute inset-0 bg-black/30" onClick={() => setMobileOpen(false)} />
-          <aside className="relative w-64 bg-white flex flex-col shadow-xl">
+          <aside className="relative flex w-72 max-w-[86vw] flex-col bg-white shadow-xl">
             <SidebarContent />
           </aside>
         </div>
@@ -416,7 +425,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Topbar */}
-        <header className="bg-white border-b border-gray-100 px-4 py-3 shrink-0 dark:border-gray-800 dark:bg-gray-900 lg:px-6">
+        <header className="shrink-0 border-b border-emerald-900/10 bg-white/95 px-4 py-3 shadow-[0_8px_26px_rgba(6,47,36,0.05)] backdrop-blur dark:border-gray-800 dark:bg-gray-900/95 lg:px-6">
           <div className="flex items-center gap-3">
             <button className="md:hidden p-1 text-gray-600" onClick={() => setMobileOpen(true)}>
               <Menu size={20} />
@@ -435,7 +444,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                   setSearchOpen(true);
                 }}
                 placeholder="Search orders, products, customers..."
-                className="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 pl-9 pr-9 text-sm text-gray-900 outline-none transition focus:border-gray-300 focus:bg-white focus:ring-2 focus:ring-gray-900/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white dark:focus:bg-gray-900"
+              className="h-10 w-full rounded-lg border border-emerald-900/10 bg-[#f8faf6] pl-9 pr-9 text-sm text-gray-900 outline-none transition focus:border-emerald-700/35 focus:bg-white focus:ring-4 focus:ring-emerald-900/5 dark:border-gray-700 dark:bg-gray-950 dark:text-white dark:focus:bg-gray-900"
               />
               {globalSearch && (
                 <button
@@ -530,7 +539,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             >
               <Mail size={18} />
               {newEnquiries > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold leading-none text-white">
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold leading-none text-white shadow-sm">
                   {newEnquiries > 99 ? '99+' : newEnquiries}
                 </span>
               )}
@@ -544,7 +553,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               >
                 <Bell size={18} />
                 {newOrders > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white shadow-sm">
                     {newOrders > 99 ? '99+' : newOrders}
                   </span>
                 )}
@@ -593,7 +602,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               )}
             </div>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-950 text-xs font-semibold text-white shadow-sm">
                 {admin?.name?.charAt(0) || 'A'}
               </div>
               <div className="hidden sm:block">
@@ -605,7 +614,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-5 lg:p-6">
           {children}
         </main>
       </div>

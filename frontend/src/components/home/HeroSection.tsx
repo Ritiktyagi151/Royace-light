@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 export function HeroSection() {
   return (
-    <section className="relative left-1/2 h-[88vh] w-screen -translate-x-1/2 overflow-hidden bg-obsidian text-ivory">
+    <section className="relative left-1/2 h-[60vh] w-screen -translate-x-1/2 overflow-hidden bg-obsidian text-ivory md:h-[88vh]">
       <motion.video
         className="absolute inset-0 h-full w-full object-cover"
         src="/videos/video-project22.mp4"

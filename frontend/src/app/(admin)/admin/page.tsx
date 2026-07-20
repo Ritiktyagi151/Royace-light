@@ -68,11 +68,11 @@ export default function AdminDashboard() {
   });
 
   const stats = [
-    { label: 'Total Revenue', value: `Rs. ${(statsData?.revenue || 0).toLocaleString()}`, icon: IndianRupee, color: 'bg-green-50 text-green-600' },
-    { label: 'Total Orders', value: statsData?.total || 0, icon: ShoppingBag, color: 'bg-blue-50 text-blue-600' },
-    { label: 'Total Customers', value: customersData?.total || 0, icon: Users, color: 'bg-cyan-50 text-cyan-600' },
-    { label: 'Products', value: productsData?.total || 0, icon: Package, color: 'bg-purple-50 text-purple-600' },
-    { label: 'Delivered', value: statsData?.delivered || 0, icon: CheckCircle, color: 'bg-orange-50 text-orange-600' },
+    { label: 'Total Revenue', value: `Rs. ${(statsData?.revenue || 0).toLocaleString()}`, icon: IndianRupee, color: 'bg-emerald-50 text-emerald-700' },
+    { label: 'Total Orders', value: statsData?.total || 0, icon: ShoppingBag, color: 'bg-sky-50 text-sky-700' },
+    { label: 'Total Customers', value: customersData?.total || 0, icon: Users, color: 'bg-teal-50 text-teal-700' },
+    { label: 'Products', value: productsData?.total || 0, icon: Package, color: 'bg-violet-50 text-violet-700' },
+    { label: 'Delivered', value: statsData?.delivered || 0, icon: CheckCircle, color: 'bg-amber-50 text-amber-700' },
   ];
 
   const orderStatusData = statsData
@@ -97,9 +97,15 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-gray-900">Dashboard</h2>
-        <p className="text-gray-500 text-sm mt-0.5">Welcome back! Here's what's happening.</p>
+      <div className="flex flex-col gap-3 rounded-lg border border-emerald-900/10 bg-[linear-gradient(135deg,#ffffff_0%,#f8fbf2_100%)] px-5 py-4 shadow-[0_12px_34px_rgba(6,47,36,0.06)] sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Dashboard</h2>
+          <p className="mt-0.5 text-sm text-gray-500">Welcome back! Here's what's happening.</p>
+        </div>
+        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+          Live overview
+        </div>
       </div>
 
       {/* Stat cards */}
@@ -107,11 +113,11 @@ export default function AdminDashboard() {
         {stats.map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="stat-card">
             <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">{label}</p>
+              <div className="min-w-0">
+                <p className="mb-1 text-sm text-gray-500">{label}</p>
                 <p className="text-2xl font-bold text-gray-900">{value}</p>
               </div>
-              <div className={`p-3 rounded-xl ${color}`}>
+              <div className={`rounded-lg p-3 ${color}`}>
                 <Icon size={20} />
               </div>
             </div>
@@ -121,8 +127,8 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Orders by status chart */}
-        <div className="admin-card p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Orders by Status</h3>
+        <div className="admin-card p-5 sm:p-6">
+          <h3 className="mb-4 font-semibold text-gray-900">Orders by Status</h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={orderStatusData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
@@ -139,10 +145,10 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent orders */}
-        <div className="admin-card p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="admin-card p-5 sm:p-6">
+          <div className="mb-4 flex items-center justify-between">
             <h3 className="font-semibold text-gray-900">Recent Orders</h3>
-            <a href="/admin/orders" className="text-xs text-gray-500 hover:text-gray-700 font-medium">View all -</a>
+            <a href="/admin/orders" className="text-xs font-semibold text-gray-500 hover:text-gray-900">View all</a>
           </div>
           <div className="space-y-3">
             {recentOrders?.map((order: any) => (
@@ -165,8 +171,8 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="admin-card p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="admin-card p-5 sm:p-6">
+          <div className="mb-4 flex items-center justify-between">
             <h3 className="font-semibold text-gray-900">Low Stock Products</h3>
             <span className="text-xs text-gray-400">Quantity below 5</span>
           </div>
@@ -186,8 +192,8 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="admin-card p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="admin-card p-5 sm:p-6">
+          <div className="mb-4 flex items-center justify-between">
             <h3 className="font-semibold text-gray-900">Top 5 Selling Products</h3>
             <TrendingUp size={18} className="text-green-600" />
           </div>
@@ -223,7 +229,7 @@ export default function AdminDashboard() {
           { icon: Truck, label: 'In Transit', value: (statsData?.confirmed || 0) + (statsData?.shipped || 0), color: 'text-orange-500' },
           { icon: CheckCircle, label: 'Delivered', value: statsData?.delivered || 0, color: 'text-green-500' },
         ].map(({ icon: Icon, label, value, color }) => (
-          <div key={label} className="admin-card p-5 flex items-center gap-4">
+          <div key={label} className="admin-card flex items-center gap-4 p-5">
             <Icon size={28} className={color} />
             <div>
               <p className="text-sm text-gray-500">{label}</p>

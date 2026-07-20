@@ -165,20 +165,33 @@ export class AuthService {
 
   async adminLogin(dto: LoginDto) {
     const envAdmin = this.getEnvAdmin();
-    if (!envAdmin) throw new UnauthorizedException('Admin credentials are not configured');
-
     const email = dto.email.trim().toLowerCase();
-    if (email !== envAdmin.email || dto.password !== envAdmin.password) {
-      throw new UnauthorizedException('Invalid admin credentials');
+
+    if (envAdmin && email === envAdmin.email && dto.password === envAdmin.password) {
+      const token = this.createEnvAdminToken();
+      return {
+        token,
+        userId: 'env-admin',
+        role: UserRole.ADMIN,
+        name: envAdmin.name,
+        email: envAdmin.email,
+      };
     }
 
-    const token = this.createEnvAdminToken();
+    const user = await this.userModel.findOne({ email, role: UserRole.ADMIN });
+    if (!user) throw new UnauthorizedException('Invalid admin credentials');
+
+    const match = await bcrypt.compare(dto.password, user.password);
+    if (!match) throw new UnauthorizedException('Invalid admin credentials');
+    if (!user.isActive) throw new UnauthorizedException('Admin account is deactivated');
+
+    const token = this.createToken(String(user._id));
     return {
       token,
-      userId: 'env-admin',
-      role: UserRole.ADMIN,
-      name: envAdmin.name,
-      email: envAdmin.email,
+      userId: user._id,
+      role: user.role,
+      name: user.name,
+      email: user.email,
     };
   }
 

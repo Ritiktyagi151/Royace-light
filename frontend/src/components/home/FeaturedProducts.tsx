@@ -58,9 +58,9 @@ export function FeaturedProducts({ collections }: FeaturedProductsProps) {
       <motion.div
         className="mx-auto grid max-w-8xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
         variants={staggerContainer}
-        initial="hidden"
+        initial="show"
         whileInView="show"
-        viewport={{ once: false, amount: 0.12 }}
+        viewport={{ once: true, amount: 0.05 }}
       >
         {collections.map((collection, index) => (
           <motion.div key={collection._id || collection.slug} variants={index % 2 === 0 ? cardReveal : cardRevealRight}>
