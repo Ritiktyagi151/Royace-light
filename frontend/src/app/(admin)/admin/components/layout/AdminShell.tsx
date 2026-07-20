@@ -12,6 +12,7 @@ import {
   Percent,
   ChevronLeft, ChevronRight, LogOut, Menu, X, Settings,
   BarChart3, Bell, Monitor, Moon, Sun, MessageSquare, Megaphone, Search, Clock, Mail,
+  WalletCards,
 } from 'lucide-react';
 import { useAdminSelector, useAdminDispatch, adminLogout } from '@/store/admin/store';
 import { adminApi } from '@/lib/adminApi';
@@ -28,6 +29,7 @@ const NAV_SECTIONS = [
     label: 'Orders',
     items: [
       { href: '/admin/orders', icon: ShoppingBag, label: 'Orders' },
+      { href: '/admin/payments', icon: WalletCards, label: 'Payments' },
     ],
   },
   {

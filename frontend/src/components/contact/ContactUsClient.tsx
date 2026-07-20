@@ -20,7 +20,6 @@ import {
   Undo2,
   Youtube,
 } from 'lucide-react';
-import { api } from '@/lib/api';
 import { SITE_CONTACT, mailTo } from '@/lib/contact';
 
 const subjectOptions = ['Product Enquiry', 'Custom Project', 'Order Support', 'Return or Refund', 'General Query'];
@@ -78,6 +77,7 @@ const whatsappNumber = SITE_CONTACT.phone.replace(/\D/g, '');
 const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
   'Hi Royace Lighting, I need help with a lighting enquiry.',
 )}`;
+const formSubmitEndpoint = `https://formsubmit.co/ajax/${SITE_CONTACT.email}`;
 
 const mapEmbedSrc =
   'https://www.google.com/maps?q=Royace%20Lighting%202%2F25%20Main%20Road%20Kirti%20Nagar%20Near%20Police%20Station%20New%20Delhi&output=embed';
@@ -103,7 +103,18 @@ export function ContactUsClient() {
     const formData = new FormData(form);
 
     try {
-      await api.post('/enquiries', {
+      const response = await fetch(formSubmitEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          _subject: 'New Royace Lighting website enquiry',
+          _template: 'table',
+          _captcha: 'false',
+          _replyto: formData.get('email'),
+          _url: window.location.href,
         name: formData.get('name'),
         email: formData.get('email'),
         phone: formData.get('phone'),
@@ -111,12 +122,18 @@ export function ContactUsClient() {
         message: formData.get('message'),
         source: 'contact-us',
         product: new URLSearchParams(window.location.search).get('product') || undefined,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Unable to submit enquiry');
+      }
+
       setSubmitted(true);
       form.reset();
       setSelectedSubject('');
     } catch (error: any) {
-      setSubmitError(error?.response?.data?.message || 'Unable to submit enquiry. Please try again.');
+      setSubmitError(error?.message || 'Unable to submit enquiry. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
