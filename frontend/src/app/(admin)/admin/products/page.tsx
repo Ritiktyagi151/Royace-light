@@ -20,15 +20,15 @@ const EMPTY_FORM = {
 };
 
 const LIGHTING_SPEC_FIELDS = [
-  { key: 'watt', label: 'Watt', placeholder: '12', type: 'number' },
+  { key: 'watt', label: 'Watt', placeholder: '12.5', type: 'number', step: 'any' },
   { key: 'inputVoltage', label: 'Input Voltage', placeholder: '220-240V', type: 'text' },
-  { key: 'lmPerW', label: 'LM/W', placeholder: '100', type: 'number' },
-  { key: 'fluxLumin', label: 'Flux Lumin', placeholder: '1200', type: 'number' },
-  { key: 'ra', label: 'RA', placeholder: '80', type: 'number' },
+  { key: 'lmPerW', label: 'LM/W', placeholder: '100.5', type: 'number', step: 'any' },
+  { key: 'fluxLumin', label: 'Flux Lumin', placeholder: '1200.5', type: 'number', step: 'any' },
+  { key: 'ra', label: 'RA', placeholder: '80.5', type: 'number', step: 'any' },
   { key: 'chipBrand', label: 'Chip Brand', placeholder: 'CREE', type: 'text' },
-  { key: 'pf', label: 'PF', placeholder: '0.95', type: 'number', step: '0.01' },
+  { key: 'pf', label: 'PF', placeholder: '0.95', type: 'number', step: 'any' },
   { key: 'cutSize', label: 'Cut Size', placeholder: '75mm', type: 'text' },
-  { key: 'beamAngle', label: 'Beam Angle', placeholder: '36', type: 'number' },
+  { key: 'beamAngle', label: 'Beam Angle', placeholder: '36.5', type: 'number', step: 'any' },
   { key: 'ipRate', label: 'IP Rate', placeholder: 'IP65', type: 'text' },
 ];
 
@@ -828,6 +828,7 @@ export default function AdminProductsPage() {
                   <div key={key}>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
                     <input required type="number" min="0" value={(form as any)[key]}
+                      step={key === 'totalQuantity' ? '1' : 'any'}
                       onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                       className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
                   </div>
@@ -895,7 +896,7 @@ export default function AdminProductsPage() {
                 ].map(({ key, label, placeholder }) => (
                   <div key={key} className={key === 'colors' || key === 'tags' || key === 'material' ? 'col-span-2' : ''}>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
-                    <input type={key === 'weight' ? 'number' : 'text'} min={key === 'weight' ? '0' : undefined} value={(form as any)[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                    <input type={key === 'weight' ? 'number' : 'text'} min={key === 'weight' ? '0' : undefined} step={key === 'weight' ? 'any' : undefined} value={(form as any)[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                       className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
                       placeholder={placeholder} />
                     {(key === 'material' || key === 'weight') && <ShowOnProductPageToggle fieldKey={key} />}

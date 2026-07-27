@@ -17,6 +17,7 @@ import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 import { NewsletterModule } from './newsletter/newsletter.module';
 import { EnquiriesModule } from './enquiries/enquiries.module';
 import { AnnouncementsModule } from './announcements/announcements.module';
+import { DeletedItemsModule } from './deleted-items/deleted-items.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { AnnouncementsModule } from './announcements/announcements.module';
     NewsletterModule,
     EnquiriesModule,
     AnnouncementsModule,
+    DeletedItemsModule,
   ],
 })
 export class AppModule {}

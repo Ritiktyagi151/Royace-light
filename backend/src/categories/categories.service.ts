@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Category, CategoryDocument } from './category.schema';
 import { CreateCategoryDto, UpdateCategoryDto } from './category.dto';
+import { DeletedItemsService } from '../deleted-items/deleted-items.service';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -14,6 +15,7 @@ import * as fs from 'fs';
 export class CategoriesService {
   constructor(
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
+    private deletedItemsService: DeletedItemsService,
   ) {}
 
   // ─── Helpers ──────────────────────────────────────────────
@@ -166,14 +168,9 @@ export class CategoriesService {
     const category = await this.categoryModel.findById(id);
     if (!category) throw new NotFoundException('Category not found');
 
-    // Remove image file if present
-    if (category.image) {
-      const imgPath = path.join(process.cwd(), 'uploads', path.basename(category.image));
-      if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
-    }
-
+    await this.deletedItemsService.archiveDocument(category, 'category', category.name || String(category._id));
     await this.categoryModel.findByIdAndDelete(id);
-    return { message: `Category "${category.name}" deleted` };
+    return { message: `Category "${category.name}" moved to trash` };
   }
 
   // ─── Admin: reorder ───────────────────────────────────────

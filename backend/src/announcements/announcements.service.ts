@@ -3,11 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateAnnouncementDto, UpdateAnnouncementDto } from './dto/announcement.dto';
 import { Announcement, AnnouncementDocument } from './schemas/announcement.schema';
+import { DeletedItemsService } from '../deleted-items/deleted-items.service';
 
 @Injectable()
 export class AnnouncementsService {
   constructor(
     @InjectModel(Announcement.name) private announcementModel: Model<AnnouncementDocument>,
+    private deletedItemsService: DeletedItemsService,
   ) {}
 
   findPublic() {
@@ -66,8 +68,14 @@ export class AnnouncementsService {
 
   async remove(id: string) {
     this.validateObjectId(id);
-    const announcement = await this.announcementModel.findByIdAndDelete(id);
+    const announcement = await this.announcementModel.findById(id);
     if (!announcement) throw new NotFoundException('Announcement not found');
+    await this.deletedItemsService.archiveDocument(
+      announcement,
+      'announcement',
+      announcement.text?.slice(0, 80) || String(announcement._id),
+    );
+    await this.announcementModel.findByIdAndDelete(id);
     return { id };
   }
 

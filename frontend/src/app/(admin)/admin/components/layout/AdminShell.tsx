@@ -12,7 +12,7 @@ import {
   Percent,
   ChevronLeft, ChevronRight, LogOut, Menu, X, Settings,
   BarChart3, Bell, Monitor, Moon, Sun, MessageSquare, Megaphone, Search, Clock, Mail,
-  WalletCards,
+  WalletCards, Trash2,
 } from 'lucide-react';
 import { useAdminSelector, useAdminDispatch, adminLogout } from '@/store/admin/store';
 import { adminApi } from '@/lib/adminApi';
@@ -57,6 +57,7 @@ const NAV_SECTIONS = [
     label: 'Reports',
     items: [
       { href: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
+      { href: '/admin/trash', icon: Trash2, label: 'Trash' },
     ],
   },
 ];

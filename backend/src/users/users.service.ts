@@ -4,10 +4,14 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { CreateManagedUserDto, UpdateManagedUserDto } from './dto/user-management.dto';
 import { User, UserDocument, UserRole } from './schemas/user.schema';
+import { DeletedItemsService } from '../deleted-items/deleted-items.service';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private deletedItemsService: DeletedItemsService,
+  ) {}
 
   async findAll(role?: string, page?: number, limit?: number, search?: string) {
     const filter: any = {};
@@ -109,6 +113,7 @@ export class UsersService {
     if (user.role === UserRole.ADMIN) {
       await this.ensureAnotherAdmin(id, 'Last admin cannot be deleted');
     }
+    await this.deletedItemsService.archiveDocument(user, 'user', user.name || user.email || String(user._id));
     await user.deleteOne();
     return { deleted: true };
   }

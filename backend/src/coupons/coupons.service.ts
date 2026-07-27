@@ -6,6 +6,7 @@ import { CreateCouponDto, UpdateCouponDto } from './dto/coupon.dto';
 import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 import { Product, ProductDocument } from '../products/schemas/product.schema';
 import { Category, CategoryDocument } from '../categories/category.schema';
+import { DeletedItemsService } from '../deleted-items/deleted-items.service';
 
 interface Actor {
   _id?: string;
@@ -28,6 +29,7 @@ export class CouponsService {
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
     private activityLogsService: ActivityLogsService,
+    private deletedItemsService: DeletedItemsService,
   ) {}
 
   async findAll() {
@@ -68,8 +70,10 @@ export class CouponsService {
   }
 
   async remove(id: string, actor?: Actor) {
-    const coupon = await this.couponModel.findByIdAndDelete(id);
+    const coupon = await this.couponModel.findById(id);
     if (!coupon) throw new NotFoundException('Coupon not found');
+    await this.deletedItemsService.archiveDocument(coupon, 'coupon', coupon.code || coupon.name || String(coupon._id), actor);
+    await this.couponModel.findByIdAndDelete(id);
     await this.activityLogsService.log({
       actor,
       action: 'coupon.deleted',

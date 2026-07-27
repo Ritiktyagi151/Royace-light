@@ -6,6 +6,7 @@ import { Coupon, CouponSchema } from './schemas/coupon.schema';
 import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
 import { Product, ProductSchema } from '../products/schemas/product.schema';
 import { Category, CategorySchema } from '../categories/category.schema';
+import { DeletedItemsModule } from '../deleted-items/deleted-items.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { Category, CategorySchema } from '../categories/category.schema';
       { name: Category.name, schema: CategorySchema },
     ]),
     ActivityLogsModule,
+    DeletedItemsModule,
   ],
   controllers: [CouponsController],
   providers: [CouponsService],

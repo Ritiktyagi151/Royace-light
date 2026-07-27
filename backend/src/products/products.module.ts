@@ -4,6 +4,7 @@ import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
 import { Product, ProductSchema } from './schemas/product.schema';
 import { Category, CategorySchema } from '../categories/category.schema';
+import { DeletedItemsModule } from '../deleted-items/deleted-items.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { Category, CategorySchema } from '../categories/category.schema';
       { name: Product.name, schema: ProductSchema },
       { name: Category.name, schema: CategorySchema },
     ]),
+    DeletedItemsModule,
   ],
   controllers: [ProductsController],
   providers: [ProductsService],

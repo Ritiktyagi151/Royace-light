@@ -3,11 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateEnquiryDto } from './dto/enquiry.dto';
 import { Enquiry, EnquiryDocument, EnquiryStatus } from './schemas/enquiry.schema';
+import { DeletedItemsService } from '../deleted-items/deleted-items.service';
 
 @Injectable()
 export class EnquiriesService {
   constructor(
     @InjectModel(Enquiry.name) private enquiryModel: Model<EnquiryDocument>,
+    private deletedItemsService: DeletedItemsService,
   ) {}
 
   async create(dto: CreateEnquiryDto) {
@@ -105,8 +107,14 @@ export class EnquiriesService {
 
   async remove(id: string) {
     this.validateObjectId(id);
-    const enquiry = await this.enquiryModel.findByIdAndDelete(id);
+    const enquiry = await this.enquiryModel.findById(id);
     if (!enquiry) throw new NotFoundException('Enquiry not found');
+    await this.deletedItemsService.archiveDocument(
+      enquiry,
+      'enquiry',
+      enquiry.subject || enquiry.email || enquiry.name || String(enquiry._id),
+    );
+    await this.enquiryModel.findByIdAndDelete(id);
     return { id };
   }
 

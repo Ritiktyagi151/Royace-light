@@ -8,6 +8,7 @@ import { Model, Types } from 'mongoose';
 import { Product, ProductDocument, ProductImageAsset } from './schemas/product.schema';
 import { Category, CategoryDocument } from '../categories/category.schema';
 import { CreateProductDto, UpdateProductDto, ProductQueryDto } from './dto/product.dto';
+import { DeletedItemsService } from '../deleted-items/deleted-items.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sharp from 'sharp';
@@ -19,6 +20,7 @@ export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
+    private deletedItemsService: DeletedItemsService,
   ) {}
 
   async optimizeUploadedImages(
@@ -126,11 +128,9 @@ export class ProductsService {
     const product = await this.productModel.findById(id);
     if (!product) throw new NotFoundException('Product not found');
 
-    this.removeImageFiles(
-      this.getStoredImageAssets(product).flatMap((asset) => [asset.url, asset.webpUrl].filter(Boolean) as string[]),
-    );
+    await this.deletedItemsService.archiveDocument(product, 'product', product.name || product.sku || String(product._id));
     await this.productModel.findByIdAndDelete(id);
-    return { message: 'Product deleted successfully' };
+    return { message: 'Product moved to trash' };
   }
 
   async findAllAdmin(query: ProductQueryDto) {
