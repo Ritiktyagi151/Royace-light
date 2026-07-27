@@ -992,10 +992,10 @@ export default function AdminProductsPage() {
       )}
 
       {cropState && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto p-3 sm:items-center sm:p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => closeCrop(true)} />
-          <div className="relative w-full max-w-2xl rounded-2xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+          <div className="relative my-3 w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-2xl sm:my-4 sm:max-h-[calc(100svh-2rem)] sm:rounded-2xl">
+            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 sm:px-6 sm:py-4">
               <h3 className="font-semibold text-gray-900">Crop Product Image</h3>
               <button
                 type="button"
@@ -1006,10 +1006,13 @@ export default function AdminProductsPage() {
               </button>
             </div>
 
-            <div className="space-y-5 p-6">
+            <div className="max-h-[calc(100svh-5.75rem)] space-y-4 overflow-y-auto p-4 sm:space-y-5 sm:p-6">
               <div
                 className="relative mx-auto w-full max-w-lg touch-none select-none overflow-hidden rounded-xl bg-gray-100"
-                style={{ aspectRatio: cropState.naturalWidth / cropState.naturalHeight }}
+                style={{
+                  aspectRatio: cropState.naturalWidth / cropState.naturalHeight,
+                  maxHeight: 'min(52svh, 32rem)',
+                }}
                 onPointerDown={startCropDrag}
                 onPointerMove={moveCropDrag}
                 onPointerUp={endCropDrag}
@@ -1061,7 +1064,7 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:pt-2">
                 <button
                   type="button"
                   onClick={() => closeCrop(true)}
