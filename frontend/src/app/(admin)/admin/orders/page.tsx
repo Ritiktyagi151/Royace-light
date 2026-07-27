@@ -21,7 +21,6 @@ import {
   Truck,
   X,
 } from 'lucide-react';
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { adminApi } from '@/lib/adminApi';
 
 const STATUSES = ['', 'Placed', 'Confirmed', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'];
@@ -450,62 +449,13 @@ export default function AdminOrdersPage() {
   const totalPages = data?.pages || 1;
   const currentPage = data?.page || page;
   const allVisibleSelected = orders.length > 0 && orders.every((order: any) => selectedOrderIds.includes(order._id));
-  const currentPagePaymentSummary = orders.reduce((acc: any, order: any) => {
-    if (order?.isDeleted || ['Cancelled', 'Returned'].includes(order?.status)) return acc;
-    const amount = Number(order?.amount || 0);
-    acc.totalAmount += amount;
-    if (order?.payment) {
-      acc.paidAmount += amount;
-      acc.paidOrders += 1;
-      if (order.paymentMethod === 'online' || order.paymentMethod === 'razorpay') {
-        acc.onlinePaidAmount += amount;
-      }
-    } else {
-      acc.dueAmount += amount;
-      acc.dueOrders += 1;
-      if (!order.paymentMethod || order.paymentMethod === 'cod') {
-        acc.codDueAmount += amount;
-      }
-    }
-    return acc;
-  }, {
-    totalAmount: 0,
-    paidAmount: 0,
-    dueAmount: 0,
-    onlinePaidAmount: 0,
-    codDueAmount: 0,
-    paidOrders: 0,
-    dueOrders: 0,
-  });
-  const hasStatsPayment = Boolean(statsData?.payment && Number(statsData.payment.totalAmount || 0) > 0);
   const summary = {
     totalOrders: statsData?.total || 0,
-    totalRevenue: hasStatsPayment ? statsData?.payment?.paidAmount || 0 : currentPagePaymentSummary.paidAmount,
+    totalRevenue: statsData?.revenue || 0,
     pendingOrders: statsData?.pending || 0,
     todaysOrders: statsData?.todaysOrders || 0,
     deletedOrders: statsData?.deleted || 0,
   };
-  const paymentSummary = hasStatsPayment ? {
-    totalAmount: statsData?.payment?.totalAmount || 0,
-    paidAmount: statsData?.payment?.paidAmount || 0,
-    dueAmount: statsData?.payment?.dueAmount || 0,
-    onlinePaidAmount: statsData?.payment?.onlinePaidAmount || 0,
-    codDueAmount: statsData?.payment?.codDueAmount || 0,
-    paidOrders: statsData?.payment?.paidOrders || 0,
-    dueOrders: statsData?.payment?.dueOrders || 0,
-  } : currentPagePaymentSummary;
-  const paidPercent = paymentSummary.totalAmount
-    ? Math.min(100, Math.round((paymentSummary.paidAmount / paymentSummary.totalAmount) * 100))
-    : 0;
-  const paymentBreakdownData = [
-    { name: 'Online Paid', value: Number(paymentSummary.onlinePaidAmount || 0), color: '#16a34a' },
-    { name: 'COD Due', value: Number(paymentSummary.codDueAmount || 0), color: '#f59e0b' },
-    {
-      name: 'Other Due',
-      value: Math.max(0, Number(paymentSummary.dueAmount || 0) - Number(paymentSummary.codDueAmount || 0)),
-      color: '#dc2626',
-    },
-  ].filter((item) => item.value > 0);
 
   const resetPage = () => setPage(1);
   const activeOrderView = ORDER_VIEWS.find((view) => view.key === orderView) || ORDER_VIEWS[0];
@@ -756,82 +706,6 @@ export default function AdminOrdersPage() {
           </div>
         ))}
       </div>
-
-      <section className="admin-card overflow-hidden">
-        <div className="border-b border-gray-100 px-5 py-4">
-          <h3 className="text-base font-bold text-gray-900">Payment Dashboard</h3>
-          <p className="mt-0.5 text-sm text-gray-500">
-            Paid, due, and billable order amount overview.
-            {!hasStatsPayment && orders.length > 0 && ' Showing current page until payment stats refresh.'}
-          </p>
-        </div>
-        <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            { label: 'Total Billable Amount', value: formatCurrency(paymentSummary.totalAmount), helper: 'Active orders only', icon: ShoppingBag, color: 'bg-blue-50 text-blue-700' },
-            { label: 'Paid Amount', value: formatCurrency(paymentSummary.paidAmount), helper: `${paymentSummary.paidOrders} paid order(s)`, icon: CreditCard, color: 'bg-green-50 text-green-700' },
-            { label: 'Amount Due', value: formatCurrency(paymentSummary.dueAmount), helper: `${paymentSummary.dueOrders} pending payment(s)`, icon: AlertCircle, color: 'bg-red-50 text-red-700' },
-            { label: 'COD Due', value: formatCurrency(paymentSummary.codDueAmount), helper: 'Cash collection pending', icon: Package, color: 'bg-amber-50 text-amber-700' },
-          ].map(({ label, value, helper, icon: Icon, color }) => (
-            <div key={label} className="rounded-lg border border-gray-100 bg-white p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{label}</p>
-                  <p className="mt-2 text-xl font-bold text-gray-900">{value}</p>
-                  <p className="mt-1 text-xs text-gray-500">{helper}</p>
-                </div>
-                <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${color}`}>
-                  <Icon size={18} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 gap-5 border-t border-gray-100 px-5 py-4 lg:grid-cols-[1fr_280px]">
-          <div>
-            <div className="mb-2 flex items-center justify-between gap-3 text-sm">
-              <span className="font-semibold text-gray-700">Payment collection</span>
-              <span className="font-semibold text-gray-900">{paidPercent}% paid</span>
-            </div>
-            <div className="h-3 overflow-hidden rounded-full bg-red-100">
-              <div className="h-full rounded-full bg-green-500 transition-all" style={{ width: `${paidPercent}%` }} />
-            </div>
-            <div className="mt-2 flex flex-wrap justify-between gap-3 text-xs text-gray-500">
-              <span>Online paid: {formatCurrency(paymentSummary.onlinePaidAmount)}</span>
-              <span>Due: {formatCurrency(paymentSummary.dueAmount)}</span>
-            </div>
-          </div>
-          <div className="rounded-lg border border-gray-100 bg-white p-3">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">Payment split</p>
-            {paymentBreakdownData.length ? (
-              <div className="grid grid-cols-[120px_1fr] items-center gap-3">
-                <ResponsiveContainer width="100%" height={120}>
-                  <PieChart>
-                    <Pie data={paymentBreakdownData} dataKey="value" innerRadius={34} outerRadius={55} paddingAngle={3}>
-                      {paymentBreakdownData.map((entry) => (
-                        <Cell key={entry.name} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="space-y-1.5">
-                  {paymentBreakdownData.map((item) => (
-                    <div key={item.name} className="flex items-center justify-between gap-2 text-xs">
-                      <span className="flex items-center gap-2 text-gray-600">
-                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                        {item.name}
-                      </span>
-                      <span className="font-semibold text-gray-900">{formatCurrency(item.value)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <p className="py-8 text-center text-sm text-gray-400">No payment data</p>
-            )}
-          </div>
-        </div>
-      </section>
 
       {statusError && (
         <div className="flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
