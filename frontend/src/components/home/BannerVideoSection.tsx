@@ -32,7 +32,7 @@ export default function ExperienceStoresSection() {
         <div className="pointer-events-auto absolute right-6 top-6 w-[520px] xl:right-10 xl:w-[680px] 2xl:w-[760px]">
           <div className="overflow-hidden border-[5px] border-[#8a7355] bg-white shadow-2xl">
             <video
-              src="/videos/video-project22.mp4"
+              src="/videos/store-video.mp4"
               poster="/images/homepage-img/light.webp"
               autoPlay
               muted
@@ -49,7 +49,7 @@ export default function ExperienceStoresSection() {
       <div className="mt-12 px-6 lg:hidden">
         <div className="overflow-hidden border-[4px] border-[#8a7355] shadow-xl">
           <video
-            src="/videos/video-project22.mp4"
+            src="/videos/store-video.mp4"
             poster="/images/homepage-img/light.webp"
             autoPlay
             muted
