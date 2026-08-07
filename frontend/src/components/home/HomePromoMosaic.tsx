@@ -76,9 +76,9 @@ export default function HomePromoMosaic({ categories = FALLBACK_CATEGORIES }: Ho
                 <h3 className="mt-2  text-2xl   leading-none text-white">
                   {tile.name}
                 </h3>
-                <p className="max-w-md overflow-hidden text-[8px] font-semibold uppercase tracking-[0.28em] text-[#e4dac3]  [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+                {/* <p className="max-w-md overflow-hidden text-[8px] font-semibold uppercase tracking-[0.28em] text-[#e4dac3]  [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
                   {getKicker(tile)}
-                </p>
+                </p> */}
               </div>
             </Link>
           </motion.div>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Instagram, Facebook, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+import { Instagram, Facebook, Mail, Phone, MapPin } from 'lucide-react';
 import { useMemo } from 'react';
 import { usePublicCategories } from '@/hooks/usePublicCategories';
 import { categoryHref, FALLBACK_CATEGORIES } from '@/lib/publicCategories';
@@ -46,6 +46,21 @@ const iconLinkClass =
 
 const primaryLinkClass =
   'inline-flex items-center justify-center gap-2 overflow-hidden border border-[var(--gold)] bg-[var(--gold)] px-6 py-4 text-center text-[0.58rem] font-medium uppercase tracking-[0.16em] text-[var(--obsidian)] transition-all duration-300 hover:bg-[linear-gradient(135deg,var(--gold-light),var(--gold-deep))] hover:shadow-[var(--glow-gold-sm)] sm:px-10 sm:tracking-[0.18em]';
+
+function XLogo() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="currentColor"
+      className="block"
+      aria-hidden="true"
+    >
+      <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.847h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.153h7.594l5.243 6.932 6.064-6.932Zm-1.293 19.492h2.039L6.486 3.24H4.298l13.31 17.405Z" />
+    </svg>
+  );
+}
 
 export function Footer() {
   const { data: fetchedCategories } = usePublicCategories();
@@ -113,19 +128,19 @@ export function Footer() {
           {/* Socials */}
           <div className="flex gap-2">
             {[
-              { Icon: Instagram, href: SITE_CONTACT.instagramUrl },
-              { Icon: Facebook, href: '#' },
-              { Icon: Twitter, href: '#' },
-            ].map(({ Icon, href }, i) => (
+              { href: SITE_CONTACT.instagramUrl, label: 'Instagram', icon: <Instagram size={14} strokeWidth={1.5} /> },
+              { href: '#', label: 'Facebook', icon: <Facebook size={14} strokeWidth={1.5} /> },
+              { href: '#', label: 'X', icon: <XLogo /> },
+            ].map(({ href, label, icon }) => (
               <a
-                key={i}
+                key={label}
                 href={href}
                 target={href.startsWith('http') ? '_blank' : undefined}
                 rel={href.startsWith('http') ? 'noreferrer' : undefined}
                 className={iconLinkClass}
-                aria-label="Royace social profile"
+                aria-label={`Royace ${label} profile`}
               >
-                <Icon size={14} strokeWidth={1.5} />
+                {icon}
               </a>
             ))}
           </div>
