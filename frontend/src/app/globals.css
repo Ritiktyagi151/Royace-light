@@ -291,6 +291,21 @@
   .home-page {
     @apply overflow-hidden bg-[#12261d] text-[#faf7f0];
   }
+
+  @media (min-width: 821px) {
+    .hero-video-section {
+      height: 88vh;
+    }
+
+    .hero-video-desktop {
+      display: block;
+    }
+
+    .hero-video-mobile,
+    .hero-video-caption {
+      display: none;
+    }
+  }
 }
 
 @keyframes fadeIn {
