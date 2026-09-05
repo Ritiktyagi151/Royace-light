@@ -306,6 +306,21 @@
       display: none;
     }
   }
+
+  @media (min-width: 821px) and (max-width: 1180px) and (orientation: portrait) {
+    .hero-video-section {
+      height: 70vh;
+    }
+
+    .hero-video-desktop {
+      display: none;
+    }
+
+    .hero-video-mobile,
+    .hero-video-caption {
+      display: block;
+    }
+  }
 }
 
 @keyframes fadeIn {
