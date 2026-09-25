@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { cardReveal, cardRevealRight, SectionReveal, staggerContainer } from './SectionReveal';
@@ -12,6 +13,8 @@ type FeaturedProductsProps = {
 };
 
 export function FeaturedProducts({ collections }: FeaturedProductsProps) {
+  const [showAll, setShowAll] = useState(false);
+
   if (!collections.length) {
     return (
       <SectionReveal direction="left" className="bg-[#f5efe6] px-4 py-16 text-[#173126] sm:px-6 lg:px-10 lg:py-24">
@@ -56,14 +59,27 @@ export function FeaturedProducts({ collections }: FeaturedProductsProps) {
       </div>
 
       <motion.div
-        className="mx-auto grid max-w-8xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+        id="featured-collections"
+        className="mx-auto flex max-w-8xl flex-wrap gap-5"
         variants={staggerContainer}
         initial="show"
         whileInView="show"
         viewport={{ once: true, amount: 0.05 }}
       >
         {collections.map((collection, index) => (
-          <motion.div key={collection._id || collection.slug} variants={index % 2 === 0 ? cardReveal : cardRevealRight}>
+          <motion.div
+            key={collection._id || collection.slug}
+            className={`min-w-0 grow basis-full sm:basis-[calc((100%-1.25rem)/2)] lg:basis-[calc((100%-3.75rem)/4)] ${
+              showAll || index < 3
+                ? ''
+                : index < 6
+                  ? 'hidden sm:block'
+                  : index < 12
+                    ? 'hidden lg:block'
+                    : 'hidden'
+            }`}
+            variants={index % 2 === 0 ? cardReveal : cardRevealRight}
+          >
             <Link
               href={categoryHref(collection)}
               className="group flex h-full min-h-[420px] flex-col overflow-hidden border border-[#173126]/12 bg-white text-[#173126] shadow-[0_18px_50px_rgba(23,49,38,0.1)] outline-none transition duration-300 hover:-translate-y-1 hover:shadow-[0_26px_70px_rgba(23,49,38,0.16)] focus-visible:ring-2 focus-visible:ring-[#006039]/40"
@@ -74,7 +90,7 @@ export function FeaturedProducts({ collections }: FeaturedProductsProps) {
                     src={collection.image}
                     alt={collection.name}
                     fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    sizes="100vw"
                     className="object-cover transition duration-700 group-hover:scale-105"
                   />
                 ) : (
@@ -105,6 +121,19 @@ export function FeaturedProducts({ collections }: FeaturedProductsProps) {
           </motion.div>
         ))}
       </motion.div>
+      {!showAll && collections.length > 3 && (
+        <div className={`mt-10 text-center ${collections.length <= 6 ? 'sm:hidden' : collections.length <= 12 ? 'lg:hidden' : ''}`}>
+          <button
+            type="button"
+            aria-controls="featured-collections"
+            aria-expanded={showAll}
+            onClick={() => setShowAll(true)}
+            className="inline-flex items-center gap-2 bg-[#006039] px-6 py-3 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-[#0b7a4d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#006039]"
+          >
+            Show More <ArrowRight size={14} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

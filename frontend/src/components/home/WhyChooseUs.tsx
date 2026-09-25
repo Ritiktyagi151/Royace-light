@@ -87,7 +87,7 @@ export function WhyChooseUs() {
       </div>
 
       <motion.div
-        className="relative mx-auto grid max-w-7xl grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+        className="relative mx-auto grid max-w-7xl auto-rows-fr grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
         variants={staggerContainer}
         initial="hidden"
         whileInView="show"
@@ -95,7 +95,7 @@ export function WhyChooseUs() {
       >
         {reasons.map(({ icon: Icon, title, desc, stat, statLabel }, index) => (
           <motion.div key={title} variants={index % 2 === 0 ? cardReveal : cardRevealRight}>
-            <div className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-sm border border-[#006039]/12 bg-white p-7 shadow-[0_22px_60px_rgba(28,51,36,0.08)] transition duration-300 hover:-translate-y-1 hover:border-[#006039]/40 hover:shadow-[0_28px_70px_rgba(28,51,36,0.14)]">
+            <div className="group relative flex h-full min-h-[280px] flex-col overflow-hidden rounded-sm border border-[#006039]/12 bg-white p-7 shadow-[0_22px_60px_rgba(28,51,36,0.08)] transition duration-300 hover:-translate-y-1 hover:border-[#006039]/40 hover:shadow-[0_28px_70px_rgba(28,51,36,0.14)]">
               <span className="absolute right-6 top-6 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#006039]/30">
                 {String(index + 1).padStart(2, '0')}
               </span>
